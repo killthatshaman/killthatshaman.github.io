@@ -3,7 +3,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>thatshaman&#39;s site</title>
+  <title>friends - thatshaman&#39;s site</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
@@ -11,19 +11,22 @@
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
   <meta property="og:type" content="website">
-<meta property="og:title" content="thatshaman&#39;s site">
-<meta property="og:url" content="http://shiroinu.top/index.html">
+<meta property="og:title" content="friends">
+<meta property="og:url" content="http://shiroinu.top/friends.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://www.chainwon.com/static/logo.png">
+<meta property="og:updated_time" content="2019-08-07T14:42:19.390Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="thatshaman&#39;s site">
+<meta name="twitter:title" content="friends">
+<meta name="twitter:image" content="https://www.chainwon.com/static/logo.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1565189287766">
+  <link rel="stylesheet" href="/css/style.css?v=1565189287798">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -148,58 +151,77 @@
               <i class="mdui-icon material-icons">menu</i>
             </a>
           </div>
-        <section class="nexmoe-posts" id="brand-waterfall">
-    
-    <div class="nexmoe-post">
-        <a href="/2019/08/07/pwnable-xyz-welcome-WriteUp/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png">
-                
-                <h1>pwnable.xyz welcome WriteUp</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月07日</a>
-            <a><i class="nexmoefont icon-areachart"></i>222 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-                <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
-            
-        </div>
-        <article>
-            
-            <p>开始做pwnable.xyz上的题目了，记录下做题的思路。</p>
-            
-        </article>
-    </div>
-    
-    <div class="nexmoe-post">
-        <a href="/2019/08/03/hello-world/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png">
-                
-                <h1>Hello World</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月03日</a>
-            <a><i class="nexmoefont icon-areachart"></i>75 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-        </div>
-        <article>
-            
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-            
-        </article>
-    </div>
-    
-</section>
+        <style>
+  article ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: -5px;
+  }
+  article ul li {
+    transition: all .03s;
+    width: calc(12.5% - 10px);
+    margin: 5px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    font-size: 0;
+    overflow: hidden;
+  }
+  article ul li > a::after {
+    font-size: 13px;
+    color: #606266;
+    -webkit-transition: none;
+    transition: none;
+    content: attr(title);
+    display: block;
+    position: relative;
+    width: 100%;
+    border: none;
+    padding: 3px 10px 5px 10px;
+    margin-top: -2px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  article ul li img {
+    width: 100%;
+    border-radius: 0;
+    border: none;
+  }
+  @media screen and (max-width: 768px) {
+    article ul li {
+      width: calc(33.3333333333% - 10px);
+    }
+}
+</style>
 
+<div class="nexmoe-post">
+  <article class="nexmoe-py">
+    <ul>
+<li><a href="https://www.chainwon.com/" title="轻惋导航" target="_blank" rel="noopener"><img src="https://www.chainwon.com/static/logo.png" alt="轻惋导航"></a></li>
+</ul>
+
+  </article>
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>

