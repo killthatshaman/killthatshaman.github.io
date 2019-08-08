@@ -4,6 +4,46 @@
   
     
     <entry>
+      <title>pwnable.xyz add WriteUP</title>
+      <link href="/2019/08/08/add/"/>
+      <url>/2019/08/08/add/</url>
+      
+        <content type="html"><![CDATA[<p>pwnable.xyz 上的add的WriteUP。</p><a id="more"></a><h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="http://i2.tiimg.com/696456/0f3701a7745115c4.png" alt="Markdown"></p><p>依旧是拖进IDA</p><p><img src="http://i2.tiimg.com/696456/745835338a81ed4f.png" alt="Markdown"></p><p><img src="http://i2.tiimg.com/696456/6cef7378623e6976.png" alt="Markdown"></p><p>注意到<code>win()</code>函数可获得flag，地址为0x400822 == 4196386。而<code>v7[v6] = v4 + v5</code>这一步可以任意覆写栈上内容，只要利用这个修改位于<code>rbp + 8</code>的ret地址，然后在第二次while循环时输入任意非数字字符使得<code>scanf()</code>返回值 != 3，在return时就可cat /flag 。</p><h2 id="计算"><a href="#计算" class="headerlink" title="计算"></a>计算</h2><p> v7 = rbp - 60h ; ret地址 = rbp + 8h ; 因此距离为0x68 = 104。值得注意的是v7数组类型是 <em>int64</em> ，占8个字节，所以 v6应该等于 104 / 8 == 13。  </p><p>另一边，v4 + v5 = win()函数的入口地址 = 4196386d即可。</p><h3 id="最终输入"><a href="#最终输入" class="headerlink" title="最终输入"></a>最终输入</h3><p>依旧不用写EXP</p><p>第一次循环 v4 = 4196385 v5 = 1 v6 =13</p><p>第二次循环，随便打个字母就行。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> ctf </tag>
+            
+            <tag> pwn </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>pwnable.xyz sub WriteUp</title>
+      <link href="/2019/08/08/sub/"/>
+      <url>/2019/08/08/sub/</url>
+      
+        <content type="html"><![CDATA[<p> pwnable.xyz上的白给题的wp。</p><a id="more"></a><h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="http://i2.tiimg.com/696456/4df890822636f8f2.png" alt="Markdown">  </p><p>直接拖进IDA:</p><p><img src="http://i2.tiimg.com/696456/ae51a0863b07f649.png" alt="Markdown"></p><p>只要满足v4 - v5 == 4919即可。所以v4=4918，v5=-1就行了，连EXP都不用写。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> ctf </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>pwnable.xyz welcome WriteUp</title>
       <link href="/2019/08/07/pwnable-xyz-welcome-WriteUp/"/>
       <url>/2019/08/07/pwnable-xyz-welcome-WriteUp/</url>
@@ -14,9 +54,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       

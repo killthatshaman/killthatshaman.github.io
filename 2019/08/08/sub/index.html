@@ -3,27 +3,35 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>标签：pwn - thatshaman&#39;s site</title>
+  <title>pwnable.xyz sub WriteUp - thatshaman&#39;s site</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="thatshaman&#39;s site">
-<meta property="og:url" content="http://shiroinu.top/tags/pwn/index.html">
+  <meta name="description" content="pwnable.xyz上的白给题的wp。">
+<meta name="keywords" content="ctf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwnable.xyz sub WriteUp">
+<meta property="og:url" content="http://shiroinu.top/2019/08/08/sub/index.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
+<meta property="og:description" content="pwnable.xyz上的白给题的wp。">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://i2.tiimg.com/696456/4df890822636f8f2.png">
+<meta property="og:image" content="http://i2.tiimg.com/696456/ae51a0863b07f649.png">
+<meta property="og:updated_time" content="2019-08-08T13:35:11.447Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="thatshaman&#39;s site">
+<meta name="twitter:title" content="pwnable.xyz sub WriteUp">
+<meta name="twitter:description" content="pwnable.xyz上的白给题的wp。">
+<meta name="twitter:image" content="http://i2.tiimg.com/696456/4df890822636f8f2.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1565272382121">
+  <link rel="stylesheet" href="/css/style.css?v=1565272382116">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -148,60 +156,48 @@
               <i class="mdui-icon material-icons">menu</i>
             </a>
           </div>
-        <section class="nexmoe-posts" id="brand-waterfall">
-    
-    <div class="nexmoe-post">
-        <a href="/2019/08/08/add/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png">
-                
-                <h1>pwnable.xyz add WriteUP</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月08日</a>
-            <a><i class="nexmoefont icon-areachart"></i>188 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-                <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
-            
-        </div>
-        <article>
-            
-            <p>pwnable.xyz 上的add的WriteUP。</p>
-            
-        </article>
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>pwnable.xyz sub WriteUp</h1>
     </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月08日</a>
+    <a><i class="nexmoefont icon-areachart"></i>39 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
     
-    <div class="nexmoe-post">
-        <a href="/2019/08/07/pwnable-xyz-welcome-WriteUp/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png">
-                
-                <h1>pwnable.xyz welcome WriteUp</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月07日</a>
-            <a><i class="nexmoefont icon-areachart"></i>222 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-                <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
-            
-        </div>
-        <article>
-            
-            <p>开始做pwnable.xyz上的题目了，记录下做题的思路。</p>
-            
-        </article>
-    </div>
     
-</section>
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a>
+    
+  </div>
+  <article>
+    <p> pwnable.xyz上的白给题的wp。</p>
+<a id="more"></a>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="http://i2.tiimg.com/696456/4df890822636f8f2.png" alt="Markdown">  </p>
+<p>直接拖进IDA:</p>
+<p><img src="http://i2.tiimg.com/696456/ae51a0863b07f649.png" alt="Markdown"></p>
+<p>只要满足v4 - v5 == 4919即可。所以v4=4918，v5=-1就行了，连EXP都不用写。</p>
 
+  </article>
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
