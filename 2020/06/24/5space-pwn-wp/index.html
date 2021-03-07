@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="广莫之野">
 <meta property="og:description" content="第五空间智能安全大赛pwn题的wp">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-06-24T13:35:10.013Z">
+<meta property="og:updated_time" content="2020-09-29T04:25:49.652Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="5space pwn writeup">
 <meta name="twitter:description" content="第五空间智能安全大赛pwn题的wp">
@@ -30,7 +30,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1593005764751">
+  <link rel="stylesheet" href="/css/style.css?v=1615121782746">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -54,7 +54,7 @@
         </a>
     </div>
     <div class="nexmoe-count">
-        <div><span>文章</span>18</div>
+        <div><span>文章</span>20</div>
         <div><span>标签</span>2</div>
         <div><span>分类</span>0</div>
     </div>
@@ -110,7 +110,7 @@
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">文章归档</h3>
     <div class="nexmoe-widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
     </div>
   </div>
 
@@ -118,7 +118,7 @@
   
 </aside>
     <div class="nexmoe-copyright">
-        &copy; 2020 tsts
+        &copy; 2021 tsts
         Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
         & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
     </div>
@@ -177,7 +177,8 @@
 <pre><code class="bash">sudo mv ld-uClibc-1.0.34.so ld-uClibc.so.0
 sudo mv ld-uClibc.so.0 /lib/
 sudo mv libuClibc-1.0.34.so libc.so.0
-sudo mv libc.so.0 /lib/</code></pre>
+sudo mv libc.so.0 /lib/ 
+//显示缺什么就把ld和libc重命名过去</code></pre>
 <p>之后</p>
 <pre><code class="bash">qemu-arm -L ./lib ./a.out</code></pre>
 <p>就可以运行了<br>调试的话</p>
@@ -375,7 +376,7 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1593005764756"></script>
+<script src="/js/app.js?v=1615121782749"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 
