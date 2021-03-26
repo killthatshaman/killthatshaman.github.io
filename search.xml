@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>网易云UWP版安装/配置相关细节</title>
+      <link href="/2021/03/26/wangyiyun-uwp-install/"/>
+      <url>/2021/03/26/wangyiyun-uwp-install/</url>
+      
+        <content type="html"><![CDATA[<p>在另一台电脑上折腾了一下一直用的网易云UWP版的安装细节.</p><a id="more"></a><h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>从<a href="https://github.com/JasonWei512/NetEase-Cloud-Music-UWP-Repack" target="_blank" rel="noopener">这里</a>下载uwp安装包，然后按照说明安装。<br>如果连接不上microsoft store记得关代理。</p><h1 id="登录"><a href="#登录" class="headerlink" title="登录"></a>登录</h1><p>参考<a href="https://www.bilibili.com/read/cv9556360" target="_blank" rel="noopener">这里</a></p><h1 id="在开了系统代理的情况下显示网络错误的解决办法"><a href="#在开了系统代理的情况下显示网络错误的解决办法" class="headerlink" title="在开了系统代理的情况下显示网络错误的解决办法"></a>在开了系统代理的情况下显示网络错误的解决办法</h1><p>参考<a href="https://zhuanlan.zhihu.com/p/29989157" target="_blank" rel="noopener">这里</a>,找到网易云uwp的SID即可.</p><p>更快捷的方法,我使用的NetLimiterPro自带显示SID,无需打开regedit.<br>clash安装目录下自带<code>EnableLoopback.exe</code>,直接勾选也可以.</p><p>之后就可以正常使用了.</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> others </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>d3ctf-qemu逃逸-d3dev writeup</title>
       <link href="/2021/03/07/d3ctf-qemu-escape-d3dev-writeup/"/>
       <url>/2021/03/07/d3ctf-qemu-escape-d3dev-writeup/</url>
