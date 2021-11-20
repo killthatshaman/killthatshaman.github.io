@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>ubuntu安装流程记录 - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="记录新装的ubuntu20.04/配置/美化的过程">
+<meta name="keywords" content="others">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ubuntu安装流程记录">
+<meta property="og:url" content="http://shiroinu.top/2021/10/27/ubuntu-setup/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="记录新装的ubuntu20.04/配置/美化的过程">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-11-15T10:36:10.357Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ubuntu安装流程记录">
+<meta name="twitter:description" content="记录新装的ubuntu20.04/配置/美化的过程">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1637381239068">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>32</div>
+        <div><span>标签</span>3</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/pwn/" style="font-size: 15px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>ubuntu安装流程记录</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年10月27日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 5 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/others/">others</a>
+    
+  </div>
+  <article>
+    <p>记录新装的ubuntu20.04/配置/美化的过程</p>
+<a id="more"></a>
+<h1 id="安装环境"><a href="#安装环境" class="headerlink" title="安装环境"></a>安装环境</h1><p>创建安装过程略/配置内存4GB/2核cpu/30G硬盘</p>
+<p>apt换清华源</p>
+<pre><code class="bash">sudo apt install vim
+vim /etc/apt/sources.list
+</code></pre>
+<p>直接换https会显示<code>Certificate verification failed: The certificate is NOT trusted.</code></p>
+<pre><code class="bash">sudo apt install ca-certificates</code></pre>
+<p>然后再update即可</p>
+<p>安装python等环境</p>
+<pre><code class="bash">sudo apt install python3-pip</code></pre>
+<p>pip换源</p>
+<pre><code class="bash">cd ~
+mkdir .pip
+cd .pip/
+touch pip.conf
+sudo vim pip.conf</code></pre>
+<p>设置sudo无需密码</p>
+<pre><code class="bash">sudo su
+vim /etc/sudoers</code></pre>
+<p>在最后一行加上<code>srin    ALL=(ALL) NOPASSWD: ALL</code></p>
+<h2 id="装pwn环境"><a href="#装pwn环境" class="headerlink" title="装pwn环境"></a>装pwn环境</h2><pre><code class="bash">sudo apt install git
+sudo apt install gcc-multilib
+sudo apt install libc6:i386
+pip install pwntools</code></pre>
+<h3 id="vscode"><a href="#vscode" class="headerlink" title="vscode"></a>vscode</h3><p>官网下.deb复制进去之后</p>
+<pre><code class="bash">sudo dpkg -i ./code_1.61.2-1634656828_amd64.deb</code></pre>
+<h3 id="patchelf"><a href="#patchelf" class="headerlink" title="patchelf"></a>patchelf</h3><p>github上下源码</p>
+<pre><code class="bash">./bootstrap.sh
+./configure
+make
+make check
+sudo make install
+</code></pre>
+<h3 id="pwntools"><a href="#pwntools" class="headerlink" title="pwntools"></a>pwntools</h3><pre><code class="bash">git clone https://github.com/pwndbg/pwndbg
+cd pwndbg
+./setup.sh
+</code></pre>
+<blockquote>
+<p>最新版有bug,qemu远程调试的时候vmmap指令不能正确分析,建议随便换个旧版</p>
+</blockquote>
+<p>修改/pwndbg/commands/heap.py</p>
+<pre><code class="python">@pwndbg.commands.ParsedCommand
+@pwndbg.commands.OnlyWhenRunning
+def fake_fastbin_all(addr):
+  &quot;&quot;&quot;
+  Finds candidate fake fast chunks that will overlap with the specified
+  address. Used for fastbin dups and house of spirit
+  &quot;&quot;&quot;
+  main_heap = pwndbg.heap.current
+  max_fast = main_heap.global_max_fast
+  max_idx  = main_heap.fastbin_index(max_fast)
+  start    = int(addr) - int(max_fast)
+  mem      = pwndbg.memory.read(start, max_fast, partial=True)
+  fmt = {
+      &#39;little&#39;: &#39;&lt;&#39;,
+      &#39;big&#39;: &#39;&gt;&#39;
+  }[pwndbg.arch.endian] + {
+      4: &#39;I&#39;,
+      8: &#39;Q&#39;
+  }[pwndbg.arch.ptrsize]
+  print(C.banner(&quot;FAKE CHUNKS&quot;))
+  for idx in range(max_idx +1):
+      if pwndbg.arch.ptrsize == 8:
+          print(message.hint(hex((idx+2)&lt;&lt;4))+&quot;: &quot;)
+      else:
+          print(message.hint(hex((idx+2)&lt;&lt;3))+&quot;: &quot;)
+      for offset in range(max_fast - pwndbg.arch.ptrsize):
+          candidate = mem[offset:offset + pwndbg.arch.ptrsize]
+          if len(candidate) == pwndbg.arch.ptrsize:
+              value = struct.unpack(fmt, candidate)[0]
+              if main_heap.fastbin_index(value&amp;0xffffffff) == idx:
+                  print(&#39;[+]&#39;,hex(start+offset-pwndbg.arch.ptrsize),&#39;, padding len:&#39;,hex(int(addr)-start-offset-pwndbg.arch.ptrsize))
+</code></pre>
+<h3 id="proxychains4"><a href="#proxychains4" class="headerlink" title="proxychains4"></a>proxychains4</h3><pre><code class="bash">sudo apt install proxychains4
+sudo vim /etc/proxychains4.conf</code></pre>
+<p>注释掉其他的,加入</p>
+<pre><code>http 192.168.134.1 7890 #主机中vmnet8的IP地址</code></pre><h3 id="qemu-armlib"><a href="#qemu-armlib" class="headerlink" title="qemu/armlib"></a>qemu/armlib</h3><p><a href="https://www.cjovi.icu/pwnreview/1353.html" target="_blank" rel="noopener">参考这篇博客</a></p>
+<pre><code class="bash">proxychains4 wget https://download.qemu.org/qemu-6.1.0.tar.xz</code></pre>
+<p>在configure时遇到<code>../meson.build:328:2: ERROR: Dependency &quot;pixman-1&quot; not found, tried pkgconfig</code><br>使用<code>sudo apt install libpixman-1-dev</code>解决</p>
+<p>下载解压之后在~/.bashrc中加入环境变量</p>
+<pre><code class="bash">export PATH=&quot;/home/srin/gcc-linaro-7.5.0-2019.12-x86_64_arm-linux-gnueabihf/bin/:$PATH&quot;</code></pre>
+<p>然后下载glibc源码,自行编译<br>报错显示缺少bison和gawk,install即可<br><code>--disable-werror</code>需要添加,否则会因为warning报错无法make<br>在编译高等级libc(2.31)时 需要添加CXX的编译选项,否则C++相关的库会被默认编译成x64而报错</p>
+<pre><code class="bash">CC=arm-none-linux-gnueabihf-gcc CFLAGS=&quot;-g -g3 -ggdb -gdwarf-4 -Og -Wno-error&quot; CXX=arm-none-linux-gnueabihf-g++ CXXFLAGS=&quot;-g -g3 -ggdb -gdwarf-4 -Og -Wno-error&quot; ../configure \
+--prefix=/home/srin/libc/libc2.31 --host=arm-linux --target=arm-linux --disable-werror
+
+make -j$(nproc)
+make install</code></pre>
+<h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><p>在使用带符号libc时,如果题目指定的ld并非<code>ld-linux-armhf.so.3</code>(比如<code>ld-linux.so.3</code>),以前的做法是直接重命名或者<code>ln -s ./ld-2.31.so ./ld-linux.so.3</code>,那么就会在调用<code>rtld_lock_lock_recursive</code>的时候出现crash,在调试时发现vmmap中有两个ld,一个是实际的<code>ld-2.31.so</code>,另一个就是题目指定的名字,qemu为这两个都映射了地址,但只有<code>ld-2.31.so</code>中存在可以访问的函数指针(另一个全都为0),程序在寻址时找的却是<code>ld-linux.so.3</code>的代码段,因此会因为地址为NULL而crash.</p>
+<h5 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h5><pre><code class="bash">patchelf --replace-needed ld-linux.so.3 ld-linux-armhf.so.3 ./kirin</code></pre>
+<h2 id="美化"><a href="#美化" class="headerlink" title="美化"></a>美化</h2><h3 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h3><pre><code class="bash">sudo apt install gnome-tweak-tool</code></pre>
+<p>去<code>https://extensions.gnome.org/</code>上装浏览器扩展<br>然后</p>
+<pre><code class="bash">sudo apt install gnome-shell-extensions</code></pre>
+<p>然后在<code>https://extensions.gnome.org/</code>上安装<code>user-themes</code>/<code>dash to dock</code>/<code>extensions</code>/<code>OpenWeather</code></p>
+<p>安装fildem<code>https://github.com/gonzaarcr/Fildem</code></p>
+<h3 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h3><p><code>https://www.gnome-look.org/</code><br>左侧GTK3/4Themes 下载Nordic中的<code>Nordic-darker-standard-buttons-v40</code><br>解压到~/.themes 打开优化,设置外观和shell<br>图标左侧FULL Icon themes,下载<code>https://www.gnome-look.org/p/1361468</code></p>
+<h3 id="zsh"><a href="#zsh" class="headerlink" title="zsh"></a>zsh</h3><pre><code class="bash">sudo apt install zsh
+sudo apt-get install fonts-powerline
+sh -c &quot;$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)&quot;
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+</code></pre>
+<p>修改<code>~/.zshrc</code>设置<br><code>plugins=(git zsh-syntax-highlighting zsh-autosuggestions)</code></p>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1637381239079"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>

